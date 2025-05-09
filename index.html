@@ -1,528 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Home | Coders Club</title>
-    <meta name="description" content="Coders Club">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-
-    <!-- External CSS -->
-    <link rel="shortcut icon" href="img/codersclub_logo.jpeg" type="image/x-icon" />
-    <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="vendor/select2/select2.min.css">
-    <link rel="stylesheet" href="vendor/owlcarousel/owl.carousel.min.css">
-    <link rel="stylesheet" href="vendor/lightcase/lightcase.css">
-     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400|Work+Sans:300,400,700" rel="stylesheet">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/style.min.css">
-    <link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
-    <!-- Modernizr JS for IE8 support of HTML5 elements and media queries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABC Store</title>
+    <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
 </head>
-<body data-target="#navbar">
-	<nav id="header-navbar" class="navbar navbar-expand-lg py-4">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center text-white" href="index.html">
-            <h3 class="font-weight-bolder mb-0">Coders Club</h3>
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-nav-header" aria-controls="navbar-nav-header" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="lnr lnr-menu"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbar-nav-header">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="about.html">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="blog.html">Blog</a>
-                </li>
-		      <li class="nav-item">
-                    <a class="nav-link" href="ARcode.html">ARcode</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Forum.html">Forum</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="references.html">References</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="contact.html">Contact</a>
-                </li>
-                <li class="nav-item">
-                    <a id="side-search-open" class="nav-link" href="#">
-                        <span class="lnr lnr-magnifier"></span>
-                    </a>
-                </li>
+<body>
+    <!-- Checkout container -->
+    <div id="checkout" hidden></div>
 
-                <li class="nav-item">
-                    <a id="tab1" class="btn btn-primary btn-shadow btn-lg" href="signin.html">Login/Register</a>
-                </li>
-                            
-                 <li class="nav-item only-desktop">
-                    <a class="nav-link" id="side-nav-open" href="#">
-                        <span class="lnr lnr-menu"></span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+    <h1>Welcome to ABC Store</h1>
 
-<div id="side-nav" class="sidenav">
-	<a href="javascript:void(0)" id="side-nav-close">&times;</a>
-	
-	<div class="sidenav-content">
-		<p>
-			Coders Club
-		</p>
-		<p>
-			<span class="fs-16 primary-color">9869803429</span>
-		</p>
-		<p>info@codersclub.com</p>
-	</div>
-</div><div id="side-search" class="sidenav">
-	<a href="javascript:void(0)" id="side-search-close">&times;</a>
-	<div class="sidenav-content">
-		<form action="">
+    <!-- Product details can be added here -->
 
-			<div class="input-group md-form form-sm form-2 pl-0">
-			  <input class="form-control my-0 py-1 red-border" type="text" placeholder="Search" aria-label="Search">
-			  <div class="input-group-append">
-			    <button class="input-group-text red lighten-3" id="basic-text1">
-			    	<span class="lnr lnr-magnifier"></span>
-			    </button>
-			  </div>
-			</div>
+    <button id="checkout-btn">Checkout</button>
 
-		</form>
-	</div>
-	
-</div>	<div class="jumbotron d-flex align-items-center">
-  <div class="container text-center">
-    <h1 class="display-1  p-4 mb-4">Coders/<br>Club</h1>
-  </div>
-  <div class="rectangle-1"></div>
-  <div class="rectangle-2"></div>
-  <div class="rectangle-transparent-1"></div>
-  <div class="rectangle-transparent-2"></div>
-  <div class="circle-1"></div>
-  <div class="circle-2"></div>
-  <div class="circle-3"></div>
-  <div class="triangle triangle-1">
-  	<img src="img/obj_triangle.png" alt="">
-  </div>
-  <div class="triangle triangle-2">
-  	<img src="img/obj_triangle.png" alt="">
-  </div>
-  <div class="triangle triangle-3">
-  	<img src="img/obj_triangle.png" alt="">
-  </div>
-  <div class="triangle triangle-4">
-  	<img src="img/obj_triangle.png" alt="">
-  </div>
-</div>	<!-- Features Section-->
-<section id="features" class="bg-white">
-    <div class="container">
-        <div class="section-content">
-            <!-- Section Title -->
-            <div class="title-wrap mb-5" data-aos="fade-up">
-                <h2 class="section-title">
-                    Welcome to Coders Club 
-                </h2>
-                <p class="section-sub-title">Our Club is dedicated for students teaching & learning, who enjoy programming. <br> We are dedicated for imparting programming skills to the upcoming young generation .</p>
-            </div>
-            <!-- End of Section Title -->
-            <div class="row">
-                <!-- Features Holder-->
-                <div class="col-md-10 offset-md-1 features-holder">
-                    <div class="row">
-                        <!-- Features Item -->
-                        <div class="col-md-4 col-sm-12 text-center mt-4">
-                            <div class="shadow rounded feature-item p-4 mb-4" data-aos="fade-up">
-                                <div class="my-4">
-                                    <i class="lnr lnr-cog fs-40"></i>
-                                </div>
-                                <h4>optimized learning experience</h4>
-                                <p>Get yourself geared up with our customized learning for you</p>
-                            </div>
-                            <div class="shadow rounded feature-item p-4 mb-4" data-aos="fade-up">
-                                <div class="my-4">
-                                    <i class="lnr lnr-frame-contract fs-40"></i>
-                                </div>
-                                <h4>Pixel Perfect</h4>
-                                <p>Get the required knowledge and start your journey now.</p>
-                            </div>
-                        </div>
-                        <!-- End of Feature Item -->
-                        <!-- Features Item -->
-                        <div class="col-md-4 col-sm-12 text-center">
-                            <div class="shadow rounded feature-item p-4 mb-4" data-aos="fade-up">
-                                <div class="my-4">
-                                    <i class="lnr lnr-bubble fs-40"></i>
-                                </div>
-                                <h4>Full Support</h4>
-                                <p>Get your customized support and </p>
-                            </div>
-                            <div class="shadow rounded feature-item p-4 mb-4" data-aos="fade-up">
-                                <div class="my-4">
-                                    <i class="lnr lnr-magic-wand fs-40"></i>
-                                </div>
-                                <h4>Clean Design</h4>
-                                <p>Begin with the design that you love.</p>
-                            </div>
-                        </div>
-                        <!-- End of Feature Item -->
-                        <!-- Features Item -->
-                        <div class="col-md-4 col-sm-12 text-center mt-4">
-                            <div class="shadow rounded feature-item p-4 mb-4" data-aos="fade-up">
-                                <div class="my-4">
-                                    <i class="lnr lnr-clock fs-40"></i>
-                                </div>
-                                <h4>Weekly Ontime Project</h4>
-                                <p>Get weekly projects to enhance your learning</p>
-                            </div>
-                            <div class="shadow rounded feature-item p-4 mb-4" data-aos="fade-up">
-                                <div class="my-4">
-                                    <i class="lnr lnr-thumbs-up fs-40"></i>
-                                </div>
-                                <h4>Practise sessions </h4>
-                                <p>It doesn't matter if you started to learn Python yesterday or are a full-stack developer with more than ten years of experience: Practice every day.</p>
-                            </div>
-                        </div>
-                        <!-- End of Feature Item -->
-                    </div>
-                </div>
-                <!-- End of Features Holder-->
-            </div>
-        </div>
-    </div>
-</section>
-<!-- End of Features Section-->	<section id="section-featurettes" class="featurettes overlay bg-fixed" style="background-image: url(img/bg.jpg);">
+    <script>
+        const options = {
+            userInfo: {
+                name: "John Doe",
+                email: "john@gmail.com",
+                state: "Bagmati",
+                country: "Nepal",
+                zipcode: "44600",
+                city: "Kathmandu",
+                address: "Chabahil",
+            },
+            clientRequestId: "CLIENT123",
+            PAPINFO: "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==",
+            oprKey: "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5",
+            inskey: "",
+            websiteDomain: "http://localhost:8080",
+            price: "5545",
+            businessName: "OneStop Shopping - Rediscover a great shopping tradition",
+            imageUrl: "http://localhost:8080/image.png",
+            currency: "NPR",
+            prefill: {
+                name: true,
+                email: true,
+                state: true,
+                city: true,
+                address: true,
+                zipcode: true,
+                country: true
+            },
+            disableFields: {
+                address: true,
+                state: true,
+            },
+            callbackUrl: {
+                successUrl: 'http://localhost:8080/success.html',
+                failUrl: 'http://localhost:8080/fail.html',
+            },
+            themeColor: "#5662FF",
+            orderInformationUI: `<div style="font-family:Arial;"><h3>Order Information</h3><div class="item" style="margin-bottom: 20px;"><div class="item"><img style="max-width: 50px; margin-right: 10px;" src="http://localhost:8080/image.png" alt="image"><p>Cup Set</p><span>Rs 450</span></div></div>`,
+            onSuccess: (options) => {
+                window.location.href = "./payment.html";
+            },
+            onError: (error) => {
+                console.error(error);
+            },
+        };
 
-    <div class="container">
-        <div class="section-content">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row align-items-center text-white">
-
-                        <div class="col-md-4 offset-md-2 col-sm-6" data-aos="fade-right">
-                            <h4 class="mb-4">Capture every moments and share it to all your friends</h4>
-                            <p>Get board of all your exam.</p>
-                            <button type="button" class="btn btn-outline-primary">FEATURES</button>
-                        </div><!--/ .col-md-4.col-md-offset-2.col-sm-6 -->
-
-                        <div class="col-md-4 offset-md-right-2 col-sm-6" data-aos="flip-right">
-                            <img class="my-5" src="img/pic1.jpg" alt="">
-                        </div><!--/ .col-md-4.col-md-offset-right-2.col-sm-6 -->
-
-                    </div><!--/ .featurettes-item -->
-
-                </div><!--/ .col-md-12 -->
-
-            </div><!--/ .row -->
-        </div>
-    </div><!--/ .container -->
-
-</section>	<section id="section-featurettes" class="featurettes">
-
-    <div class="container">
-        <div class="section-content">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row align-items-center">
-
-                        <div class="col-md-4 offset-md-2 col-sm-6" data-aos="flip-left">
-                            <img class="my-5" src="img/app-profile-mockup.png" alt="">
-                        </div><!--/ .col-md-4.col-md-offset-right-2.col-sm-6 -->
-
-                        <div class="col-md-4 offset-md-right-2 col-sm-6" data-aos="fade-left">
-                            <h4 class="mb-4">Capture every moments and share it to all your friends</h4>
-                            <p>Nulla vitae elit libero, a pharetra augue. Maecenas sed diam eget risus varius blandit sit amet non magna. Cras mattis consectetur purus sit amet.</p>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">HTML5 95%</div>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">CSS3 90%</div>
-                            </div>
-                        </div><!--/ .col-md-4.col-md-offset-2.col-sm-6 -->
-
-                    </div><!--/ .featurettes-item -->
-
-                </div><!--/ .col-md-12 -->
-
-            </div><!--/ .row -->
-        </div>
-    </div><!--/ .container -->
-
-</section>	<!-- Testimonial Section-->
-<section id="testimonial" class="section-padding bg-fixed bg-white overlay" style="background-image: url(img/bg-white.jpg);">
-    <div class="container">
-        <div class="section-content" data-aos="fade-up">
-            <div class="heading-section text-center">
-                <h2>
-                    User Testimonials
-                </h2>
-            </div>
-            <div class="row">
-                <!-- Testimonial -->
-                <div class="testi-content testi-carousel owl-carousel">
-                    <div class="testi-item text-center">
-                        <i class="testi-icon fa fa-3x fa-quote-left"></i>
-                        <h4 class="testi-text"><b>Coders Club</b> has been my ultimate guide<br> It’s best for learning coding knowledge like me!</h4>
-                        <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-                            <div class="testi-img mr-2">
-                                <img src="img/testi- 1.jpg" alt="">
-                            </div>
-                            <div class="testi-details">
-                                <p class="testi-author mb-0 font-weight-bolder">Sandeep Kumar Jha</p>
-                                <p class="testi-desc mb-0">Web Developer</p>
-                            </div>
-                        </div>
-                        
-                    </div>
-                    <div class="testi-item text-center">
-                        <i class="testi-icon fa fa-3x fa-quote-left"></i>
-                        <h4 class="testi-text">Coder Club is best resource i have used so far.<br> It’s ideal for learning coding knowledge.</h4>
-                        <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-                            <div class="testi-img mr-2">
-                                <img src="img/testi-2.jpg" alt="">
-                            </div>
-                            <div class="testi-details">
-                                <p class="testi-author mb-0 font-weight-bolder">Prince Karna</p>
-                                <p class="testi-desc mb-0">Full stack developer</p>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="testi-item text-center">
-                        <i class="testi-icon fa fa-3x fa-quote-left"></i>
-                        <h4 class="testi-text">Earlier I used to find it difficult to understand coding.<br> But coders club has helped me learn better.</h4>
-                        <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-                            <div class="testi-img mr-2">
-                                <img src="img/testi-3.jpg" alt="">
-                            </div>
-                            <div class="testi-details">
-                                <p class="testi-author mb-0 font-weight-bolder">Suraj Chaudhary</p>
-                                <p class="testi-desc mb-0">Software Engineer</p>
-                            </div>
-                        </div>
-                    </div>
-
-                     <div class="testi-content testi-carousel owl-carousel">
-                        <div class="testi-item text-center">
-                            <i class="testi-icon fa fa-3x fa-quote-left"></i>
-                            <h4 class="testi-text"><b>Coders Club</b> has been my ultimate guide<br> It’s best for learning coding knowledge like me!</h4>
-                            <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-                                <div class="testi-img mr-2">
-                                    <img src="img/testi- 1.jpg" alt="">
-                                </div>
-                                <div class="testi-details">
-                                    <p class="testi-author mb-0 font-weight-bolder">Prince Kumar Shah</p>
-                                    <p class="testi-desc mb-0">Backend developer</p>
-                                </div>
-                            </div>
-                            
-                        </div>
-                </div>
-                <!-- End of Testimonial -->
-            </div>
-        </div>
-    </div>
-</section>
-<!-- End of Testimonial Section-->	<!-- Portfolio Section -->
-<section id="portfolio" class="bg-white">
-    <div class="container">
-        <div class="section-content">
-            <!-- Section Title -->
-            <div class="title-wrap">
-                <h2 class="section-title">Our <b>Awesome</b> Courses</h2>
-                <p class="section-sub-title">Learn Courses with your ease and comfort with just few clicks</p>
-            </div>
-            
-
-                <!-- End of Portfolio Holder -->
-            </div>
-        </div>
-    </div>
-</section>
-<!-- End of Portfolio Section -->	<!-- Client Section -->
-<section id="client" class="overlay bg-fixed" style="background-image: url(img/bg.jpg);">
-    <div class="container">
-        <div class="section-content" data-aos="fade-up">
-            <div class="row ">
-                <div class="col-md-12">
-                    <!-- Section Title -->
-                    <div class="title-wrap mb-5">
-                        <h2>Courses <span> available</span> with us</h2>
-                    </div>
-                    <!-- End of Section Title -->
-                </div>
-                <!-- Client Holder -->
-                <div class="col-md-12 client-holder">
-                    <div class="client-slider owl-carousel">
-                        <div class="client-item">
-                            <img class="img-responsive" src="img/client.png" alt=" ">
-                        </div>
-                        <div class="client-item">
-                            <img class="img-responsive" src="img/Js.jpg" alt=" ">
-                        </div>
-                        <div class="client-item">
-                            <img class="img-responsive" src="img/python.jpg" alt=" ">
-                        </div>
-                        <div class="client-item">
-                            <img class="img-responsive" src="img/php.png" alt=" ">
-                        </div>
-                        <div class="client-item">
-                            <img class="img-responsive" src="img/html.png" alt=" ">
-                        </div>
-                        <div class="client-item">
-                            <img class="img-responsive" src="img/java.png" alt=" ">
-                        </div>
-                    </div>
-                    <!-- End of Client Holder -->
-                </div>
-            </div>
-        </div>
-</section>
-<!-- End of Client Section -->	<!-- Reservation Section -->
-<section id="reservation" class="bg-white section-content">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-5 offset-lg-1 mb-5 mb-lg-0" data-aos="fade-right">
-                <div class="bg-white p-5 shadow">
-                    <div class="heading-section text-center">
-                        <h2 class="mb-4">
-                            Contact Us
-                        </h2>
-                    </div>
-                    <form method="post" name="contact-us" action="">
-                        <div class="row">
-                            <div class="col-md-12 form-group">
-                                <input type="text" class="form-control" id="name" name="name" placeholder="Name">
-                            </div>
-                            <div class="col-md-12 form-group">
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Email">
-                            </div>
-                            <div class="col-md-12 form-group">
-                                <input type="number" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone">
-                            </div>
-                            <div class="col-md-12 form-group">
-                                <input type="text" class="form-control" id="websiteUrl" name="websiteUrl" placeholder="Website">
-                            </div>
-                            <div class="col-md-12 form-group">
-                                <textarea class="form-control" id="message" name="message" rows="6" placeholder="Your Message ..."></textarea>
-                            </div>
-                            <div class="col-md-12 text-center">
-                                <button class="btn btn-primary btn-shadow btn-lg" type="submit" name="submit">Send Message</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="col-lg-4 offset-lg-1" data-aos="fade-left">
-                <h2 class="mb-4">
-                    Best solution to practise your coding passion.
-                </h2>
-                <p class="mb-4">Get in hand the best solutions of the problems that your lecturer throw on you.</p>
-
-                <ul class="list-inline py-2">
-                    <li class="list-inline-item text-center">
-                        <span class="lnr fs-40 lnr-rocket"></span>
-                        <p>Fast delivery</p>
-                    </li>
-                    <li class="list-inline-item text-center">
-                        <span class="lnr fs-40 lnr-magic-wand"></span>
-                        <p>Awesome design</p>
-                    </li>
-                    <li class="list-inline-item text-center">
-                        <span class="lnr fs-40 lnr-cog"></span>
-                        <p>Easy to customize</p>
-                    </li>
-                </ul>
-
-                <a href="signin.html" class="btn btn-link p-0">
-                    <span>Register Now</span>
-                    <span class="lnr lnr-arrow-right"></span>
-                </a>
-            </div>
-        </div>
-        
-    </div>
-</section>
-<!-- End of Reservation Section -->	
-<!-- Features Section-->
-<section id="cta" class="bg-fixed overlay" style="background-image: url(img/feature.jpg);">
-    <div class="container">
-        <div class="section-content" data-aos="fade-up">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <h2 class="mb-2">Make a start now.</h2>
-                    <p>Register now and start your coding journey.</p>
-                    <a class="btn btn-outline-primary btn-lg" href="signin.html">REGISTER</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- End of Features Section--></div>
-<footer class="mastfoot my-3">
-    <div class="inner container">
-         <div class="row">
-         	<div class="col-lg-4 col-md-12 d-flex align-items-center">
-         		
-         	</div>
-         	<div class="col-lg-4 col-md-12 d-flex align-items-center">
-         		<p class="mx-auto text-center mb-0">&copy; 2022 Coders Club. Design by LBEF Students.</p>
-         	</div>
-           
-            <div class="col-lg-4 col-md-12">
-            	<nav class="nav nav-mastfoot justify-content-center">
-	                <a class="nav-link" href="www.fb.com/sandeepzha99">
-	                	<i class="fab fa-facebook-f"></i>
-	                </a>
-	                <a class="nav-link" href="#">
-	                	<i class="fab fa-twitter"></i>
-	                </a>
-	                <a class="nav-link" href="#">
-	                	<i class="fab fa-instagram"></i>
-	                </a>
-	               <a class="nav-link" href="https://www.linkedin.com/in/sandeepkumarjha1999">
-	                	<i class="fab fa-linkedin"></i>
-	                </a>
-	                <a class="nav-link" href="#">
-	                	<i class="fab fa-youtube"></i>
-	                </a>
-	            </nav>
-            </div>
-            
-        </div>
-    </div>
-</footer>	<!-- External JS -->
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-	<script src="vendor/bootstrap/popper.min.js"></script>
-	<script src="vendor/bootstrap/bootstrap.min.js"></script>
-	<script src="vendor/select2/select2.min.js "></script>
-	<script src="vendor/owlcarousel/owl.carousel.min.js"></script>
-	<script src="vendor/stellar/jquery.stellar.js" type="text/javascript" charset="utf-8"></script>
-	<script src="vendor/isotope/isotope.min.js"></script>
-	<script src="vendor/lightcase/lightcase.js"></script>
-	<script src="vendor/waypoints/waypoint.min.js"></script>
-	 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-	 
-	<!-- Main JS -->
-	<script src="js/app.min.js "></script>
-	<script src="//localhost:35729/livereload.js"></script>
+        document.getElementById('checkout-btn').addEventListener('click', function () {
+            options.baseUrl = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
+            const getpay = new GetPay(options);
+            getpay.initialize();
+        });
+    </script>
 </body>
 </html>
