@@ -1,92 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Pay with GetPay</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+  <title>Processing Payment</title>
+  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    button {
-      font-size: 1.2rem;
-      padding: 10px 20px;
-      border: none;
-      background-color: #00aaff;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0077cc;
-    }
+    body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+    #checkout { margin-top: 50px; }
   </style>
 </head>
 <body>
-
-  <h1>Complete Your Purchase</h1>
-  <button id="payNow">Pay Rs 4500</button>
-
-  <div id="result" style="margin-top: 30px;"></div>
-
-  <script>
-    const papInfo = 'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==';
-    const oprKey  = '4fa4c6b9-3f91-43e5-9b4f-319f68187ba5';
-    const baseUrl = 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions';
-    const domain  = 'https://sandeepkumarjha.com.np';
-    const amount  = 4500;
-
-    document.getElementById("payNow").addEventListener("click", function () {
-      GetPayCheckout.init({
-        papInfo,
-        baseUrl,
-        oprKey,
-        domain,
-        amount
-      });
-    });
-
-    async function sha256(message) {
-      const msgBuffer = new TextEncoder().encode(message);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function verifyToken() {
-      const fragment = window.location.hash;
-      if (!fragment.startsWith("#")) return;
-
-      const token = fragment.substring(1);
-      if (!token) return;
-
-      try {
-        const decoded = atob(token);
-        const payload = JSON.parse(decoded);
-
-        const id = payload.id;
-        const oprSecret = payload.oprSecret;
-
-        const calculatedHash = await sha256(id + oprKey);
-
-        const resultDiv = document.getElementById("result");
-        if (calculatedHash === oprSecret) {
-          resultDiv.innerHTML = `<h2 style="color:green;">✅ Payment Verified: Rs ${amount}</h2><p>Redirecting...</p>`;
-          setTimeout(() => {
-            window.location.href = '/thank-you';
-          }, 5000);
-        } else {
-          resultDiv.innerHTML = `<h2 style="color:red;">❌ Payment Verification Failed</h2><p>Invalid or tampered token</p>`;
-        }
-      } catch (err) {
-        console.error("Error verifying payment token:", err);
-      }
-    }
-
-    window.addEventListener('load', verifyToken);
-  </script>
+  <h2>Please wait while we process your payment...</h2>
+  <div id="checkout"></div>
 </body>
 </html>
