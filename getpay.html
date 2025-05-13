@@ -1,88 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Coders Club</title>
-    <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout - Java Course</title>
+  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    .btn { padding: 12px 25px; font-size: 16px; background-color: #5662FF; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    .btn:hover { background-color: #3e4dcc; }
+  </style>
 </head>
 <body>
-    <!-- Checkout container -->
-    <div id="checkout" hidden></div>
+  <h1>Buy JAVA COURSE</h1>
+  <p>Price: Rs 4500</p>
+  <button id="checkout-btn" class="btn">Proceed to Pay</button>
 
-    <h1>Welcome to Coders Club</h1>
+  <div id="checkout" hidden></div>
 
-  
-
-    <button id="checkout-btn">Checkout</button>
-
-    <script>
-        const options = {
-            userInfo: {
-                name: "Sandeep Kumar Jha",
-                email: "zhasandeep7@gmail.com",
-                state: "Bagmati",
-                country: "Nepal",
-                zipcode: "44600",
-                city: "Kathmandu",
-                address: "Kamladi",
-            },
-            clientRequestId: "CLIENT123",
-            papInfo: 'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==',
-            insKey: "",  // Replace with your valid institution key
-            oprKey: "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5",
-            websiteDomain: "https://sandeepkumarjha.com.np",
-            price: "4500",
-            businessName: "Coders Club, Your Learning Partner",
-            imageUrl: "https://sandeepkumarjha.com.np/img/java.png",
-            currency: "NPR",
-         
-            prefill: {
-                name: true,
-                email: true,
-                state: true,
-                city: true,
-                address: true,
-                zipcode: true,
-                country: true
-            },
-            disableFields: {
-                address: true,
-                state: true,
-            },
-            callbackUrl: {
-                successUrl: 'https://sandeepkumarjha.com.np/success.html',
-                failUrl: 'https://sandeepkumarjha.com.np/fail.html',
-            },
-           
-      themeColor: "#5662FF",
-
-      orderInformationUI: `
-        <div style="font-family:Arial;">
-          <h3>Order Information</h3>
-          <div class="item" style="margin-bottom: 20px;">
-            <img style="max-width: 50px; margin-right: 10px;" src="https://sandeepkumarjha.com.np/img/java.png" alt="JAVA COURSE">
-            <p>JAVA COURSE</p><span>Rs 4500</span>
-          </div>
-        </div> `,
-            onSuccess: (options) => {
-                //you can receive options if needed
-
-                // redirect to payment checkout page on success
-                window.location.href = "./payment.html"
-            },
-
-            onError: (error) => {
-                // if error occured during checkout
-                console.log(error);
-            },
-
-        };
-        document.getElementById('checkout-btn').onclick = function (e) {
-        options.baseUrl = 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions';     
-            const getpay = new GetPay(options)
-            getpay.initialize()
+  <script>
+    document.getElementById('checkout-btn').addEventListener('click', function () {
+      const options = {
+        userInfo: {
+          name: "Sandeep Kumar Jha",
+          email: "sandeep@example.com",
+          state: "Bagmati",
+          country: "Nepal",
+          zipcode: "44600",
+          city: "Kathmandu",
+          address: "Maitidevi"
+        },
+        papInfo: "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==",
+        oprKey: "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5",
+        insKey: "",
+        websiteDomain: "https://sandeepkumarjha.com.np",
+        price: "4500",
+        businessName: "Sandeep Store - Learn Smart",
+        imageUrl: "https://sandeepkumarjha.com.np/img/java.png",
+        currency: "NPR",
+        clientRequestId: "ORDER001-JAVA",
+        callbackUrl: {
+          successUrl: "https://sandeepkumarjha.com.np/payment.html",
+          failUrl: "https://sandeepkumarjha.com.np/fail.html"
+        },
+        themeColor: "#5662FF",
+        prefill: {
+          name: true,
+          email: true,
+          state: true,
+          city: true,
+          address: true,
+          zipcode: true,
+          country: true
+        },
+        disableFields: {
+          address: true,
+          state: true
+        },
+        orderInformationUI: `
+          <div style="font-family:Arial;">
+            <h3>Order Information</h3>
+            <div class="item" style="margin-bottom: 20px;">
+              <img style="max-width: 50px; margin-right: 10px;" src="https://sandeepkumarjha.com.np/img/java.png" alt="image" />
+              <p>JAVA COURSE</p>
+              <span>Rs 4500</span>
+            </div>
+          </div>`,
+        baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+        onSuccess: function () {
+          // Show a short confirmation before redirect
+          alert("Redirecting to payment page...");
+          window.location.href = "https://sandeepkumarjha.com.np/payment.html";
+        },
+        onError: function (err) {
+          console.error("Checkout error:", err);
+          alert("Something went wrong. Please try again.");
         }
-    </script>
+      };
+
+      const getpay = new GetPay(options);
+      getpay.initialize();
+    });
+  </script>
 </body>
 </html>
