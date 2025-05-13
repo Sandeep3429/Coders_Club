@@ -57,18 +57,23 @@
             themeColor: "#5662FF",
             orderInformationUI: `<div style="font-family:Arial;"><h3>Order Information</h3><div class="item" style="margin-bottom: 20px;"><div class="item"><img style="max-width: 50px; margin-right: 10px;" src="http://localhost:8080/image.png" alt="image"><p>Cup Set</p><span>Rs 450</span></div></div>`,
             onSuccess: (options) => {
-                window.location.href = "./payment.html";
-            },
-            onError: (error) => {
-                console.error(error);
-            },
-        };
+                //you can receive options if needed
 
-    
-            document.getElementById('checkout-btn').addEventListener('click', function () {
-    const getpay = new GetPay(options);
-    getpay.initialize();  // SDK internally handles POST
-});
-</script>
+                // redirect to payment checkout page on success
+                window.location.href = "./payment.html"
+            },
+
+            onError: (error) => {
+                // if error occured during checkout
+                console.log(error);
+            },
+
+        };
+        document.getElementById('checkout-btn').onclick = function (e) {
+options.baseUrl = ‘https://sandeepkumarjha.com.np’;     
+            const getpay = new GetPay(options)
+            getpay.initialize()
+        }
+    </script>
 </body>
 </html>
