@@ -64,10 +64,11 @@
             },
         };
 
-        document.getElementById('checkout-btn').addEventListener('click', function () {
-            options.baseUrl = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
-            const getpay = new GetPay(options);
-            getpay.initialize();
+    
+            document.getElementById('checkout-btn').addEventListener('click', function () {
+    const getpay = new GetPay(options);
+    getpay.initialize();  // SDK internally handles POST
+});
         });
     </script>
 </body>
