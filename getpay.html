@@ -19,21 +19,21 @@
     <script>
         const options = {
             userInfo: {
-                name: "John Doe",
-                email: "john@gmail.com",
+                name: "Sandeep Kumar Jha",
+                email: "zhasandeep7@gmail.com",
                 state: "Bagmati",
                 country: "Nepal",
                 zipcode: "44600",
                 city: "Kathmandu",
-                address: "Chabahil",
+                address: "Kamladi",
             },
             clientRequestId: "CLIENT123",
             papInfo: 'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==',
             insKey: "",  // Replace with your valid institution key
             oprKey: "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5",
             websiteDomain: "https://sandeepkumarjha.com.np",
-            price: "5545",
-            businessName: "OneStop Shopping - Rediscover a great shopping tradition",
+            price: "55",
+            businessName: "Coders Club, Your Learning Partner",
             imageUrl: "https://sandeepkumarjha.com.np/img/java.png",
             currency: "NPR",
          
@@ -54,8 +54,17 @@
                 successUrl: 'https://sandeepkumarjha.com.np/success.html',
                 failUrl: 'https://sandeepkumarjha.com.np/fail.html',
             },
-            themeColor: "#5662FF",
-            orderInformationUI: `<div style="font-family:Arial;"><h3>Order Information</h3><div class="item" style="margin-bottom: 20px;"><div class="item"><img style="max-width: 50px; margin-right: 10px;" src="http://localhost:8080/image.png" alt="image"><p>Cup Set</p><span>Rs 450</span></div></div>`,
+           
+      themeColor: "#5662FF",
+
+      orderInformationUI: `
+        <div style="font-family:Arial;">
+          <h3>Order Information</h3>
+          <div class="item" style="margin-bottom: 20px;">
+            <img style="max-width: 50px; margin-right: 10px;" src="https://sandeepkumarjha.com.np/img/java.png" alt="JAVA COURSE">
+            <p>JAVA COURSE</p><span>Rs 4500</span>
+          </div>
+        </div> `,
             onSuccess: (options) => {
                 //you can receive options if needed
 
