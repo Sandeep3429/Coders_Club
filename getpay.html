@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checkout - Java Course</title>
+  <title>Checkout – Java Course</title>
+  <!-- Include GetPay JS bundle (defer so DOM is ready) -->
   <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
@@ -16,7 +17,8 @@
   <p>Price: Rs 4500</p>
   <button id="checkout-btn" class="btn">Proceed to Pay</button>
 
-  <div id="checkout" hidden></div>
+  <!-- This container may be used by GetPay to render checkout UI -->
+  <div id="checkout-container" hidden></div>
 
   <script>
     document.getElementById('checkout-btn').addEventListener('click', function () {
@@ -32,8 +34,8 @@
         },
         papInfo: "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiOTg3NjU0MzIxMDEyMzQ1IiwidGlkIjoiOTg3NjU0MyJ9",
         oprKey: "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5",
-        insKey: "",
-        websiteDomain: "https://sandeepkumarjha.com.np",
+        insKey: "",  // only if provided by GetPay for your account
+        websiteDomain: window.location.origin,
         price: 4500.00,
         businessName: "Sandeep Store - Learn Smart",
         imageUrl: "https://sandeepkumarjha.com.np/img/java.png",
@@ -58,22 +60,26 @@
           state: true
         },
         orderInformationUI: `
-          <div style="font-family:Arial;">
+          <div style="font-family:Arial; text-align: left;">
             <h3>Order Information</h3>
-            <div class="item" style="margin-bottom: 20px;">
-              <img style="max-width: 50px; margin-right: 10px;" src="https://sandeepkumarjha.com.np/img/java.png" alt="image" />
-              <p>JAVA COURSE</p>
-              <span>Rs 4500</span>
+            <div class="item" style="margin-bottom: 20px; display: flex; align-items: center;">
+              <img style="max-width: 50px; margin-right: 10px;" src="https://sandeepkumarjha.com.np/img/java.png" alt="Java Course" />
+              <div>
+                <p style="margin: 0; font-weight: bold;">JAVA COURSE</p>
+                <span>Rs 4,500.00</span>
+              </div>
             </div>
           </div>`,
-        baseUrl:"https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
-        onSuccess: function () {
-          // Show a short confirmation before redirect
+        baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+        // Optional: specify where in DOM to render checkout
+        containerId: "checkout-container",
+        onSuccess: function (response) {
+          // Payment initialized successfully — you may redirect or show message
           alert("Redirecting to payment page...");
-          window.location.href = "https://sandeepkumarjha.com.np/payment.html";
+          window.location.href = this.callbackUrl.successUrl;
         },
         onError: function (err) {
-          console.error("Checkout error:", err);
+          console.error("GetPay checkout error:", err);
           alert("Something went wrong. Please try again.");
         }
       };
@@ -84,5 +90,3 @@
   </script>
 </body>
 </html>
-
-
