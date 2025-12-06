@@ -2,16 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
-  <title>Processing Payment</title>
-  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processing Payment – Java Mastery Course</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
-    #checkout { margin-top: 50px; }
+    :root {
+      --primary: #5662FF;
+      --success: #10b981;
+      --text: #1a1a2e;
+      --light: #f8f9ff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      max-width: 500px;
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(86, 98, 255, 0.15);
+      text-align: center;
+      padding: 50px 30px;
+    }
+    .spinner {
+      width: 80px;
+      height: 80px;
+      border: 8px solid #f0f2ff;
+      border-top: 8px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      margin: 0 auto 30px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    p {
+      font-size: 18px;
+      color: #64748b;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    .secure {
+      color: var(--success);
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .course {
+      background: var(--light);
+      padding: 16px;
+      border-radius: 12px;
+      margin: 25px 0;
+      border: 1px solid #e6eaff;
+    }
+    .course img {
+      width: 70px;
+      height: 70px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
-  <h2>Please wait while we process your payment...</h2>
-  <div id="checkout"></div>
+  <div class="container">
+    <div class="spinner"></div>
+    <h1>Processing Your Payment</h1>
+    <p>Please do not refresh or close this page.<br>You're being securely redirected to your bank...</p>
+
+    <div class="course">
+      <img src="https://sandeepkumarjha.com.np/img/java.png" alt="Java Course">
+      <p style="margin:8px 0 0; font-weight:600;">JAVA MASTERY COURSE</p>
+      <strong style="color:var(--primary); font-size:20px;">Rs 4,500</strong>
+    </div>
+
+    <p class="secure">
+      <i class="fas fa-shield-alt"></i> Secured by NCHL GetPay • 256-bit Encryption
+    </p>
+  </div>
 </body>
 </html>
