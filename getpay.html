@@ -1,168 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GetPay Payment Test</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+  <title>Checkout – Java Mastery Course (GetPay Test)</title>
 
-    <!-- REQUIRED: Load GetPay WebCheckout v5 Bundle -->
-    <script src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <!-- Load test bundle (defer as per sample) -->
+  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-        }
+  <!-- Google Font + icons (optional, used by UI) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        .container {
-            width: 420px;
-            margin: 60px auto;
-            padding: 30px;
-            border-radius: 14px;
-            background: #fff;
-            box-shadow: 0 0 15px rgba(0,0,0,0.15);
-        }
+  <style>
+    :root {
+      --primary: #5662FF;
+      --primary-dark: #3e4dcc;
+      --text: #1a1a2e;
+      --light: #f8f9ff;
+      --gray: #94a3b8;
+    }
 
-        h2 {
-            margin-top: 0;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-        button {
-            padding: 14px 22px;
-            font-size: 18px;
-            background: #0066ff;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-        }
+    .container {
+      background: white;
+      max-width: 480px;
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(86, 98, 255, 0.15);
+    }
 
-        button:hover {
-            background: #004ccc;
-        }
+    .header {
+      background: linear-gradient(135deg, var(--primary), #7b85ff);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
 
-        /* GetPay REQUIRED DOM STRUCTURE */
-        #getpay-modal-root {
-            position: fixed;
-            inset: 0;
-            z-index: 999999;
-            display: none;
-        }
+    .header h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
+    .header p { opacity: 0.9; font-size: 16px; }
 
-        #getpay-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-        }
+    .content { padding: 30px; }
 
-        #getpay-frame-wrapper {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 430px;
-            height: 600px;
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-        }
+    .course-card {
+      display: flex;
+      align-items: center;
+      background: #f8f9ff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 25px;
+      border: 1px solid #e6eaff;
+    }
 
-        #getpay-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+    .course-card img {
+      width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-right: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
-        #getpay-loader {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255,255,255,0.85);
-        }
-    </style>
+    .course-info h3 { font-size: 18px; margin-bottom: 6px; color: var(--text); }
+    .price { font-size: 24px; font-weight: 700; color: var(--primary); }
+
+    .btn-pay {
+      width: 100%; padding: 16px; font-size: 18px; font-weight: 600; background: var(--primary);
+      color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+      display:flex; gap:10px; align-items:center; justify-content:center;
+    }
+
+    .btn-pay:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(86,98,255,0.3); }
+    .btn-pay:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+
+    .secure-note { text-align:center; margin-top:20px; font-size:14px; color:var(--gray); }
+    .secure-note i { color:#10b981; margin-right:6px; }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 24px; }
+      .course-card { flex-direction: column; text-align: center; }
+      .course-card img { margin-bottom: 12px; margin-right: 0; }
+    }
+
+    /* small status area for debugging / runtime feedback */
+    #integration-status { padding: 12px 20px; font-size:13px; color:#374151; text-align:center; }
+    #integration-status.err { color:#b91c1c; }
+    #integration-status.warn { color:#b45309; }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-    <h2>GetPay WebCheckout v5</h2>
-    <p>Amount: Rs 100</p>
-    <button onclick="startPayment()">Pay Now</button>
-</div>
-
-<!------------------------------------------------------
- REQUIRED DOM ELEMENTS FOR GETPAY BUNDLE WEBVIEW
-------------------------------------------------------->
-<div id="getpay-modal-root">
-    <div id="getpay-overlay"></div>
-
-    <div id="getpay-frame-wrapper">
-        <iframe id="getpay-iframe"></iframe>
-
-        <div id="getpay-loader">
-            <div style="font-size:18px;color:#333;">Loading…</div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>Java Mastery Course</h1>
+      <p>Learn Java from scratch to advanced level</p>
     </div>
-</div>
 
-<!------------------------------------------------------
-  YOUR TRANSACTION SCRIPT (NO SDK, PURE API CALLS)
-------------------------------------------------------->
-<script>
+    <div class="content">
+      <div class="course-card">
+        <img src="https://sandeepkumarjha.com.np/img/java.png" alt="Java Course">
+        <div class="course-info">
+          <h3>JAVA FULL COURSE</h3>
+          <div class="price">Rs 4,500</div>
+        </div>
+      </div>
 
-const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
+      <!-- Required DIV the GetPay bundle expects (per sample). Keep hidden initially. -->
+      <div id="checkout" hidden></div>
 
-/*----------------------------*
- * API: Create Transaction
- *----------------------------*/
-async function createTransaction() {
-    const payload = {
-        amount: 100,
-        currency: "NPR",
-        purchaseDescription: "Test Purchase",
-        papInfo: PAP_INFO,
-        merchantTxnId: "TXN-" + Date.now(),
-        successUrl: "https://example.com/success",
-        failureUrl: "https://example.com/fail"
-    };
+      <button id="checkout-btn" class="btn-pay" aria-live="polite">
+        <i class="fas fa-lock"></i>
+        <span id="btn-text">Proceed to Pay Securely</span>
+      </button>
 
-    const res = await fetch(BASE_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "oprKey": OPR_KEY
-        },
-        body: JSON.stringify(payload)
+      <p class="secure-note">
+        <i class="fas fa-shield-alt"></i>
+        Secured by NCHL GetPay • 256-bit SSL Encryption
+      </p>
+
+      <div id="integration-status">Waiting for checkout…</div>
+    </div>
+  </div>
+
+  <script>
+    /*************************************************************************
+     * YOUR TEST CREDENTIALS & ENDPOINTS (as requested)
+     *************************************************************************/
+    const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+    const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
+    const INS_KEY = ""; // intentionally empty
+    const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
+    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+
+    const statusEl = document.getElementById('integration-status');
+    const btn = document.getElementById('checkout-btn');
+    const btnText = document.getElementById('btn-text');
+
+    function setStatus(text, cls = '') {
+      statusEl.textContent = text;
+      statusEl.className = cls ? ' ' + cls : '';
+    }
+
+    // Small helper to detect if GetPay constructor is available (bundle should expose GetPay)
+    function hasGetPayConstructor() {
+      return (typeof window.GetPay === 'function' || typeof window.GetPay === 'object');
+    }
+
+    // Immediately report a helpful message to console in case browser blocks analytics or bundle
+    window.addEventListener('load', () => {
+      // check the bundle loaded (bundle may still execute and create GetPay asynchronously)
+      setTimeout(() => {
+        if (!hasGetPayConstructor()) {
+          // keep message visible — often adblock/CSP blocks parts of bundle; user needs to allow domain
+          setStatus('Warning: GetPay bundle loaded but `GetPay` constructor not found. If you see bundle.js errors in console, try disabling adblock or allow the minio domain.', 'warn');
+          console.warn('[GetPay] GetPay constructor not found on window. Globals:', {
+            GetPay: window.GetPay,
+            GetPayCheckout: window.GetPayCheckout,
+            getpay: window.getpay
+          });
+        } else {
+          setStatus('GetPay constructor is available. Ready to checkout.');
+        }
+      }, 350);
     });
 
-    return res.json();
-}
+    /*************************************************************************
+     * Click handler — follows the sample code you provided.
+     * - Builds `options` object using your parameters
+     * - Instantiates `new GetPay(options)`
+     * - Calls `getpay.initialize()`
+     *
+     * Notes:
+     * - If `GetPay` is not present, we show a clear error and log details.
+     *************************************************************************/
+    document.getElementById('checkout-btn').onclick = function (e) {
+      e.preventDefault();
 
-/*----------------------------*
- * Open Checkout WebView
- *----------------------------*/
-async function startPayment() {
+      // UI feedback
+      btn.disabled = true;
+      btnText.innerText = 'Initializing…';
 
-    const txn = await createTransaction();
-    console.log("Txn Response:", txn);
+      // Minimal wait to let bundle attach globals if it's still running
+      setTimeout(() => {
+        if (typeof window.GetPay !== 'function' && typeof window.GetPay !== 'object') {
+          const errMsg = 'GetPay constructor not available. See console for bundle errors (bundle.js may have crashed or been blocked).';
+          setStatus(errMsg, 'err');
+          console.error('[GetPay] Error: GetPay constructor not available. Globals:', {
+            GetPay: window.GetPay,
+            GetPayCheckout: window.GetPayCheckout,
+            getpay: window.getpay
+          });
+          alert('Payment initialization failed: GetPay is not available. Disable adblock or check browser console.');
+          btn.disabled = false;
+          btnText.innerText = 'Proceed to Pay Securely';
+          return;
+        }
 
-    const iframe = document.getElementById("getpay-iframe");
-    iframe.src = txn.redirectUrl;   // REQUIRED for WebView version
+        // Build options exactly as sample expects (use your credentials)
+        const options = {
+          // userInfo optional
+          userInfo: {
+            name: "Sandeep Kumar Jha",
+            email: "sandeep@example.com",
+            state: "Bagmati",
+            country: "Nepal",
+            zipcode: "44600",
+            city: "Kathmandu",
+            address: "Maitidevi"
+          },
 
-    document.getElementById("getpay-modal-root").style.display = "block";
+          // clientRequestId: optional — include unique id for the merchant order
+          clientRequestId: "ORDER001-JAVA-" + Date.now(),
 
-    iframe.onload = () => {
-        document.getElementById("getpay-loader").style.display = "none";
+          // credentials & keys
+          papInfo: PAP_INFO,
+          oprKey: OPR_KEY,
+          insKey: INS_KEY,
+
+          websiteDomain: WEBSITE_DOMAIN,
+          price: "4500.00",
+          businessName: "Sandeep Store - Learn Smart",
+          imageUrl: "https://sandeepkumarjha.com.np/img/java.png",
+          currency: "NPR",
+
+          // prefill and disable fields
+          prefill: {
+            name: true, email: true, state: true, city: true,
+            address: true, zipcode: true, country: true
+          },
+
+          disableFields: {
+            address: true,
+            state: true
+          },
+
+          // callback URLs — update these pages on your site to handle return
+          callbackUrl: {
+            successUrl: WEBSITE_DOMAIN + "/payment.html",
+            failUrl: WEBSITE_DOMAIN + "/fail.html"
+          },
+
+          themeColor: "#5662FF",
+
+          orderInformationUI: `
+            <div style="font-family:Inter,Arial,sans-serif;padding:12px;background:#f8f9ff;border-radius:10px;">
+              <h3 style="margin:0 0 8px 0;color:#1a1a2e;">Order Summary</h3>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <img style="width:52px;height:52px;border-radius:8px;object-fit:cover;" src="https://sandeepkumarjha.com.np/img/java.png" />
+                <div>
+                  <p style="margin:0;font-weight:600;">JAVA MASTERY COURSE</p>
+                  <strong style="color:#5662FF;">Rs 4,500.00</strong>
+                </div>
+              </div>
+            </div>`,
+
+          // IMPORTANT: provide baseUrl here prior to initialize (sample sets it right before new GetPay)
+          baseUrl: BASE_URL,
+
+          // callback hooks (these are executed by the bundle if provided)
+          onSuccess: function (response) {
+            console.log('GetPay.onSuccess:', response);
+            // Navigate to your success page or perform client-side verification
+            window.location.href = WEBSITE_DOMAIN + "/payment.html";
+          },
+
+          onError: function (error) {
+            console.error('GetPay.onError:', error);
+            alert('Payment initialization failed. Check console for details.');
+            btn.disabled = false;
+            btnText.innerText = 'Proceed to Pay Securely';
+          }
+        };
+
+        // instantiate & initialize as per sample
+        try {
+          const getpay = new GetPay(options);
+          // Sometimes bundle attaches methods differently; check and call whichever common name exists
+          if (typeof getpay.initialize === 'function') {
+            getpay.initialize();
+            console.info('[GetPay] Called getpay.initialize()');
+          } else if (typeof getpay.init === 'function') {
+            getpay.init();
+            console.info('[GetPay] Called getpay.init()');
+          } else {
+            // If bundle expects new GetPay(options) to auto-run, we still proceed.
+            console.info('[GetPay] Instantiated GetPay; no explicit initialize() method found.');
+          }
+          setStatus('Checkout opened. Follow the checkout UI.', '');
+        } catch (err) {
+          console.error('[GetPay] Error initializing checkout:', err);
+          alert('Payment initialization failed. See console for details.');
+          btn.disabled = false;
+          btnText.innerText = 'Proceed to Pay Securely';
+          setStatus('Payment initialization failed. See console.', 'err');
+        }
+      }, 300); // small delay
     };
-}
-
-</script>
-
+  </script>
 </body>
 </html>
