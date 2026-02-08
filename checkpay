@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCHL Payment Verify Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { background: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; }
+        #response { background: #f4f4f4; padding: 15px; margin-top: 20px; border: 1px solid #ddd; white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <h2>Verify Payment Status</h2>
+    <p><small>Note: This may fail in the browser due to CORS or IP restrictions.</small></p>
+
+
+    <div class="form-group">
+        <label>Transaction ID (from tokenInfo):</label>
+        <input type="text" id="txnId" placeholder="Enter ID">
+    </div>
+
+    <div class="form-group">
+        <label>Pap Info:</label>
+        <input type="text" id="papInfo" placeholder="Enter Pap Info">
+    </div>
+
+    <button onclick="verifyPayment()">Verify Payment</button>
+
+    <h3>Response:</h3>
+    <div id="response">Waiting for request...</div>
+
+    <script>
+        async function verifyPayment() {
+            const baseURL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
+            const txnId = document.getElementById('txnId').value;
+            const papInfo = document.getElementById('papInfo').value;
+            const responseDiv = document.getElementById('response');
+
+            responseDiv.innerText = "Sending request...";
+
+            const payload = {
+                id: txnId,
+                papInfo: papInfo
+            };
+
+            try {
+                const response = await fetch(`${baseURL}/v1/secure-merchant/transactions/merchant-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Note: Browsers usually block setting 'User-Agent' for security
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                responseDiv.innerText = JSON.stringify(data, null, 4);
+            } catch (error) {
+                responseDiv.innerText = "Error: " + error.message + 
+                "\n\n(This is likely a CORS block or the 403 Forbidden issue seen in your logs.)";
+            }
+        }
+    </script>
+</body>
+</html>
