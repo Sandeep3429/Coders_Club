@@ -7,10 +7,10 @@ try:
     req = urllib.request.Request("http://localhost:8080/getpay.html")
     with urllib.request.urlopen(req) as response:
         html = response.read().decode('utf-8')
-        if "window.getpay.initialize" in html:
+        if "window.GetPay" in html:
             print("getpay.html is updated correctly and served.")
         else:
-            print("ERROR: getpay.html not updated - window.getpay.initialize not found.")
+            print("ERROR: getpay.html not updated - window.GetPay not found.")
 
     # 2. Test payment.html logic (Can't execute JS, but checking content)
     req2 = urllib.request.Request("http://localhost:8080/payment.html")
