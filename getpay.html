@@ -331,7 +331,7 @@
 
           // callback URLs — the bundle redirects the browser here after 3DS completes
           callbackUrl: {
-            successUrl: WEBSITE_DOMAIN + "/success.html",
+            successUrl: WEBSITE_DOMAIN + "/payment.html",
             failUrl: WEBSITE_DOMAIN + "/fail.html"
           },
 
@@ -383,9 +383,10 @@
         };
 
         // Call window.getpay.initialize as per the GetPay integration spec
+        // papInfo and oprKey are passed INSIDE the options object — do NOT pass them separately
         try {
-          window.getpay.initialize(PAP_INFO, OPR_KEY, options);
-          console.info('[GetPay] Called window.getpay.initialize(papInfo, oprKey, options)');
+          window.getpay.initialize(options);
+          console.info('[GetPay] Called window.getpay.initialize(options)');
           setStatus('Checkout opened. Follow the checkout UI.', '');
         } catch (err) {
           console.error('[GetPay] Error initializing checkout:', err);
