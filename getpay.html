@@ -352,65 +352,33 @@
           // IMPORTANT: provide baseUrl here prior to initialize (sample sets it right before new GetPay)
           baseUrl: BASE_URL,
 
-          // callback hooks (these are executed by the bundle if provided)
-          onSuccess: async function (response) {
-            console.log('GetPay.onSuccess:', response);
-            setStatus('Payment successful. Verifying transaction...', '');
+          // The GetPay bundle automatically handles the redirection for 3DS authentication.
+          // Once 3DS is complete, it will submit to either successUrl or failUrl defined above.
+          // The final verification step (merchant-status) should ideally be done on the 
+          // actual destination pages (e.g. within payment.html or on a backend server).
+          
+          onSuccess: function (response) {
+            console.log('GetPay.onSuccess callback fired:', response);
+            // Most of the time in a standard 3DS flow, the page is navigated away to 
+            // the bank ACS before this is even reached or this is fired strictly for non-3DS flows.
+            // So we simply allow the bundle's native redirection or fallback to redirect manually
+            const txnId = response.transactionId || response.id || response.txnId || response.clientRequestId;
             
-            try {
-              // Extract the transaction ID from the bundle's response
-              const txnId = response.transactionId || response.id || response.txnId || (response.data && response.data.transactionId) || response.clientRequestId;
-              
-              if (!txnId) {
-                console.warn('Could not extract txnId from response. Redirecting to success page.');
+            if (txnId) {
+                // If there's a need to pass the txnId manually, we append it to the success URL
+                window.location.href = WEBSITE_DOMAIN + "/payment.html?txnId=" + txnId;
+            } else {
                 window.location.href = WEBSITE_DOMAIN + "/payment.html";
-                return;
-              }
-
-              const payload = {
-                id: txnId
-              };
-
-              console.log('Checking transaction status with payload:', payload);
-
-              const statusResponse = await fetch(`${BASE_URL}/merchant-status`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  // Note: Add any required authorization headers here if the API requires them from the frontend
-                },
-                body: JSON.stringify(payload)
-              });
-
-              if (!statusResponse.ok) {
-                throw new Error('Merchant status check failed with status: ' + statusResponse.status);
-              }
-
-              const statusData = await statusResponse.json();
-              console.log('Status check response:', statusData);
-
-              // Assume statusData contains verification info (e.g. statusData.status === 'SUCCESS')
-              // Redirect to SUCCESS or FAIL mapping appropriately
-              if (statusData && (statusData.status === 'SUCCESS' || statusData.status === '000' || statusData.transactionStatus === 'SUCCESS')) {
-                setStatus('Transaction verified successfully. Redirecting...', '');
-                window.location.href = WEBSITE_DOMAIN + "/payment.html";
-              } else {
-                console.warn('Transaction details did not match or status was not SUCCESS.', statusData);
-                window.location.href = WEBSITE_DOMAIN + "/fail.html";
-              }
-
-            } catch (err) {
-              console.error('Error verifying transaction status:', err);
-              // Fallback to failure URL if verification cannot be completed
-              window.location.href = WEBSITE_DOMAIN + "/fail.html";
             }
           },
 
           onError: function (error) {
-            console.error('GetPay.onError:', error);
+            console.error('GetPay.onError fired:', error);
+            // In case of a direct cancel or failure that didn't trigger a 3DS redirect:
             alert('Payment initialization or processing failed. Check console for details.');
             btn.disabled = false;
             btnText.innerText = 'Proceed to Pay Securely';
+            window.location.href = WEBSITE_DOMAIN + "/fail.html";
           }
         };
 
