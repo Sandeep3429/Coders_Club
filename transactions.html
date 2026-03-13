@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+  <title>Transaction History – Java Mastery Course</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary: #5662FF;
+      --text: #1a1a2e;
+      --light: #f8f9ff;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border: #e2e8f0;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      background: white;
+      max-width: 800px;
+      margin: 0 auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(86, 98, 255, 0.15);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--primary), #7b85ff);
+      color: white;
+      padding: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .header a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      background: rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    
+    .header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .content {
+      padding: 30px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    
+    td {
+      font-size: 15px;
+      color: var(--text);
+    }
+    
+    .status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .status.completed {
+      background: #dcfce7;
+      color: var(--success);
+    }
+    
+    .status.failed {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #64748b;
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      color: var(--border);
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-history"></i> Transaction Ledger</h1>
+      <a href="getpay.html"><i class="fas fa-shopping-cart"></i> Go to Shop</a>
+    </div>
+    
+    <div class="content">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Transaction ID</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="transaction-list">
+          <!-- Transactions will be populated here -->
+        </tbody>
+      </table>
+      
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <i class="fas fa-receipt"></i>
+        <h2>No transactions yet</h2>
+        <p>Your payment history will appear here once you make a purchase.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadTransactions() {
+      const stored = localStorage.getItem('transactions');
+      const transactions = stored ? JSON.parse(stored) : [];
+      
+      const tbody = document.getElementById('transaction-list');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (transactions.length === 0) {
+        document.querySelector('table').style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      transactions.forEach(txn => {
+        const tr = document.createElement('tr');
+        
+        const statusClass = txn.status.toLowerCase() === 'completed' ? 'completed' : 'failed';
+        
+        tr.innerHTML = `
+          <td>${new Date(txn.date).toLocaleString()}</td>
+          <td style="font-family: monospace; color: #475569;">${txn.id}</td>
+          <td style="font-weight: 600;">Rs. ${parseFloat(txn.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+          <td><span class="status ${statusClass}">${txn.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Load data on page ready
+    document.addEventListener('DOMContentLoaded', loadTransactions);
+  </script>
+
+</body>
+</html>

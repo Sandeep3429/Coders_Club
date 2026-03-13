@@ -242,13 +242,13 @@
         if (!hasGetPayConstructor()) {
           // keep message visible — often adblock/CSP blocks parts of bundle; user needs to allow domain
           setStatus('Warning: GetPay bundle loaded but `GetPay` constructor not found. If you see bundle.js errors in console, try disabling adblock or allow the minio domain.', 'warn');
-          console.warn('[GetPay] GetPay constructor not found on window. Globals:', {
+          console.warn('[GetPay] window.getpay not found. Globals:', {
             GetPay: window.GetPay,
             GetPayCheckout: window.GetPayCheckout,
             getpay: window.getpay
           });
         } else {
-          setStatus('GetPay constructor is available. Ready to checkout.');
+          setStatus('GetPay initialized. Ready to checkout.');
         }
       }, 350);
     });
@@ -271,15 +271,15 @@
 
       // Minimal wait to let bundle attach globals if it's still running
       setTimeout(() => {
-        if (typeof window.GetPay !== 'function' && typeof window.GetPay !== 'object') {
-          const errMsg = 'GetPay constructor not available. See console for bundle errors (bundle.js may have crashed or been blocked).';
+        if (!window.getpay || typeof window.getpay.initialize !== 'function') {
+          const errMsg = 'GetPay not available. See console for bundle errors.';
           setStatus(errMsg, 'err');
-          console.error('[GetPay] Error: GetPay constructor not available. Globals:', {
+          console.error('[GetPay] Error: getpay.initialize is not available. Globals:', {
             GetPay: window.GetPay,
             GetPayCheckout: window.GetPayCheckout,
             getpay: window.getpay
           });
-          alert('Payment initialization failed: GetPay is not available. Disable adblock or check browser console.');
+          alert('Payment initialization failed: GetPay is not available.');
           btn.disabled = false;
           btnText.innerText = 'Proceed to Pay Securely';
           return;
@@ -384,18 +384,10 @@
 
         // instantiate & initialize as per sample
         try {
-          const getpay = new GetPay(options);
-          // Sometimes bundle attaches methods differently; check and call whichever common name exists
-          if (typeof getpay.initialize === 'function') {
-            getpay.initialize();
-            console.info('[GetPay] Called getpay.initialize()');
-          } else if (typeof getpay.init === 'function') {
-            getpay.init();
-            console.info('[GetPay] Called getpay.init()');
-          } else {
-            // If bundle expects new GetPay(options) to auto-run, we still proceed.
-            console.info('[GetPay] Instantiated GetPay; no explicit initialize() method found.');
-          }
+          // Initialize using window.getpay as specified in the docs
+          window.getpay.initialize(options);
+          console.info('[GetPay] Called window.getpay.initialize()');
+          
           setStatus('Checkout opened. Follow the checkout UI.', '');
         } catch (err) {
           console.error('[GetPay] Error initializing checkout:', err);
