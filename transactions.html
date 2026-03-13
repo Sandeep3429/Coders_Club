@@ -176,7 +176,7 @@
         const statusClass = txn.status.toLowerCase() === 'completed' ? 'completed' : 'failed';
         
         tr.innerHTML = `
-          <td>${new Date(txn.date).toLocaleString()}</td>
+          <td>${txn.date}</td>
           <td style="font-family: monospace; color: #475569;">${txn.id}</td>
           <td style="font-weight: 600;">Rs. ${parseFloat(txn.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
           <td><span class="status ${statusClass}">${txn.status}</span></td>

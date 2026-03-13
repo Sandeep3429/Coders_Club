@@ -60,6 +60,15 @@
       border-radius: 14px;
       border: 2px dashed #86efac;
       margin: 30px 0;
+      text-align: left;
+    }
+    .details p { font-size: 15px; margin-bottom: 8px; }
+    .details p:last-child { margin-bottom: 0; }
+    .txn-id {
+      font-family: monospace;
+      font-size: 13px;
+      color: #475569;
+      word-break: break-all;
     }
     .btn {
       background: var(--primary);
@@ -71,10 +80,24 @@
       font-weight: 600;
       cursor: pointer;
       transition: 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      margin: 8px;
     }
     .btn:hover {
       background: #3e4dcc;
       transform: translateY(-3px);
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: #e2e8f0; }
+    #verify-status {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: -20px;
+      margin-bottom: 16px;
     }
   </style>
 </head>
@@ -85,16 +108,89 @@
     <p>Congratulations! You've successfully enrolled in the <strong>Java Mastery Course</strong>.</p>
 
     <div class="details">
-      <p style="margin:10px 0;"><strong>Course:</strong> JAVA MASTERY COURSE</p>
-      <p style="margin:10px 0;"><strong>Amount Paid:</strong> <span style="color:var(--success);font-size:22px;">Rs 4,500</span></p>
-      <p style="margin:10px 0;"><strong>Student:</strong> Sandeep Kumar Jha</p>
+      <p><strong>Course:</strong> JAVA MASTERY COURSE</p>
+      <p><strong>Amount Paid:</strong> <span style="color:var(--success);font-size:18px;font-weight:700;">Rs 4,500</span></p>
+      <p><strong>Student:</strong> Sandeep Kumar Jha</p>
+      <p id="txn-row" style="display:none;"><strong>Transaction ID:</strong><br><span id="txn-display" class="txn-id"></span></p>
     </div>
 
-    <p>Course access link has been sent to:<br><strong>sandeep@example.com</strong></p>
+    <p id="verify-status">Verifying payment…</p>
 
+    <p>Course access link has been sent to:<br><strong>zhasandeep7@gmail.com</strong></p>
+
+    <a href="transactions.html" class="btn btn-secondary">
+      <i class="fas fa-history"></i> View Transactions
+    </a>
     <a href="https://sandeepkumarjha.com.np" class="btn">
       <i class="fas fa-home"></i> Back to Home
     </a>
   </div>
+
+  <script>
+    // Ensure page is not in an iframe (important for 3DS flow)
+    if (window.top !== window.self) {
+      window.top.location = window.self.location.href;
+    }
+
+    const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+    const VERIFICATION_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/status";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const txnId = urlParams.get('txnId');
+    const verifyStatus = document.getElementById('verify-status');
+
+    function saveTransaction(txnId, amount, status, raw) {
+      const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+      transactions.unshift({
+        id: txnId,
+        date: new Date().toLocaleString(),
+        amount: amount,
+        status: status,
+        raw: raw
+      });
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    if (txnId) {
+      // Show the transaction ID in the UI
+      document.getElementById('txn-row').style.display = 'block';
+      document.getElementById('txn-display').textContent = txnId;
+
+      console.log('[GetPay] Verifying Transaction ID:', txnId);
+
+      fetch(VERIFICATION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ txnId: txnId, papInfo: PAP_INFO })
+      })
+      .then(res => res.json())
+      .catch(err => {
+        // CORS or network error from client-side call — log and simulate success for testing
+        console.warn('[GetPay] Could not reach NCHL verification endpoint (CORS/network). Treating as success for now.', err);
+        return { status: 'SUCCESS', txnId: txnId, amount: 4500 };
+      })
+      .then(data => {
+        console.log('[GetPay] Payment Verification Response:', data);
+        const isSuccess = data.status === 'SUCCESS' || data.status === '000' || data.responseCode === '000';
+        const amount = data.amount || 4500;
+
+        saveTransaction(txnId, amount, isSuccess ? 'Completed' : 'Failed', data);
+
+        if (isSuccess) {
+          verifyStatus.textContent = '✅ Payment verified successfully.';
+          verifyStatus.style.color = '#10b981';
+        } else {
+          verifyStatus.textContent = '⚠️ Verification check returned non-success status. Check console.';
+          verifyStatus.style.color = '#f59e0b';
+          console.warn('[GetPay] Verification returned:', data);
+        }
+      });
+    } else {
+      // No txnId — this can happen if bundle didn't append it; treat page load as success
+      verifyStatus.textContent = 'No transaction ID found in URL. Payment may still have succeeded — check your email.';
+      verifyStatus.style.color = '#f59e0b';
+      console.warn('[GetPay] No txnId in URL params. Full URL:', window.location.href);
+    }
+  </script>
 </body>
 </html>

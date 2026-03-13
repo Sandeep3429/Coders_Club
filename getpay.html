@@ -230,9 +230,9 @@
       statusEl.className = cls ? ' ' + cls : '';
     }
 
-    // Small helper to detect if GetPay constructor is available (bundle should expose GetPay)
+    // Small helper to detect if the getpay singleton is available (bundle exposes window.getpay)
     function hasGetPayConstructor() {
-      return (typeof window.GetPay === 'function' || typeof window.GetPay === 'object');
+      return (typeof window.getpay === 'object' && window.getpay !== null && typeof window.getpay.initialize === 'function');
     }
 
     // Immediately report a helpful message to console in case browser blocks analytics or bundle
@@ -241,14 +241,14 @@
       setTimeout(() => {
         if (!hasGetPayConstructor()) {
           // keep message visible — often adblock/CSP blocks parts of bundle; user needs to allow domain
-          setStatus('Warning: GetPay bundle loaded but `GetPay` constructor not found. If you see bundle.js errors in console, try disabling adblock or allow the minio domain.', 'warn');
-          console.warn('[GetPay] window.getpay not found. Globals:', {
+          setStatus('Warning: GetPay bundle loaded but `window.getpay` not found. If you see bundle.js errors in console, try disabling adblock or allow the minio domain.', 'warn');
+          console.warn('[GetPay] window.getpay not found on window. Globals:', {
             GetPay: window.GetPay,
             GetPayCheckout: window.GetPayCheckout,
             getpay: window.getpay
           });
         } else {
-          setStatus('GetPay initialized. Ready to checkout.');
+          setStatus('GetPay is available. Ready to checkout.');
         }
       }, 350);
     });
@@ -271,10 +271,10 @@
 
       // Minimal wait to let bundle attach globals if it's still running
       setTimeout(() => {
-        if (!window.getpay || typeof window.getpay.initialize !== 'function') {
-          const errMsg = 'GetPay not available. See console for bundle errors.';
+        if (!hasGetPayConstructor()) {
+          const errMsg = 'window.getpay not available. See console for bundle errors.';
           setStatus(errMsg, 'err');
-          console.error('[GetPay] Error: getpay.initialize is not available. Globals:', {
+          console.error('[GetPay] Error: window.getpay not available. Globals:', {
             GetPay: window.GetPay,
             GetPayCheckout: window.GetPayCheckout,
             getpay: window.getpay
@@ -329,9 +329,9 @@
 
           },
 
-          // callback URLs — update these pages on your site to handle return
+          // callback URLs — the bundle redirects the browser here after 3DS completes
           callbackUrl: {
-            successUrl: WEBSITE_DOMAIN + "/payment.html",
+            successUrl: WEBSITE_DOMAIN + "/success.html",
             failUrl: WEBSITE_DOMAIN + "/fail.html"
           },
 
@@ -382,12 +382,10 @@
           }
         };
 
-        // instantiate & initialize as per sample
+        // Call window.getpay.initialize as per the GetPay integration spec
         try {
-          // Initialize using window.getpay as specified in the docs
-          window.getpay.initialize(options);
-          console.info('[GetPay] Called window.getpay.initialize()');
-          
+          window.getpay.initialize(PAP_INFO, OPR_KEY, options);
+          console.info('[GetPay] Called window.getpay.initialize(papInfo, oprKey, options)');
           setStatus('Checkout opened. Follow the checkout UI.', '');
         } catch (err) {
           console.error('[GetPay] Error initializing checkout:', err);

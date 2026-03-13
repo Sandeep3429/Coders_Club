@@ -52,13 +52,28 @@
     window.top.location = window.self.location.href;
   }
 
-  const hash = window.location.hash || '';
-  const urlParams = new URLSearchParams(hash.replace('#','?'));
-  const token = urlParams.get('token');
-  console.log('Payment Failed Token:', token);
+  // Extract txnId from query params (bundle may append it here)
+  const urlParams = new URLSearchParams(window.location.search);
+  const txnId = urlParams.get('txnId') || urlParams.get('clientRequestId');
 
-  // Optionally notify server of failed payment
-  // fetch('/verify-payment', { method:'POST', body: JSON.stringify({ token, papInfo: 'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==' }) })
+  // Also check hash fallback (older bundleversions)
+  const hash = window.location.hash || '';
+  const hashParams = new URLSearchParams(hash.replace('#', '?'));
+  const token = hashParams.get('token') || hashParams.get('txnId');
+
+  const failedId = txnId || token || 'UNKNOWN-' + Date.now();
+  console.log('[GetPay] Payment Failed. txnId/token:', failedId);
+
+  // Record failed transaction to localStorage so it appears in transactions.html
+  const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+  transactions.unshift({
+    id: failedId,
+    date: new Date().toLocaleString(),
+    amount: 4500,
+    status: 'Failed',
+    raw: { txnId: failedId, reason: 'Payment failed or cancelled by user' }
+  });
+  localStorage.setItem('transactions', JSON.stringify(transactions));
 </script>
 
 </body>
