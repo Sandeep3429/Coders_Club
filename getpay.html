@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
@@ -21,7 +22,12 @@
       --gray: #94a3b8;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Inter', Arial, sans-serif;
       background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%);
@@ -50,10 +56,20 @@
       text-align: center;
     }
 
-    .header h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
-    .header p { opacity: 0.9; font-size: 16px; }
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
 
-    .content { padding: 30px; }
+    .header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+
+    .content {
+      padding: 30px;
+    }
 
     .course-card {
       display: flex;
@@ -66,37 +82,101 @@
     }
 
     .course-card img {
-      width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-right: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .course-info h3 { font-size: 18px; margin-bottom: 6px; color: var(--text); }
-    .price { font-size: 24px; font-weight: 700; color: var(--primary); }
+    .course-info h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
 
     .btn-pay {
-      width: 100%; padding: 16px; font-size: 18px; font-weight: 600; background: var(--primary);
-      color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
-      display:flex; gap:10px; align-items:center; justify-content:center;
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
     }
 
-    .btn-pay:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(86,98,255,0.3); }
-    .btn-pay:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+    .btn-pay:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(86, 98, 255, 0.3);
+    }
 
-    .secure-note { text-align:center; margin-top:20px; font-size:14px; color:var(--gray); }
-    .secure-note i { color:#10b981; margin-right:6px; }
+    .btn-pay:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secure-note {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    .secure-note i {
+      color: #10b981;
+      margin-right: 6px;
+    }
 
     @media (max-width: 480px) {
-      .header h1 { font-size: 24px; }
-      .course-card { flex-direction: column; text-align: center; }
-      .course-card img { margin-bottom: 12px; margin-right: 0; }
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .course-card {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .course-card img {
+        margin-bottom: 12px;
+        margin-right: 0;
+      }
     }
 
     /* small status area for debugging / runtime feedback */
-    #integration-status { padding: 12px 20px; font-size:13px; color:#374151; text-align:center; }
-    #integration-status.err { color:#b91c1c; }
-    #integration-status.warn { color:#b45309; }
+    #integration-status {
+      padding: 12px 20px;
+      font-size: 13px;
+      color: #374151;
+      text-align: center;
+    }
+
+    #integration-status.err {
+      color: #b91c1c;
+    }
+
+    #integration-status.warn {
+      color: #b45309;
+    }
   </style>
 </head>
+
 <body>
 
   <div class="container">
@@ -212,7 +292,7 @@
             name: "Sandeep Kumar Jha",
             email: "zhasandeep7@gmail.com",
             state: "Bagmati",
-            country: "Nepal",
+            country: "NP",
             zipcode: "44600",
             city: "Kathmandu",
             address: "Maitidevi"
@@ -273,15 +353,62 @@
           baseUrl: BASE_URL,
 
           // callback hooks (these are executed by the bundle if provided)
-          onSuccess: function (response) {
+          onSuccess: async function (response) {
             console.log('GetPay.onSuccess:', response);
-            // Navigate to your success page or perform client-side verification
-            window.location.href = WEBSITE_DOMAIN + "/payment.html";
+            setStatus('Payment successful. Verifying transaction...', '');
+            
+            try {
+              // Extract the transaction ID from the bundle's response
+              const txnId = response.transactionId || response.id || response.txnId || (response.data && response.data.transactionId) || response.clientRequestId;
+              
+              if (!txnId) {
+                console.warn('Could not extract txnId from response. Redirecting to success page.');
+                window.location.href = WEBSITE_DOMAIN + "/payment.html";
+                return;
+              }
+
+              const payload = {
+                id: txnId
+              };
+
+              console.log('Checking transaction status with payload:', payload);
+
+              const statusResponse = await fetch(`${BASE_URL}/merchant-status`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  // Note: Add any required authorization headers here if the API requires them from the frontend
+                },
+                body: JSON.stringify(payload)
+              });
+
+              if (!statusResponse.ok) {
+                throw new Error('Merchant status check failed with status: ' + statusResponse.status);
+              }
+
+              const statusData = await statusResponse.json();
+              console.log('Status check response:', statusData);
+
+              // Assume statusData contains verification info (e.g. statusData.status === 'SUCCESS')
+              // Redirect to SUCCESS or FAIL mapping appropriately
+              if (statusData && (statusData.status === 'SUCCESS' || statusData.status === '000' || statusData.transactionStatus === 'SUCCESS')) {
+                setStatus('Transaction verified successfully. Redirecting...', '');
+                window.location.href = WEBSITE_DOMAIN + "/payment.html";
+              } else {
+                console.warn('Transaction details did not match or status was not SUCCESS.', statusData);
+                window.location.href = WEBSITE_DOMAIN + "/fail.html";
+              }
+
+            } catch (err) {
+              console.error('Error verifying transaction status:', err);
+              // Fallback to failure URL if verification cannot be completed
+              window.location.href = WEBSITE_DOMAIN + "/fail.html";
+            }
           },
 
           onError: function (error) {
             console.error('GetPay.onError:', error);
-            alert('Payment initialization failed. Check console for details.');
+            alert('Payment initialization or processing failed. Check console for details.');
             btn.disabled = false;
             btnText.innerText = 'Proceed to Pay Securely';
           }
@@ -313,6 +440,5 @@
     };
   </script>
 </body>
+
 </html>
-
-
