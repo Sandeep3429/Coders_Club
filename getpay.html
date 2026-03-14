@@ -67,9 +67,14 @@
             };
 
             if (window.getpay && window.getpay.initialize) {
-                window.getpay.initialize(options);
+                try {
+                    window.getpay.initialize(options);
+                } catch (error) {
+                    console.error("Error during GetPay initialization:", error);
+                    alert("An error occurred while initializing the payment gateway. Please try again later.");
+                }
             } else {
-                console.error("GetPay SDK not loaded");
+                console.error("GetPay SDK not loaded. Ensure the script URL is correct and accessible.");
                 alert("Payment gateway SDK is not loaded correctly. Check documentation or network.");
             }
         });
