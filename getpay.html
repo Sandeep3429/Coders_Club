@@ -29,7 +29,6 @@
         const OPR_KEY   = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
         const INS_KEY   = ""; 
         const BASE_URL  = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
-        const BASE_DOMAIN = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout";
         const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
 
         document.getElementById("payBtn").addEventListener("click", () => {
@@ -56,7 +55,7 @@
                     failUrl:    WEBSITE_DOMAIN + "/fail.html",
                 },
                 themeColor: "#5662FF",
-                baseUrl: BASE_DOMAIN, // Use the base without specific path
+                baseUrl: BASE_URL, // Use the base without specific path
                 onSuccess: (options) => {
                     console.log("GetPay Init Success", options);
                     window.location.href = WEBSITE_DOMAIN + "/payment.html";
