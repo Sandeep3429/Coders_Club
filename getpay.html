@@ -250,11 +250,6 @@
 
           },
 
-          // callback URLs — update these pages on your site to handle return
-          callbackUrl: {
-            successUrl: WEBSITE_DOMAIN + "/payment.html",
-            failUrl: WEBSITE_DOMAIN + "/fail.html"
-          },
 
           themeColor: "#5662FF",
 
@@ -310,7 +305,13 @@
           btnText.innerText = 'Proceed to Pay Securely';
           setStatus('Payment initialization failed. See console.', 'err');
         }
-      }, 300); // small delay
+      },
+                // callback URLs — update these pages on your site to handle return
+          callbackUrl: {
+            successUrl: WEBSITE_DOMAIN + "/payment.html",
+            failUrl: WEBSITE_DOMAIN + "/fail.html"
+          },
+
     };
   </script>
 </body>
