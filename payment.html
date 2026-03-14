@@ -21,48 +21,45 @@
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: #f4f7ff;
+      min-height: 100vh;
     }
 
     body {
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 20px 12px;
-      min-height: 100vh;
+      padding: 24px 16px;
     }
 
     .payment-wrapper {
       width: 100%;
-      max-width: 620px;               /* balanced – not too narrow, not ultra-wide */
-      background: white;
+      max-width: 720px;               /* ← key: matches your "half screen / good looking" width */
+      background: #ffffff;
       border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.09);
-      overflow: hidden;               /* helps contain any overflow */
+      box-shadow: 0 10px 40px rgba(0,0,0,0.10);
+      overflow: hidden;
       margin: 16px auto;
     }
 
-    /* ── Critical change ── Let injected content breathe + grow naturally */
     #checkout {
       width: 100%;
-      min-height: 720px;              /* fallback – increase to 800–1000 if still squished */
-      height: auto !important;        /* fight against forced 100% height if any */
-      display: block !important;
+      min-height: 780px;              /* fallback – covers most tall forms even if sparse */
+      height: auto;
+      display: block;
     }
 
-    /* Loader overlay – covers whole checkout area during processing */
     #status-message {
       position: absolute;
       inset: 0;
-      background: rgba(255,255,255,0.96);
+      z-index: 20;
+      background: rgba(255,255,255,0.97);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 20px;
-      z-index: 10;
     }
 
     .loader {
@@ -71,7 +68,7 @@
       border-radius: 50%;
       width: 56px;
       height: 56px;
-      animation: spin 1s linear infinite;
+      animation: spin 1.1s linear infinite;
     }
 
     @keyframes spin {
@@ -79,24 +76,33 @@
     }
 
     .error-message {
-      margin: 24px;
+      margin: 24px 16px;
       padding: 16px;
       background: #fee2e2;
       color: #dc2626;
-      border-radius: 12px;
+      border-radius: 10px;
       text-align: center;
       border: 1px solid #fecaca;
       display: none;
     }
 
-    @media (max-width: 520px) {
-      body { padding: 12px 8px; }
+    @media (max-width: 760px) {
       .payment-wrapper {
-        border-radius: 12px;
-        padding: 0;                   /* remove internal padding – form has its own */
+        max-width: 100%;              /* full width on smaller screens */
+        border-radius: 0;
+        margin: 0;
+      }
+      body {
+        padding: 16px 10px;
       }
       #checkout {
-        min-height: 800px;            /* mobile often needs more vertical space */
+        min-height: 820px;            /* little extra breathing on mobile */
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .payment-wrapper {
+        max-width: 720px;             /* do NOT grow wider than this */
       }
     }
   </style>
@@ -117,8 +123,8 @@
 
 </div>
 
+
 <script>
-// Your existing config & logic – unchanged except minor cleanups
 const PAP_INFO       = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
 const OPR_KEY        = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
 const VERIFY_URL     = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
@@ -140,8 +146,8 @@ async function verifyAndRedirect(txnId) {
   try {
     const res = await fetch(VERIFY_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: txnId })
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({id: txnId})
     });
 
     if (!res.ok) throw new Error("HTTP " + res.status);
@@ -194,9 +200,9 @@ window.addEventListener("load", () => {
 
     const options = {
       userInfo: {
-        name: "Sandeep Kumar Jha",
-        email: "zhasandeep7@gmail.com",
-        city: "Kathmandu",
+        name:    "Sandeep Kumar Jha",
+        email:   "zhasandeep7@gmail.com",
+        city:    "Kathmandu",
         address: "Maitidevi"
       },
       clientRequestId: "ORD-" + Date.now(),
@@ -207,14 +213,13 @@ window.addEventListener("load", () => {
       price: EXPECTED_AMOUNT,
       currency: "NPR",
       baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+
       onSuccess: (res) => {
         const tid = res.transactionId || res.id || res.txnId;
-        if (tid) {
-          verifyAndRedirect(tid);
-        } else {
-          showError("Transaction ID missing");
-        }
+        if (tid) verifyAndRedirect(tid);
+        else showError("Transaction ID missing");
       },
+
       onError: (err) => {
         console.warn(err);
         showError("Payment failed. Please try again.");
@@ -226,6 +231,7 @@ window.addEventListener("load", () => {
       (gp.initialize || gp.init || gp.start)?.();
     } catch (e) {
       showError("Payment initialization failed");
+      console.error(e);
     }
   }
 
