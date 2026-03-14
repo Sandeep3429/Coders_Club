@@ -1,420 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Secure Payment - GetPay</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Cybersource Flex Microform v2 (use test or prod accordingly) -->
+  <script src="https://testflex.cybersource.com/microform/bundle/v2/flex-microform.min.js"></script>
+  <!-- For production: https://flex.cybersource.com/microform/bundle/v2/flex-microform.min.js -->
 
-<meta name="viewport"
-content="width=device-width,
-initial-scale=1,
-maximum-scale=1,
-viewport-fit=cover">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #1f2937;
+      --gray: #6b7280;
+      --light: #f3f4f6;
+      --border: #d1d5db;
+      --error: #dc2626;
+    }
 
-<title>Secure Checkout | GetPay</title>
+    * { margin:0; padding:0; box-sizing:border-box; }
 
-<script>
-if (window.top !== window.self) {
-    window.top.location = window.self.location.href;
-}
-</script>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--light);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem 1rem;
+      line-height: 1.5;
+    }
 
-<script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
 
-<style>
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
 
-:root{
---primary:#6366f1;
---primary-dark:#4f46e5;
---bg:#f8fafc;
---surface:#ffffff;
---text:#0f172a;
---text-muted:#64748b;
---error:#ef4444;
---radius:16px;
---shadow:0 10px 32px rgba(0,0,0,0.08);
-}
+    .header h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+    .header p   { font-size: 0.95rem; opacity: 0.9; }
 
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
+    .content { padding: 1.75rem 1.5rem; }
 
-html,body{
-height:100%;
-width:100%;
-font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-background:linear-gradient(to bottom,#f8fafc,#e2e8f0);
-color:var(--text);
--webkit-font-smoothing:antialiased;
-}
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 1.5rem 0 1rem;
+      color: var(--primary);
+    }
 
-body{
-display:flex;
-justify-content:center;
-align-items:center;
-padding:16px;
-}
+    .store-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
 
-/* MAIN WRAPPER */
+    .store-icon { font-size: 2rem; color: var(--primary); }
 
-.payment-wrapper{
+    .form-group { margin-bottom: 1.4rem; }
 
-width:100%;
-max-width:460px;
+    label {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: #374151;
+    }
 
-min-height:560px;
+    input, select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
 
-background:var(--surface);
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
 
-border-radius:var(--radius);
+    .hosted-field-container {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      min-height: 48px;          /* Enough space for card number field */
+      background: #fff;
+      transition: border-color 0.2s;
+    }
 
-box-shadow:var(--shadow);
+    .hosted-field-container:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
 
-padding:28px 20px;
+    .expiry-cvv { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
 
-display:flex;
-flex-direction:column;
+    .error-msg {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.4rem;
+      display: none;
+    }
 
-align-items:center;
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 2rem;
+    }
 
-overflow:hidden;
+    .btn:hover { background: var(--primary-dark); }
+    .btn:disabled { background: #9ca3af; cursor: not-allowed; }
 
-}
+    .security {
+      text-align: center;
+      margin: 1.8rem 0;
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
 
-/* HEADER */
+    .security i { color: #10b981; margin-right: 0.4rem; }
 
-.logo-area{
-margin-bottom:20px;
-}
-
-.logo-area h1{
-font-size:1.6rem;
-font-weight:700;
-color:var(--primary-dark);
-}
-
-/* CHECKOUT CONTAINER */
-
-#checkout{
-
-width:100%;
-
-height:420px;
-
-min-height:420px;
-
-overflow:hidden;
-
-}
-
-/* LOADER */
-
-.loader{
-border:5px solid #e2e8f0;
-border-top:5px solid var(--primary);
-border-radius:50%;
-width:46px;
-height:46px;
-animation:spin 1s linear infinite;
-margin:20px auto;
-}
-
-@keyframes spin{
-0%{transform:rotate(0)}
-100%{transform:rotate(360deg)}
-}
-
-#status-message{
-display:none;
-text-align:center;
-padding-top:30px;
-}
-
-h2{
-font-size:1.35rem;
-margin-bottom:8px;
-}
-
-p{
-color:var(--text-muted);
-font-size:.95rem;
-line-height:1.6;
-}
-
-.error-message{
-
-margin-top:20px;
-
-background:#fef2f2;
-
-border:1px solid #fecaca;
-
-padding:14px;
-
-border-radius:10px;
-
-font-size:.92rem;
-
-color:var(--error);
-
-display:none;
-
-}
-
-/* MOBILE */
-
-@media (max-width:480px){
-
-body{
-padding:10px;
-}
-
-.payment-wrapper{
-
-max-width:100%;
-
-min-height:520px;
-
-padding:22px 16px;
-
-}
-
-#checkout{
-
-height:400px;
-
-min-height:400px;
-
-}
-
-.logo-area h1{
-font-size:1.45rem;
-}
-
-}
-
-</style>
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.8rem; }
+      .content { padding: 1.5rem 1.2rem; }
+      .header h1 { font-size: 1.45rem; }
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="payment-wrapper">
-
-<div class="logo-area">
-<h1>GetPay</h1>
-</div>
-
-<div id="status-message">
-
-<h2 id="status-title">Processing Payment</h2>
-
-<p id="status-desc">
-Please wait while we securely verify your transaction
-</p>
-
-<div class="loader"></div>
-
-</div>
-
-<div id="checkout"></div>
-
-<div id="error-display" class="error-message"></div>
-
-</div>
-
-<script>
-
-const PAP_INFO="eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-
-const OPR_KEY="4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-
-const VERIFY_URL="https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
-
-const WEBSITE_DOMAIN="https://sandeepkumarjha.com.np";
-
-const EXPECTED_AMOUNT=4500.55;
-
-function showError(msg){
-
-const el=document.getElementById("error-display");
-
-el.innerText=msg;
-
-el.style.display="block";
-
-document.getElementById("checkout").style.display="none";
-
-document.getElementById("status-message").style.display="none";
-
-}
-
-async function verifyAndRedirect(txnId){
-
-document.getElementById("checkout").style.display="none";
-
-document.getElementById("status-message").style.display="block";
-
-try{
-
-const res=await fetch(VERIFY_URL,{
-
-method:"POST",
-
-headers:{"Content-Type":"application/json"},
-
-body:JSON.stringify({id:txnId})
-
-});
-
-const result=await res.json();
-
-const data=result.data||result;
-
-if(!data || data.status!=="SUCCESS"){
-
-window.location.href=`${WEBSITE_DOMAIN}/fail.html`;
-
-return;
-
-}
-
-const received=Number(data.amount);
-
-if(Math.abs(received-EXPECTED_AMOUNT)>0.01){
-
-window.location.href=`${WEBSITE_DOMAIN}/fail.html?reason=amount`;
-
-return;
-
-}
-
-window.location.href=`${WEBSITE_DOMAIN}/success.html?txid=${txnId}`;
-
-}
-
-catch(err){
-
-window.location.href=`${WEBSITE_DOMAIN}/fail.html?reason=verify`;
-
-}
-
-}
-
-window.addEventListener("load",()=>{
-
-const params=new URLSearchParams(window.location.search);
-
-const token=params.get("token");
-
-if(token){
-
-try{
-
-const payload=JSON.parse(atob(token));
-
-const txnId=payload.id||payload.transactionId||payload.txnId;
-
-if(txnId){
-
-verifyAndRedirect(txnId);
-
-return;
-
-}
-
-}catch(e){
-
-showError("Invalid bank response");
-
-return;
-
-}
-
-}
-
-function init(){
-
-if(typeof GetPay==="undefined"){
-
-setTimeout(init,300);
-
-return;
-
-}
-
-const options={
-
-userInfo:{
-
-name:"Sandeep Kumar Jha",
-
-email:"zhasandeep7@gmail.com",
-
-city:"Kathmandu",
-
-address:"Maitidevi"
-
-},
-
-clientRequestId:"ORD-"+Date.now(),
-
-papInfo:PAP_INFO,
-
-oprKey:OPR_KEY,
-
-insKey:"",
-
-websiteDomain:WEBSITE_DOMAIN,
-
-price:EXPECTED_AMOUNT,
-
-currency:"NPR",
-
-baseUrl:"https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
-
-onSuccess:(res)=>{
-
-const tid=res.transactionId||res.id||res.txnId;
-
-if(tid){
-
-verifyAndRedirect(tid);
-
-}else{
-
-showError("Transaction finished but ID missing");
-
-}
-
-},
-
-onError:(err)=>{
-
-showError("Payment failed. Please try again.");
-
-}
-
-};
-
-try{
-
-const gp=new GetPay(options);
-
-(gp.initialize||gp.init||gp.start)?.();
-
-}catch(e){
-
-showError("Payment initialization failed");
-
-}
-
-}
-
-setTimeout(init,300);
-
-});
-
-</script>
+  <div class="container">
+    <div class="header">
+      <h1>GetPay</h1>
+      <p>Secure Payment</p>
+    </div>
+
+    <div class="content">
+
+      <div class="store-info">
+        <i class="fas fa-store store-icon"></i>
+        <div>
+          <strong>Sandeep Kumar Jha</strong><br>
+          <small>Store</small>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.8rem;">
+        <button style="padding:0.8rem 1.2rem; background:#2563eb; color:white; border:none; border-radius:6px; font-weight:500; cursor:default;">
+          <i class="fas fa-credit-card" style="margin-right:0.5rem;"></i> Card
+        </button>
+      </div>
+
+      <form id="paymentForm">
+
+        <h2 class="section-title">Card Information</h2>
+
+        <div class="form-group">
+          <label for="cardName">Name on Card</label>
+          <input type="text" id="cardName" name="cardName" value="Sandeep Kumar Jha" required placeholder="Full name on card">
+        </div>
+
+        <div class="form-group">
+          <label>Card Number</label>
+          <div id="number-container" class="hosted-field-container"></div>
+          <div id="number-error" class="error-msg"></div>
+        </div>
+
+        <div class="expiry-cvv">
+          <div class="form-group">
+            <label>Expiry (MM/YY)</label>
+            <div id="expiry-container" class="hosted-field-container"></div>
+            <div id="expiry-error" class="error-msg"></div>
+          </div>
+
+          <div class="form-group">
+            <label>CVV</label>
+            <div id="cvv-container" class="hosted-field-container"></div>
+            <div id="cvv-error" class="error-msg"></div>
+          </div>
+        </div>
+
+        <h2 class="section-title">Billing Address</h2>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" value="zhasandeep7@gmail.com" required placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <label for="country">Country</label>
+          <select id="country" name="country" required>
+            <option value="NP" selected>Nepal</option>
+            <option value="IN">India</option>
+            <option value="US">United States</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="zip">Zip / Postal Code</label>
+          <input type="text" id="zip" name="zip" placeholder="44600" required>
+        </div>
+
+        <button type="submit" id="payBtn" class="btn" disabled>Pay Securely</button>
+
+      </form>
+
+      <div class="security">
+        <i class="fas fa-lock"></i> Secured by GetPay • SSL Encrypted
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Replace with your ACTUAL capture context JWT from backend
+    // Example: fetch from your server → /api/capture-context
+    const captureContext = "YOUR_CAPTURE_CONTEXT_JWT_HERE";   // ← Critical: get this from server!
+
+    let microform;
+    let cardNumberField, expiryField, cvvField;
+
+    const styles = {
+      input: {
+        'font-size': '16px',
+        'color': '#1f2937',
+        'font-family': 'system-ui, sans-serif',
+        'line-height': '1.5'
+      },
+      ':focus': {
+        'outline': 'none'
+      },
+      '::placeholder': {
+        'color': '#9ca3af'
+      },
+      '.invalid': {
+        'border-color': '#dc2626'
+      }
+    };
+
+    function showError(id, message) {
+      const el = document.getElementById(id);
+      el.textContent = message;
+      el.style.display = message ? 'block' : 'none';
+    }
+
+    function initMicroform() {
+      if (!captureContext) {
+        console.error("Missing captureContext JWT – cannot initialize Microform");
+        alert("Payment system not ready. Please contact support.");
+        return;
+      }
+
+      try {
+        const flex = new Flex(captureContext);
+        microform = flex.microform({ styles });
+
+        // Create individual fields
+        cardNumberField = microform.createField('number', { placeholder: '•••• •••• •••• ••••' });
+        expiryField     = microform.createField('expirationDate', { placeholder: 'MM / YY' });
+        cvvField        = microform.createField('securityCode', { placeholder: 'CVV' });
+
+        // Load fields into containers
+        cardNumberField.load('#number-container');
+        expiryField.load('#expiry-container');
+        cvvField.load('#cvv-container');
+
+        // Enable pay button once fields are ready
+        microform.on('ready', () => {
+          console.log("Microform ready");
+          document.getElementById('payBtn').disabled = false;
+        });
+
+        // Listen for changes / validation
+        const fields = [cardNumberField, expiryField, cvvField];
+        fields.forEach(field => {
+          field.on('change', (data) => {
+            const errEl = document.getElementById(`${field._type || 'field'}-error`);
+            if (data.error) {
+              showError(`${field._type || 'field'}-error`, data.error.message || 'Invalid input');
+            } else {
+              showError(`${field._type || 'field'}-error`, '');
+            }
+          });
+        });
+
+      } catch (err) {
+        console.error("Microform init failed:", err);
+        alert("Failed to load secure card form. Please refresh or contact support.");
+      }
+    }
+
+    // Submit handler – get transient token
+    document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+
+      try {
+        const tokenResponse = await microform.createToken({
+          card: {
+            name: document.getElementById('cardName').value.trim()
+          }
+        });
+
+        if (tokenResponse.valid) {
+          const transientToken = tokenResponse.token;
+          console.log("Transient Token:", transientToken);
+
+          // Send transientToken + billing info to your backend for processing
+          // Example: await fetch('/api/process-payment', { method: 'POST', body: JSON.stringify({ token: transientToken, ... }) })
+          alert("Payment token generated successfully! (Check console)");
+        } else {
+          console.error("Token invalid:", tokenResponse);
+          alert("Card details invalid. Please check and try again.");
+        }
+      } catch (err) {
+        console.error("Token creation failed:", err);
+        alert("Payment processing failed. Please try again.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Pay Securely";
+      }
+    });
+
+    // Start
+    initMicroform();
+  </script>
 
 </body>
 </html>
