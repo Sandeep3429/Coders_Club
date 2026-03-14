@@ -6,17 +6,24 @@
     <title>Payment Failed</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; border-top: 6px solid #dc3545; }
+        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; border-top: 6px solid #dc3545; }
         .icon { font-size: 60px; color: #dc3545; margin-bottom: 20px; }
-        .btn { display: inline-block; background-color: #dc3545; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
+        .reason { color: #666; font-style: italic; margin-bottom: 20px; }
+        .btn { display: inline-block; background-color: #dc3545; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="icon">❌</div>
         <h2>Payment Failed</h2>
-        <p>The transaction was declined by the bank or cancelled. No funds were deducted.</p>
-        <a href="/getpay.html" class="btn">Return to Checkout</a>
+        <p>We couldn't process your transaction.</p>
+        <p class="reason" id="failReason"></p>
+        <a href="/getpay.html" class="btn">Try Again</a>
     </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const reason = params.get('reason') || "Transaction was declined or cancelled.";
+        document.getElementById('failReason').innerText = "Reason: " + reason;
+    </script>
 </body>
 </html>
