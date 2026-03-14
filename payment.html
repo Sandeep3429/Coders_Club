@@ -17,56 +17,5 @@
         .loading { text-align: center; color: #64748b; padding: 40px; }
     </style>
 </head>
-<body>
-    <div class="payment-container">
-        <h3 class="heading">Secure Checkout</h3>
-        <div id="checkout">
-            <div class="loading">Initializing Secure Session...</div>
-        </div>
-    </div>
 
-    <script>
-        const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-        const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-        const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
-        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                if (typeof GetPay !== 'undefined') {
-                    const options = {
-                        userInfo: {
-                            name: "Sandeep Kumar Jha",
-                            email: "zhasandeep7@gmail.com",
-                            city: "Kathmandu",
-                            address: "Maitidevi"
-                        },
-                        clientRequestId: "REQ-" + Date.now(),
-                        papInfo: PAP_INFO,
-                        oprKey: OPR_KEY,
-                        insKey: "", 
-                        websiteDomain: WEBSITE_DOMAIN,
-                        price: 4500.55,
-                        currency: "NPR",
-                        baseUrl: BASE_URL,
-                        onSuccess: function (res) {
-                            // Only redirect if there is a result/token from the successful payment
-                            if (res) {
-                                console.log("Payment completed:", res);
-                                // Forwarding with verified=true so success.html accepts it
-                                window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + (res.transactionId || res.id || "N/A");
-                            }
-                        },
-                        onError: function (err) {
-                            console.error("Payment Error:", err);
-                            window.location.href = WEBSITE_DOMAIN + "/fail.html";
-                        }
-                    };
-                    const gp = new GetPay(options);
-                    gp.initialize ? gp.initialize() : gp.init();
-                }
-            }, 1000);
-        });
-    </script>
-</body>
 </html>
