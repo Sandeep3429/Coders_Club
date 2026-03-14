@@ -4,133 +4,235 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Checkout | GetPay</title>
+    
+    <!-- Prevent clickjacking / framing -->
     <script>
-        // Prevent page from being framed
-        if (window.top !== window.self) { window.top.location = window.self.location.href; }
+        if (window.top !== window.self) {
+            window.top.location = window.self.location.href;
+        }
     </script>
+
     <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+
     <style>
-        :root { --primary: #5662FF; --bg: #f4f7ff; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .payment-wrapper { width: 100%; max-width: 500px; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-top: 40px; text-align: center;}
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #checkout { min-height: 450px; }
+        :root {
+            --primary: #5662FF;
+            --bg: #f4f7ff;
+            --error: #e63946;
+            --success: #2ecc71;
+        }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .payment-wrapper {
+            width: 100%;
+            max-width: 520px;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin: 40px auto;
+            text-align: center;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #checkout {
+            min-height: 480px;
+        }
+        .error-message {
+            color: var(--error);
+            margin: 20px 0;
+            padding: 12px;
+            background: #ffebee;
+            border-radius: 8px;
+        }
+        h2 { margin: 0.8em 0 0.4em; color: #333; }
+        p { color: #555; line-height: 1.5; }
     </style>
 </head>
 <body>
 
-    <div class="payment-wrapper">
-        <div id="status-message" style="display: none;">
-            <div class="loader"></div>
-            <h3 id="status-title">Verifying Payment...</h3>
-            <p id="status-desc">Communicating with NCHL secure servers.</p>
-        </div>
-
-        <div id="checkout">
-            <div class="loader"></div>
-            <p>Loading Secure Payment Form...</p>
-        </div>
+<div class="payment-wrapper">
+    <div id="status-message" style="display: none;">
+        <div class="loader"></div>
+        <h2 id="status-title">Processing Payment</h2>
+        <p id="status-desc">Please wait while we securely verify your transaction with NCHL...</p>
     </div>
 
-    <script>
-        const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-        const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-        const VERIFY_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
-        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-        const EXPECTED_AMOUNT = 4500.55;
+    <div id="checkout">
+        <div class="loader"></div>
+        <p>Loading secure payment form...</p>
+    </div>
 
-        async function verifyAndRedirect(txnId) {
-            // Switch UI to verification mode
-            document.getElementById('checkout').style.display = 'none';
-            document.getElementById('status-message').style.display = 'block';
+    <div id="error-display" class="error-message" style="display: none;"></div>
+</div>
 
+<script>
+    // ────────────────────────────────────────────────
+    //  CONFIGURATION
+    // ────────────────────────────────────────────────
+    const PAP_INFO        = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+    const OPR_KEY         = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
+    const VERIFY_URL      = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
+    const WEBSITE_DOMAIN  = "https://sandeepkumarjha.com.np";
+    const EXPECTED_AMOUNT = 4500.55;
+
+    const showError = (msg) => {
+        const el = document.getElementById('error-display');
+        el.textContent = msg;
+        el.style.display = 'block';
+        document.getElementById('checkout').style.display = 'none';
+        document.getElementById('status-message').style.display = 'none';
+    };
+
+    async function verifyAndRedirect(txnId) {
+        document.getElementById('checkout').style.display = 'none';
+        document.getElementById('status-message').style.display = 'block';
+
+        try {
+            const res = await fetch(VERIFY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: txnId })
+            });
+
+            if (!res.ok) {
+                throw new Error(`Verification HTTP ${res.status}`);
+            }
+
+            const result = await res.json();
+            console.log("[VERIFY] Full response:", result);
+
+            const data = result.data || result;
+
+            if (!data || data.status !== "SUCCESS") {
+                const reason = data?.remarks || data?.message || "Transaction declined or failed";
+                window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(reason)}`;
+                return;
+            }
+
+            // Safer amount comparison
+            const received = Number(data.amount);
+            if (Math.abs(received - EXPECTED_AMOUNT) > 0.011) {
+                console.warn("Amount mismatch", { expected: EXPECTED_AMOUNT, received });
+                window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=Amount%20mismatch`;
+                return;
+            }
+
+            // Success
+            window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${encodeURIComponent(txnId)}`;
+        } catch (err) {
+            console.error("[VERIFY] Failed:", err);
+            window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=Verification%20error`;
+        }
+    }
+
+    // ────────────────────────────────────────────────
+    //  MAIN LOGIC
+    // ────────────────────────────────────────────────
+    window.addEventListener('load', () => {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+
+        // Case 1: Returning from bank (3DS/ACS redirect)
+        if (token) {
+            console.log("[REDIRECT] Token received:", token);
             try {
-                const response = await fetch(VERIFY_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: txnId })
-                });
+                const decodedStr = atob(token);
+                console.log("[REDIRECT] Decoded:", decodedStr);
+                const payload = JSON.parse(decodedStr);
+                console.log("[REDIRECT] Parsed:", payload);
 
-                const result = await response.json();
-                console.log("Verification Result:", result);
+                const txnId = payload.id || payload.transactionId || payload.txnId || payload.transaction_id;
 
-                // Use the successful verification logic based on NCHL response structure
-                if (result.data && result.data.status === "SUCCESS" && parseFloat(result.data.amount) === EXPECTED_AMOUNT) {
-                    window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
+                if (txnId) {
+                    verifyAndRedirect(txnId);
+                    return;
                 } else {
-                    const msg = result.data ? result.data.remarks : "Transaction failed or declined";
-                    window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(msg)}`;
+                    throw new Error("No transaction ID in token");
                 }
-            } catch (error) {
-                console.error("API Call failed:", error);
-                window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=ConnectionError`;
+            } catch (err) {
+                console.error("[REDIRECT] Token parsing failed:", err);
+                showError("Invalid response from bank. Please try again or contact support.");
+                return;
             }
         }
 
-        window.addEventListener('load', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-
-            // CASE 1: Handle Post-ACS Redirect (Token Found)
-            if (token) {
-                try {
-                    const decoded = JSON.parse(atob(token));
-                    if (decoded.id) {
-                        verifyAndRedirect(decoded.id);
-                        return; // Prevent SDK from initializing
-                    }
-                } catch (e) {
-                    console.error("Token invalid:", e);
+        // Case 2: Fresh checkout → wait for SDK
+        function attemptInitialize() {
+            if (typeof GetPay === 'undefined') {
+                if (document.readyState === 'complete') {
+                    showError("Payment module failed to load. Please check your internet connection and try again.");
+                } else {
+                    setTimeout(attemptInitialize, 400);
                 }
+                return;
             }
 
-            // CASE 2: Regular Initialization (No Token)
-            setTimeout(() => {
-                if (typeof GetPay !== 'undefined') {
-                    const options = {
-                        userInfo: { 
-                            name: "Sandeep Kumar Jha", 
-                            email: "zhasandeep7@gmail.com", 
-                            city: "Kathmandu", 
-                            address: "Maitidevi" 
-                        },
-                        clientRequestId: "ORD" + Date.now(),
-                        papInfo: PAP_INFO,
-                        oprKey: OPR_KEY,
-                        insKey: "", 
-                        websiteDomain: WEBSITE_DOMAIN,
-                        price: EXPECTED_AMOUNT,
-                        currency: "NPR",
-                        baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
-                        onSuccess: (res) => {
-                            const tid = res.transactionId || res.id;
-                            verifyAndRedirect(tid);
-                        },
-                        onError: (err) => {
-                            // LOG but DON'T REDIRECT immediately unless it's a critical failure
-                            console.warn("GetPay SDK Notice:", err);
-                            // If the checkout container is still empty after 5 seconds, then fail
-                            setTimeout(() => {
-                                if(document.getElementById('checkout').innerHTML.includes("Loading")) {
-                                     window.location.href = WEBSITE_DOMAIN + "/fail.html?reason=InitTimeout";
-                                }
-                            }, 5000);
-                        }
-                    };
-                    
-                    try {
-                        const gp = new GetPay(options);
-                        gp.initialize ? gp.initialize() : gp.init();
-                    } catch (e) {
-                        console.error("Manual Init Error:", e);
+            const options = {
+                userInfo: {
+                    name:    "Sandeep Kumar Jha",
+                    email:   "zhasandeep7@gmail.com",
+                    city:    "Kathmandu",
+                    address: "Maitidevi"
+                },
+                clientRequestId: "ORD-" + Date.now() + "-" + Math.random().toString(36).slice(2,8),
+                papInfo: PAP_INFO,
+                oprKey: OPR_KEY,
+                insKey: "",
+                websiteDomain: WEBSITE_DOMAIN,
+                price: EXPECTED_AMOUNT,
+                currency: "NPR",
+                baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+
+                onSuccess: (res) => {
+                    console.log("[SDK] Success callback:", res);
+                    const tid = res.transactionId || res.id || res.txnId;
+                    if (tid) {
+                        verifyAndRedirect(tid);
+                    } else {
+                        showError("Transaction completed but no ID received.");
                     }
-                } else {
-                    console.error("SDK Bundle not loaded");
-                    document.getElementById('checkout').innerHTML = "Failed to load payment module. Check internet connection.";
+                },
+
+                onError: (err) => {
+                    console.warn("[SDK] Error:", err);
+                    setTimeout(() => {
+                        if (document.getElementById('checkout').innerHTML.includes("Loading")) {
+                            showError("Payment form took too long to initialize. Please refresh or try again later.");
+                        }
+                    }, 12000);
                 }
-            }, 1000); // 1 second buffer for bundle parsing
-        });
-    </script>
+            };
+
+            try {
+                const gp = new GetPay(options);
+                (gp.initialize || gp.init || gp.start)?.();
+            } catch (e) {
+                console.error("[SDK] Initialization failed:", e);
+                showError("Failed to start payment module. Please try again.");
+            }
+        }
+
+        attemptInitialize();
+    });
+</script>
 </body>
 </html>
