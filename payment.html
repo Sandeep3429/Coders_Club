@@ -15,7 +15,6 @@
   <!-- GetPay bundle -->
   <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
 
-  <!-- Basic layout / responsive styles -->
   <style>
     * {
       box-sizing: border-box;
@@ -26,21 +25,20 @@
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f4f7ff;
+      background: #eef2ff;
       min-height: 100vh;
     }
 
     body {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 24px 16px;
     }
 
+    /* Single centered column, no extra wrapper card */
     .payment-page {
       width: 100%;
       max-width: 960px;
-      margin: 0 auto;
+      padding: 24px 16px 40px;
     }
 
     .page-header {
@@ -60,23 +58,12 @@
       color: #6b7280;
     }
 
-    .payment-wrapper {
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-      margin: 16px auto;
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    /* Top bar with NCHL logo and store name */
+    /* Thin top bar only, rest is native GetPay layout */
     .payment-header-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       gap: 12px;
     }
 
@@ -87,7 +74,7 @@
     }
 
     .brand-logo {
-      height: 36px;
+      height: 32px;
       width: auto;
       object-fit: contain;
     }
@@ -103,17 +90,53 @@
       color: #6b7280;
       padding: 4px 8px;
       border-radius: 999px;
-      background: #f3f4ff;
+      background: rgba(255, 255, 255, 0.7);
     }
 
-    /* Container where GetPay injects its UI */
+    /* Main GetPay mount point – let it define its own card width */
     #checkout {
       width: 100%;
       min-height: 820px;
       display: block;
     }
 
-    /* Loading overlay */
+    /* Information / logo strip below (maps to your information-section path) */
+    .information-section {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: #4b5563;
+    }
+
+    .information-section .info-text {
+      flex: 1 1 auto;
+    }
+
+    .information-section .nchl-logo {
+      height: 26px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .error-message {
+      margin-top: 16px;
+      padding: 16px;
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid #fecaca;
+      display: none;
+      font-size: 0.9rem;
+    }
+
+    /* Full‑page processing overlay */
     #status-message {
       position: fixed;
       inset: 0;
@@ -141,126 +164,58 @@
       }
     }
 
-    .error-message {
-      margin-top: 16px;
-      padding: 16px;
-      background: #fee2e2;
-      color: #dc2626;
-      border-radius: 10px;
-      text-align: center;
-      border: 1px solid #fecaca;
-      display: none;
-      font-size: 0.9rem;
-    }
-
-    /* Optional extra information area with logo (maps to your information-section Xpath) */
-    .information-section {
-      margin-top: 20px;
-      padding-top: 12px;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      font-size: 0.85rem;
-      color: #6b7280;
-    }
-
-    .information-section .info-text {
-      flex: 1 1 auto;
-    }
-
-    .information-section .nchl-logo {
-      height: 28px;
-      width: auto;
-      object-fit: contain;
-    }
-
     /* Responsive tweaks */
-    @media (min-width: 768px) {
-      .payment-wrapper {
-        padding: 28px 32px;
-      }
-
-      .payment-page {
-        padding: 0 8px;
-      }
-    }
-
     @media (min-width: 1200px) {
-      /* Keep the form from looking too narrow on big monitors */
-      body {
-        padding-top: 40px;
-      }
-
-      .payment-wrapper {
-        max-width: 720px;
+      .payment-page {
+        max-width: 1100px;
+        padding-top: 32px;
       }
     }
 
     @media (max-width: 640px) {
-      body {
-        padding: 16px 8px;
-      }
-
-      .payment-wrapper {
-        border-radius: 12px;
-        margin-top: 8px;
-        padding: 20px 12px;
-      }
-
-      #checkout {
-        min-height: 860px;
+      .payment-page {
+        padding: 16px 10px 28px;
       }
 
       .payment-header-bar {
         flex-direction: column;
         align-items: flex-start;
       }
+
+      #checkout {
+        min-height: 860px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="payment-page">
+  <main class="payment-page">
     <header class="page-header">
       <h1>Secure Payment</h1>
       <p>Complete your payment safely via NCHL getPay</p>
     </header>
 
-    <div class="payment-wrapper">
-      <div class="payment-header-bar">
-        <div class="brand-left">
-          <!-- NCHL / bank brand logo (update src to your hosted logo path) -->
-          <img
-            src="img/NCHL-Logo.png"
-            alt="NCHL Logo"
-            class="brand-logo"
-          />
-          <span class="brand-text">Sandeep Store</span>
-        </div>
-        <span class="gateway-badge">Powered by NCHL getPay</span>
+    <div class="payment-header-bar">
+      <div class="brand-left">
+        <img src="img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
+        <span class="brand-text">Sandeep Store</span>
       </div>
-
-      <!-- Main checkout container (xpath: /html/body/div/div[2]/main/div/div[4]) -->
-      <div id="checkout"></div>
-
-      <!-- Optional extra info area with NCHL brand logo (xpath /html/body/div/div[2]/main/div/div[3]) -->
-      <div class="information-section">
-        <div class="info-text">
-          Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
-        </div>
-        <img
-          src="img/NCHL-Logo.png"
-          alt="NCHL"
-          class="nchl-logo"
-        />
-      </div>
-
-      <!-- Error container -->
-      <div id="error-display" class="error-message"></div>
+      <span class="gateway-badge">Powered by NCHL getPay</span>
     </div>
-  </div>
+
+    <!-- Main checkout container (xpath: /html/body/div/div[2]/main/div/div[4]) -->
+    <div id="checkout"></div>
+
+    <!-- Information section with NCHL logo (xpath: /html/body/div/div[2]/main/div/div[3]) -->
+    <div class="information-section">
+      <div class="info-text">
+        Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
+      </div>
+      <img src="img/NCHL-Logo.png" alt="NCHL" class="nchl-logo" />
+    </div>
+
+    <div id="error-display" class="error-message"></div>
+  </main>
 
   <!-- Full‑page processing overlay -->
   <div id="status-message">
