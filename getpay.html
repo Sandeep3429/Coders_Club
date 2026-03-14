@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GetPay Checkout</title>
     <!-- TODO: replace with Bundle.js URL from NCHL -->
-    <script defer src="https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/js/Bundle.js"></script>
+    <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
         .checkout-card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
@@ -29,7 +29,6 @@
         const OPR_KEY   = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
         const INS_KEY   = ""; 
         const BASE_URL  = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
-        const BASE_DOMAIN = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout";
         const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
 
         document.getElementById("payBtn").addEventListener("click", () => {
@@ -45,7 +44,7 @@
                 oprKey: OPR_KEY,
                 insKey: INS_KEY,
                 websiteDomain: WEBSITE_DOMAIN,
-                price: "10.00",
+                price: 10.00,
                 businessName: "Sandeep Kumar Jha - Payment Demo",
                 imageUrl: WEBSITE_DOMAIN + "/logo.png",
                 currency: "NPR",
@@ -56,7 +55,7 @@
                     failUrl:    WEBSITE_DOMAIN + "/fail.html",
                 },
                 themeColor: "#5662FF",
-                baseUrl: BASE_DOMAIN, // Use the base without specific path
+                baseUrl: BASE_URL, // Use the base without specific path
                 onSuccess: (options) => {
                     console.log("GetPay Init Success", options);
                     window.location.href = WEBSITE_DOMAIN + "/payment.html";
@@ -67,10 +66,16 @@
                 }
             };
 
+            console.log("Payload being sent to GetPay:", options);
             if (window.getpay && window.getpay.initialize) {
-                window.getpay.initialize(options);
+                try {
+                    window.getpay.initialize(options);
+                } catch (error) {
+                    console.error("Error during GetPay initialization:", error);
+                    alert("An error occurred while initializing the payment gateway. Please try again later.");
+                }
             } else {
-                console.error("GetPay SDK not loaded");
+                console.error("GetPay SDK not loaded. Ensure the script URL is correct and accessible.");
                 alert("Payment gateway SDK is not loaded correctly. Check documentation or network.");
             }
         });
