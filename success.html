@@ -3,54 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful</title>
-    <!-- Iframe buster script -->
+    <title>Verifying Payment...</title>
     <script>
-        // FILE: success.html | GetPay Integration
-        if (window.top !== window.self) {
-            window.top.location = window.self.location.href;
-        }
+        // Iframe buster
+        if (window.top !== window.self) { window.top.location = window.self.location.href; }
     </script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
-        .success-card { background: white; padding: 3rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #28a745; max-width: 450px; width: 90%; }
-        .icon { font-size: 50px; color: #28a745; margin-bottom: 20px; }
-        .txid { font-family: monospace; background: #eee; padding: 5px 10px; border-radius: 4px; display: inline-block; margin: 15px 0; word-break: break-all; }
-        .btn { display: inline-block; background-color: #28a745; color: white; text-decoration: none; padding: 12px 24px; font-size: 16px; border-radius: 4px; margin-top: 20px; transition: 0.3s; }
-        .btn:hover { background-color: #218838; }
-        .error-msg { color: #dc3545; }
+        :root { --primary: #5662FF; --success: #28a745; --error: #dc3545; }
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; transition: all 0.3s ease; }
+        .icon { font-size: 50px; margin-bottom: 20px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animate: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn { display: inline-block; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 20px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-retry { background: #6c757d; color: white; }
+        .txid { font-family: monospace; background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 13px; }
     </style>
 </head>
 <body>
-    <div class="success-card">
-        <div id="content">
-            <div class="icon">✅</div>
-            <h2>Payment Successful!</h2>
-            <p>Thank you for your payment.</p>
-            <div id="txnContainer" style="display: none;">
-                Transaction ID: <br><strong class="txid" id="txnIdDisplay"></strong>
-            </div>
-            <a href="https://sandeepkumarjha.com.np" class="btn">Return to Home</a>
+
+    <div class="card" id="statusCard">
+        <div id="loadingArea">
+            <div class="loader"></div>
+            <h3>Verifying Transaction</h3>
+            <p>Please wait while we confirm your payment with NCHL...</p>
         </div>
+        <div id="resultArea" style="display: none;"></div>
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const verified = urlParams.get('verified');
-        const txid = urlParams.get('txid');
+        const EXPECTED_AMOUNT = 4500.55;
+        const VERIFY_API = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
+        
+        async function verifyPayment() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const txnId = urlParams.get('txid');
+            const resultArea = document.getElementById('resultArea');
+            const loadingArea = document.getElementById('loadingArea');
+            const card = document.getElementById('statusCard');
 
-        // Enforcement of server verification param
-        if (verified !== 'true') {
-            document.getElementById('content').innerHTML = `
-                <div class="icon" style="color:#dc3545">⚠️</div>
-                <h2 class="error-msg">Unverified Access</h2>
-                <p>This payment has not been verified yet.</p>
-                <a href="https://sandeepkumarjha.com.np" class="btn" style="background-color:#6c757d">Return to Home</a>
-            `;
-        } else if (txid) {
-            document.getElementById('txnContainer').style.display = 'block';
-            document.getElementById('txnIdDisplay').textContent = txid;
+            if (!txnId) {
+                showError("No Transaction ID found. Access Denied.");
+                return;
+            }
+
+            try {
+                const response = await fetch(VERIFY_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: txnId })
+                });
+
+                const data = await response.json();
+                console.log("NCHL Verification Response:", data);
+
+                // 1. Check if status is SUCCESS
+                const status = (data.status || data.transactionStatus || "").toUpperCase();
+                // 2. Validate Amount (convert to float to be safe)
+                const actualAmount = parseFloat(data.amount || data.totalAmount || 0);
+
+                if ((status === "SUCCESS" || status === "APPROVED") && actualAmount === EXPECTED_AMOUNT) {
+                    showSuccess(txnId, actualAmount);
+                } else if (actualAmount !== EXPECTED_AMOUNT && status === "SUCCESS") {
+                    showError(`Amount Mismatch! Expected ${EXPECTED_AMOUNT}, but received ${actualAmount}.`);
+                } else {
+                    showError(`Payment Status: ${status || 'FAILED'}`);
+                }
+
+            } catch (error) {
+                console.error("Verification Error:", error);
+                showError("Network error. Could not verify payment status.");
+            } finally {
+                loadingArea.style.display = 'none';
+                resultArea.style.display = 'block';
+            }
         }
+
+        function showSuccess(id, amt) {
+            const area = document.getElementById('resultArea');
+            document.getElementById('statusCard').style.borderTop = "6px solid var(--success)";
+            area.innerHTML = `
+                <div class="icon">✅</div>
+                <h2 style="color: var(--success)">Payment Verified!</h2>
+                <p>Successfully processed <strong>Rs ${amt.toFixed(2)}</strong></p>
+                <p>Transaction ID: <span class="txid">${id}</span></p>
+                <a href="/dashboard" class="btn btn-primary">Start Learning Java</a>
+            `;
+        }
+
+        function showError(msg) {
+            const area = document.getElementById('resultArea');
+            document.getElementById('statusCard').style.borderTop = "6px solid var(--error)";
+            area.innerHTML = `
+                <div class="icon">⚠️</div>
+                <h2 style="color: var(--error)">Verification Failed</h2>
+                <p>${msg}</p>
+                <a href="/getpay.html" class="btn btn-retry">Try Again</a>
+            `;
+        }
+
+        // Run on load
+        window.onload = verifyPayment;
     </script>
 </body>
 </html>
