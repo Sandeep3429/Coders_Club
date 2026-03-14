@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Secure Checkout | getPay</title>
 
-  <!-- Break out of any unwanted frames -->
   <script>
     if (window.top !== window.self) {
       window.top.location = window.self.location.href;
@@ -19,71 +18,59 @@
       box-sizing: border-box;
     }
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #f4f7ff 0%, #e0e7ff 100%);
+    html, body {
       margin: 0;
-      padding: 16px 12px;
-      min-height: 100vh;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f7ff;
+    }
+
+    body {
       display: flex;
       justify-content: center;
       align-items: flex-start;
+      padding: 20px 12px;
+      min-height: 100vh;
     }
 
     .payment-wrapper {
       width: 100%;
-      max-width: 720px;               /* A bit wider → less cramped */
-      background: #ffffff;
-      padding: 32px 24px;
-      border-radius: 20px;
-      box-shadow: 0 12px 50px rgba(0,0,0,0.10);
-      margin: 24px auto;
+      max-width: 620px;               /* balanced – not too narrow, not ultra-wide */
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.09);
+      overflow: hidden;               /* helps contain any overflow */
+      margin: 16px auto;
     }
 
-    h2 {
-      margin: 0 0 1em;
-      text-align: center;
-      color: #1e293b;
-      font-size: 1.5rem;
-    }
-
-    /* Key fix: generous min-height + allow growth */
-    .checkout-container {
-      width: 100%;
-      min-height: 680px;              /* ← increased → most payment forms need 650–850px */
-      height: auto;                   /* let content expand if needed */
-      border-radius: 14px;
-      overflow: hidden;
-      background: #f9fafb;
-      border: 1px solid #e2e8f0;
-      position: relative;
-    }
-
+    /* ── Critical change ── Let injected content breathe + grow naturally */
     #checkout {
       width: 100%;
-      min-height: 100%;
-      border: none;
+      min-height: 720px;              /* fallback – increase to 800–1000 if still squished */
+      height: auto !important;        /* fight against forced 100% height if any */
+      display: block !important;
     }
 
-    /* Loader overlay */
-    .loader-wrapper {
+    /* Loader overlay – covers whole checkout area during processing */
+    #status-message {
       position: absolute;
       inset: 0;
-      display: flex;
+      background: rgba(255,255,255,0.96);
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(255,255,255,0.96);
-      z-index: 20;
-      gap: 16px;
+      gap: 20px;
+      z-index: 10;
     }
 
     .loader {
       border: 6px solid #f3f3f3;
       border-top: 6px solid #5662FF;
       border-radius: 50%;
-      width: 52px;
-      height: 52px;
+      width: 56px;
+      height: 56px;
       animation: spin 1s linear infinite;
     }
 
@@ -92,23 +79,24 @@
     }
 
     .error-message {
-      margin-top: 24px;
+      margin: 24px;
       padding: 16px;
       background: #fee2e2;
       color: #dc2626;
       border-radius: 12px;
       text-align: center;
-      font-weight: 500;
       border: 1px solid #fecaca;
+      display: none;
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: 520px) {
+      body { padding: 12px 8px; }
       .payment-wrapper {
-        padding: 24px 18px;
-        border-radius: 16px;
+        border-radius: 12px;
+        padding: 0;                   /* remove internal padding – form has its own */
       }
-      .checkout-container {
-        min-height: 720px;           /* even taller on small screens if needed */
+      #checkout {
+        min-height: 800px;            /* mobile often needs more vertical space */
       }
     }
   </style>
@@ -117,43 +105,34 @@
 
 <div class="payment-wrapper">
 
-  <!-- Shown during verification -->
-  <div id="status-message" class="loader-wrapper" style="display: none;">
+  <div id="status-message">
     <div class="loader"></div>
     <h2>Processing Payment</h2>
     <p>Please wait while we verify your transaction…</p>
   </div>
 
-  <!-- Where SDK injects the form / iframe -->
-  <div class="checkout-container">
-    <div id="checkout"></div>
-  </div>
+  <div id="checkout"></div>
 
-  <!-- Error display -->
-  <div id="error-display" class="error-message" style="display:none;"></div>
+  <div id="error-display" class="error-message"></div>
 
 </div>
 
 <script>
-// ──────────────────────────────────────────────
-// CONFIG (unchanged)
+// Your existing config & logic – unchanged except minor cleanups
 const PAP_INFO       = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
 const OPR_KEY        = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
 const VERIFY_URL     = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
 const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
 const EXPECTED_AMOUNT = 4500.55;
 
-// ──────────────────────────────────────────────
-// ERROR
 function showError(msg) {
-  document.getElementById("error-display").innerText = msg;
-  document.getElementById("error-display").style.display = "block";
+  const el = document.getElementById("error-display");
+  el.textContent = msg;
+  el.style.display = "block";
   document.getElementById("checkout").style.display = "none";
   document.getElementById("status-message").style.display = "none";
 }
 
-// ──────────────────────────────────────────────
-// VERIFY
 async function verifyAndRedirect(txnId) {
   document.getElementById("checkout").style.display = "none";
   document.getElementById("status-message").style.display = "flex";
@@ -165,7 +144,7 @@ async function verifyAndRedirect(txnId) {
       body: JSON.stringify({ id: txnId })
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new Error("HTTP " + res.status);
 
     const result = await res.json();
     const data = result.data || result;
@@ -178,19 +157,17 @@ async function verifyAndRedirect(txnId) {
 
     const received = Number(data.amount);
     if (Math.abs(received - EXPECTED_AMOUNT) > 0.01) {
-      window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount_mismatch`;
+      window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount`;
       return;
     }
 
     window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
   } catch (err) {
     console.error(err);
-    window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification_failed`;
+    window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification`;
   }
 }
 
-// ──────────────────────────────────────────────
-// MAIN
 window.addEventListener("load", () => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
@@ -204,23 +181,22 @@ window.addEventListener("load", () => {
         return;
       }
     } catch (e) {
-      showError("Invalid bank response format");
+      showError("Invalid response from bank");
       return;
     }
   }
 
-  // Init SDK
   function init() {
     if (typeof GetPay === "undefined") {
-      setTimeout(init, 300);
+      setTimeout(init, 400);
       return;
     }
 
     const options = {
       userInfo: {
-        name:    "Sandeep Kumar Jha",
-        email:   "zhasandeep7@gmail.com",
-        city:    "Kathmandu",
+        name: "Sandeep Kumar Jha",
+        email: "zhasandeep7@gmail.com",
+        city: "Kathmandu",
         address: "Maitidevi"
       },
       clientRequestId: "ORD-" + Date.now(),
@@ -231,30 +207,31 @@ window.addEventListener("load", () => {
       price: EXPECTED_AMOUNT,
       currency: "NPR",
       baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
-
       onSuccess: (res) => {
         const tid = res.transactionId || res.id || res.txnId;
-        if (tid) verifyAndRedirect(tid);
-        else showError("No transaction ID received");
+        if (tid) {
+          verifyAndRedirect(tid);
+        } else {
+          showError("Transaction ID missing");
+        }
       },
-
       onError: (err) => {
-        console.warn("Payment error:", err);
-        showError("Payment could not be processed. Please try again or contact support.");
+        console.warn(err);
+        showError("Payment failed. Please try again.");
       }
     };
 
     try {
       const gp = new GetPay(options);
-      (gp.initialize || gp.init || gp.start || gp.load)?.();
+      (gp.initialize || gp.init || gp.start)?.();
     } catch (e) {
-      showError("Failed to start payment form");
-      console.error(e);
+      showError("Payment initialization failed");
     }
   }
 
   init();
 });
 </script>
+
 </body>
 </html>
