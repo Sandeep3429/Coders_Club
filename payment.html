@@ -4,14 +4,13 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Secure Checkout | GetPay</title>
 
 <script>
 if (window.top !== window.self) {
-window.top.location = window.self.location.href;
+    window.top.location = window.self.location.href;
 }
 </script>
 
@@ -19,147 +18,50 @@ window.top.location = window.self.location.href;
 
 <style>
 
-:root{
---primary:#6366f1;
---bg:#f8fafc;
---surface:#ffffff;
---text:#0f172a;
---text-muted:#64748b;
---error:#ef4444;
---radius:16px;
---shadow:0 12px 34px rgba(0,0,0,.08);
-}
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-html,body{
-height:100%;
-font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-background:linear-gradient(to bottom,#f8fafc,#e2e8f0);
-}
-
-/* CENTER VIEW */
-
 body{
-
+font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+background:#f4f7ff;
+margin:0;
+padding:20px;
 display:flex;
 justify-content:center;
-align-items:center;
-
-padding:16px;
-
 }
-
-/* MAIN CARD */
 
 .payment-wrapper{
 
 width:100%;
+max-width:520px;
 
-max-width:460px;
+background:#ffffff;
 
-height:auto;
+padding:30px;
 
-background:var(--surface);
+border-radius:14px;
 
-border-radius:var(--radius);
-
-box-shadow:var(--shadow);
-
-padding:24px;
-
-display:flex;
-
-flex-direction:column;
-
-align-items:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
 
 }
 
-/* HEADER */
-
-.logo-area{
-
-margin-bottom:18px;
-
-}
-
-.logo-area h1{
-
-font-size:1.5rem;
-
-font-weight:700;
-
-color:var(--primary);
-
-}
-
-/* FIXED FORM CONTAINER */
-
-.checkout-container{
-
-width:100%;
-
-max-width:420px;
-
-height:460px;
-
-border-radius:12px;
-
-overflow:hidden;
-
-display:flex;
-
-justify-content:center;
-
-align-items:flex-start;
-
-}
-
-/* GETPAY FORM TARGET */
+/* IMPORTANT — do not constrain the SDK */
 
 #checkout{
 
 width:100%;
 
-height:460px;
-
-min-height:460px;
+min-height:500px;
 
 }
 
-/* STATUS */
-
-#status-message{
-
-display:none;
-
-text-align:center;
-
-padding:30px 0;
-
-}
+/* loader */
 
 .loader{
-
-border:5px solid #e2e8f0;
-
-border-top:5px solid var(--primary);
-
+border:5px solid #f3f3f3;
+border-top:5px solid #5662FF;
 border-radius:50%;
-
-width:46px;
-
-height:46px;
-
+width:40px;
+height:40px;
 animation:spin 1s linear infinite;
-
-margin:20px auto;
-
+margin:30px auto;
 }
 
 @keyframes spin{
@@ -169,47 +71,17 @@ margin:20px auto;
 
 .error-message{
 
-display:none;
+color:#e63946;
 
 margin-top:20px;
 
-background:#fef2f2;
+padding:12px;
 
-border:1px solid #fecaca;
+background:#ffebee;
 
-padding:14px;
+border-radius:8px;
 
-border-radius:10px;
-
-font-size:.9rem;
-
-color:var(--error);
-
-}
-
-/* MOBILE OPTIMIZATION */
-
-@media(max-width:480px){
-
-.payment-wrapper{
-
-max-width:100%;
-
-padding:18px;
-
-}
-
-.checkout-container{
-
-height:440px;
-
-}
-
-#checkout{
-
-height:440px;
-
-}
+display:none;
 
 }
 
@@ -221,11 +93,7 @@ height:440px;
 
 <div class="payment-wrapper">
 
-<div class="logo-area">
-<h1>GetPay</h1>
-</div>
-
-<div id="status-message">
+<div id="status-message" style="display:none;text-align:center">
 
 <h2>Processing Payment</h2>
 
@@ -235,17 +103,15 @@ height:440px;
 
 </div>
 
-<div class="checkout-container">
-
 <div id="checkout"></div>
-
-</div>
 
 <div id="error-display" class="error-message"></div>
 
 </div>
 
 <script>
+
+/* CONFIG */
 
 const PAP_INFO="eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
 
@@ -256,6 +122,9 @@ const VERIFY_URL="https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secur
 const WEBSITE_DOMAIN="https://sandeepkumarjha.com.np";
 
 const EXPECTED_AMOUNT=4500.55;
+
+
+/* ERROR HANDLER */
 
 function showError(msg){
 
@@ -271,6 +140,9 @@ document.getElementById("status-message").style.display="none";
 
 }
 
+
+/* VERIFY */
+
 async function verifyAndRedirect(txnId){
 
 document.getElementById("checkout").style.display="none";
@@ -280,14 +152,14 @@ document.getElementById("status-message").style.display="block";
 try{
 
 const res=await fetch(VERIFY_URL,{
-
 method:"POST",
-
 headers:{"Content-Type":"application/json"},
-
 body:JSON.stringify({id:txnId})
-
 });
+
+if(!res.ok){
+throw new Error("HTTP "+res.status);
+}
 
 const result=await res.json();
 
@@ -295,7 +167,9 @@ const data=result.data||result;
 
 if(!data || data.status!=="SUCCESS"){
 
-window.location.href=`${WEBSITE_DOMAIN}/fail.html`;
+const reason=data?.remarks || "Transaction failed";
+
+window.location.href=`${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(reason)}`;
 
 return;
 
@@ -311,17 +185,22 @@ return;
 
 }
 
-window.location.href=`${WEBSITE_DOMAIN}/success.html?txid=${txnId}`;
+window.location.href=`${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
 
 }
 
 catch(err){
 
-window.location.href=`${WEBSITE_DOMAIN}/fail.html?reason=verify`;
+console.error(err);
+
+window.location.href=`${WEBSITE_DOMAIN}/fail.html?reason=verification`;
 
 }
 
 }
+
+
+/* MAIN */
 
 window.addEventListener("load",()=>{
 
@@ -329,13 +208,16 @@ const params=new URLSearchParams(window.location.search);
 
 const token=params.get("token");
 
+
+/* RETURN FROM BANK */
+
 if(token){
 
 try{
 
 const payload=JSON.parse(atob(token));
 
-const txnId=payload.id||payload.transactionId||payload.txnId;
+const txnId=payload.id || payload.transactionId || payload.txnId;
 
 if(txnId){
 
@@ -347,7 +229,7 @@ return;
 
 }catch(e){
 
-showError("Invalid bank response");
+showError("Invalid response from bank");
 
 return;
 
@@ -355,11 +237,14 @@ return;
 
 }
 
+
+/* INITIALIZE SDK */
+
 function init(){
 
 if(typeof GetPay==="undefined"){
 
-setTimeout(init,300);
+setTimeout(init,400);
 
 return;
 
@@ -368,15 +253,10 @@ return;
 const options={
 
 userInfo:{
-
 name:"Sandeep Kumar Jha",
-
 email:"zhasandeep7@gmail.com",
-
 city:"Kathmandu",
-
 address:"Maitidevi"
-
 },
 
 clientRequestId:"ORD-"+Date.now(),
@@ -397,7 +277,7 @@ baseUrl:"https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchan
 
 onSuccess:(res)=>{
 
-const tid=res.transactionId||res.id||res.txnId;
+const tid=res.transactionId || res.id || res.txnId;
 
 if(tid){
 
@@ -413,6 +293,8 @@ showError("Transaction ID missing");
 
 onError:(err)=>{
 
+console.warn(err);
+
 showError("Payment failed. Please try again.");
 
 }
@@ -423,7 +305,7 @@ try{
 
 const gp=new GetPay(options);
 
-(gp.initialize||gp.init||gp.start)?.();
+(gp.initialize || gp.init || gp.start)?.();
 
 }catch(e){
 
@@ -433,7 +315,7 @@ showError("Payment initialization failed");
 
 }
 
-setTimeout(init,400);
+init();
 
 });
 
