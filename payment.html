@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Payment | GetPay</title>
+    <title>Secure Checkout | GetPay</title>
     
     <script>
         if (window.top !== window.self) {
@@ -37,19 +37,39 @@
     <div class="payment-wrapper">
         <div id="checkout">
             <div class="status-text">
-                <p>Loading secure payment module...</p>
+                <p id="msg">Initializing secure payment module...</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Constants matching your getpay.html
         const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
         const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
         const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
         const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
 
         window.addEventListener('load', () => {
+            // STEP 1: Check if we are returning from the bank (ACS Redirect)
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            if (token) {
+                document.getElementById('msg').innerText = "Processing Bank Authentication...";
+                try {
+                    // Decode Base64 Token
+                    const decoded = JSON.parse(atob(token));
+                    const txnId = decoded.id;
+                    if (txnId) {
+                        // Redirect to success page for final API verification
+                        window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + txnId;
+                        return; // Stop further execution
+                    }
+                } catch (e) {
+                    console.error("Token decode failed", e);
+                }
+            }
+
+            // STEP 2: Normal SDK Initialization (First Load)
             setTimeout(() => {
                 if (typeof GetPay !== 'undefined') {
                     const options = {
@@ -67,16 +87,12 @@
                         price: 4500.55,
                         currency: "NPR",
                         baseUrl: BASE_URL,
-                        
-                        // ON SUCCESS: Redirect to success.html with the Txn ID for validation
                         onSuccess: function (res) {
                             const txid = res.transactionId || res.id;
                             if (txid) {
                                 window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + txid;
                             }
                         },
-                        
-                        // ON ERROR: Send to your fail page
                         onError: function (err) {
                             window.location.href = WEBSITE_DOMAIN + "/fail.html";
                         }
