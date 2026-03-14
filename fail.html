@@ -4,131 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Failed</title>
-    <!-- Iframe buster script -->
-    <script>
-        // FILE: fail.html | GetPay Integration
-        if (window.top !== window.self) {
-            window.top.location = window.self.location.href;
-        }
-    </script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; flex-direction: column; }
-        .fail-card { background: white; padding: 3rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #dc3545; max-width: 450px; width: 90%; }
-        .icon { font-size: 50px; color: #dc3545; margin-bottom: 20px; }
-        .btn { display: inline-block; background-color: #dc3545; color: white; text-decoration: none; padding: 12px 24px; font-size: 16px; border-radius: 4px; margin-top: 20px; transition: 0.3s; }
-        .btn:hover { background-color: #c82333; }
-        
-        #verifyLayer { display: none; margin-top: 20px; }
-        .debug-panel { margin-top: 30px; width: 90%; max-width: 600px; background: #222; color: #0f0; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; display: none; overflow-x: auto; text-align: left;}
-        .debug-toggle { cursor: pointer; color: #5662FF; text-decoration: underline; font-size: 14px; margin-top: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 400px; border-top: 6px solid #dc3545; }
+        .icon { font-size: 60px; color: #dc3545; margin-bottom: 20px; }
+        .btn { display: inline-block; background-color: #dc3545; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="fail-card">
-        <div id="contentLayer">
-            <div class="icon">❌</div>
-            <h2>Payment Failed</h2>
-            <p id="failReason">We couldn't process your payment. Please try again.</p>
-            <a href="https://sandeepkumarjha.com.np/getpay.html" class="btn">Try Again</a>
-        </div>
-        <div id="verifyLayer">
-            <div class="icon" style="color:#5662FF; font-size: 30px;">↻</div>
-            <p>Verifying payment status...</p>
-        </div>
+    <div class="card">
+        <div class="icon">❌</div>
+        <h2>Payment Failed</h2>
+        <p>The transaction was declined by the bank or cancelled. No funds were deducted.</p>
+        <a href="/getpay.html" class="btn">Return to Checkout</a>
     </div>
-
-    <!-- Debug Panel required as per instructions -->
-    <div class="debug-toggle" onclick="document.getElementById('debugPanel').style.display='block'">Show Debug Info</div>
-    <div class="debug-panel" id="debugPanel">
-        <strong>DEBUG LOGS:</strong><br>
-        <pre id="debugContent"></pre>
-    </div>
-
-    <script>
-        const PAP_INFO  = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-        const VERIFY_API = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
-        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-        
-        const debugContent = document.getElementById("debugContent");
-        function appendDebug(msg, data) {
-            console.log(msg, data);
-            debugContent.innerHTML += msg + (data ? ": " + JSON.stringify(data, null, 2) : "") + "\n\n";
-        }
-
-        async function extractAndVerifyToken() {
-            // Check if we arrived here from transaction.html verification flow
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('verified') === 'true') {
-                appendDebug("Already verified by transaction.html routing", {txid: urlParams.get('txid')});
-                const txid = urlParams.get('txid');
-                if (txid) {
-                    document.getElementById('failReason').innerText = `Transaction ${txid} failed or was declined.`;
-                }
-                return;
-            }
-
-            // Alternatively, GetPay might redirect directly to failUrl with hash containing token. Check for it:
-            const url = window.frames[0]?.location.hash || window.location.hash || window.location.search;
-            const tokenParams = new URLSearchParams(url.replace(/^#|^\?/, ""));
-            const token = tokenParams.get("token");
-            appendDebug("Extracted Token", token);
-
-            if (!token) {
-                appendDebug("No token found in URL", null);
-                return;
-            }
-
-            // Process direct token validation flow as per STEP 3 instructions
-            document.getElementById('contentLayer').style.display = 'none';
-            document.getElementById('verifyLayer').style.display = 'block';
-
-            let txnId = null;
-            try {
-                const decoded = JSON.parse(atob(token));
-                appendDebug("Decoded Token", decoded);
-                txnId = decoded.id || decoded.transactionId || decoded.txnId;
-            } catch(e) { 
-                appendDebug("Token decode error", e.message); 
-            }
-
-            if (!txnId) {
-                document.getElementById('verifyLayer').innerHTML = "Invalid token payload.";
-                document.getElementById('contentLayer').style.display = 'block';
-                return;
-            }
-
-            try {
-                const payload = { id: txnId, papInfo: PAP_INFO };
-                appendDebug("Request Payload", payload);
-
-                const response = await fetch(VERIFY_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await response.json();
-                appendDebug("API Response", data);
-                
-                const status = (data.status || data.transactionStatus || "").toUpperCase();
-                
-                if (status === "SUCCESS" || status === "APPROVED") {
-                    window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + txnId;
-                } else if (status === "FAILED" || status === "DECLINED") {
-                    document.getElementById('verifyLayer').style.display = 'none';
-                    document.getElementById('contentLayer').style.display = 'block';
-                    document.getElementById('failReason').innerText = `Transaction ${txnId} failed or was declined.`;
-                } else {
-                    document.getElementById('verifyLayer').innerHTML = "Payment Pending / Unknown Status.<br>Status: " + status;
-                }
-            } catch (error) {
-                appendDebug("Network/Processing Error", error.message);
-                document.getElementById('verifyLayer').style.display = 'none';
-                document.getElementById('contentLayer').style.display = 'block';
-            }
-        }
-
-        window.onload = extractAndVerifyToken;
-    </script>
 </body>
 </html>
