@@ -1,196 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payment Successful! – Java Mastery Course</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #5662FF;
-      --success: #10b981;
-      --text: #1a1a2e;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      max-width: 520px;
-      width: 100%;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 25px 50px rgba(16, 185, 129, 0.2);
-      text-align: center;
-      padding: 50px 30px;
-    }
-    .icon {
-      font-size: 80px;
-      color: var(--success);
-      margin-bottom: 20px;
-      animation: bounce 2s infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-    h1 {
-      font-size: 32px;
-      color: var(--success);
-      margin-bottom: 16px;
-    }
-    p {
-      font-size: 18px;
-      color: #4b5563;
-      line-height: 1.7;
-      margin-bottom: 30px;
-    }
-    .details {
-      background: #f0fdf4;
-      padding: 20px;
-      border-radius: 14px;
-      border: 2px dashed #86efac;
-      margin: 30px 0;
-      text-align: left;
-    }
-    .details p { font-size: 15px; margin-bottom: 8px; }
-    .details p:last-child { margin-bottom: 0; }
-    .txn-id {
-      font-family: monospace;
-      font-size: 13px;
-      color: #475569;
-      word-break: break-all;
-    }
-    .btn {
-      background: var(--primary);
-      color: white;
-      padding: 14px 32px;
-      border: none;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-      text-decoration: none;
-      display: inline-block;
-      margin: 8px;
-    }
-    .btn:hover {
-      background: #3e4dcc;
-      transform: translateY(-3px);
-    }
-    .btn-secondary {
-      background: #f1f5f9;
-      color: var(--text);
-    }
-    .btn-secondary:hover { background: #e2e8f0; }
-    #verify-status {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: -20px;
-      margin-bottom: 16px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <!-- Iframe buster script -->
+    <script>
+        // FILE: success.html | GetPay Integration
+        if (window.top !== window.self) {
+            window.top.location = window.self.location.href;
+        }
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .success-card { background: white; padding: 3rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #28a745; max-width: 450px; width: 90%; }
+        .icon { font-size: 50px; color: #28a745; margin-bottom: 20px; }
+        .txid { font-family: monospace; background: #eee; padding: 5px 10px; border-radius: 4px; display: inline-block; margin: 15px 0; word-break: break-all; }
+        .btn { display: inline-block; background-color: #28a745; color: white; text-decoration: none; padding: 12px 24px; font-size: 16px; border-radius: 4px; margin-top: 20px; transition: 0.3s; }
+        .btn:hover { background-color: #218838; }
+        .error-msg { color: #dc3545; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <i class="fas fa-check-circle icon"></i>
-    <h1>Payment Successful!</h1>
-    <p>Congratulations! You've successfully enrolled in the <strong>Java Mastery Course</strong>.</p>
-
-    <div class="details">
-      <p><strong>Course:</strong> JAVA MASTERY COURSE</p>
-      <p><strong>Amount Paid:</strong> <span style="color:var(--success);font-size:18px;font-weight:700;">Rs 4,500</span></p>
-      <p><strong>Student:</strong> Sandeep Kumar Jha</p>
-      <p id="txn-row" style="display:none;"><strong>Transaction ID:</strong><br><span id="txn-display" class="txn-id"></span></p>
+    <div class="success-card">
+        <div id="content">
+            <div class="icon">✅</div>
+            <h2>Payment Successful!</h2>
+            <p>Thank you for your payment.</p>
+            <div id="txnContainer" style="display: none;">
+                Transaction ID: <br><strong class="txid" id="txnIdDisplay"></strong>
+            </div>
+            <a href="https://sandeepkumarjha.com.np" class="btn">Return to Home</a>
+        </div>
     </div>
 
-    <p id="verify-status">Verifying payment…</p>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const verified = urlParams.get('verified');
+        const txid = urlParams.get('txid');
 
-    <p>Course access link has been sent to:<br><strong>zhasandeep7@gmail.com</strong></p>
-
-    <a href="transactions.html" class="btn btn-secondary">
-      <i class="fas fa-history"></i> View Transactions
-    </a>
-    <a href="https://sandeepkumarjha.com.np" class="btn">
-      <i class="fas fa-home"></i> Back to Home
-    </a>
-  </div>
-
-  <script>
-    // Ensure page is not in an iframe (important for 3DS flow)
-    if (window.top !== window.self) {
-      window.top.location = window.self.location.href;
-    }
-
-    const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-    const VERIFICATION_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/status";
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const txnId = urlParams.get('txnId');
-    const verifyStatus = document.getElementById('verify-status');
-
-    function saveTransaction(txnId, amount, status, raw) {
-      const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-      transactions.unshift({
-        id: txnId,
-        date: new Date().toLocaleString(),
-        amount: amount,
-        status: status,
-        raw: raw
-      });
-      localStorage.setItem('transactions', JSON.stringify(transactions));
-    }
-
-    if (txnId) {
-      // Show the transaction ID in the UI
-      document.getElementById('txn-row').style.display = 'block';
-      document.getElementById('txn-display').textContent = txnId;
-
-      console.log('[GetPay] Verifying Transaction ID:', txnId);
-
-      fetch(VERIFICATION_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ txnId: txnId, papInfo: PAP_INFO })
-      })
-      .then(res => res.json())
-      .catch(err => {
-        // CORS or network error from client-side call — log and simulate success for testing
-        console.warn('[GetPay] Could not reach NCHL verification endpoint (CORS/network). Treating as success for now.', err);
-        return { status: 'SUCCESS', txnId: txnId, amount: 4500 };
-      })
-      .then(data => {
-        console.log('[GetPay] Payment Verification Response:', data);
-        const isSuccess = data.status === 'SUCCESS' || data.status === '000' || data.responseCode === '000';
-        const amount = data.amount || 4500;
-
-        saveTransaction(txnId, amount, isSuccess ? 'Completed' : 'Failed', data);
-
-        if (isSuccess) {
-          verifyStatus.textContent = '✅ Payment verified successfully.';
-          verifyStatus.style.color = '#10b981';
-        } else {
-          verifyStatus.textContent = '⚠️ Verification check returned non-success status. Check console.';
-          verifyStatus.style.color = '#f59e0b';
-          console.warn('[GetPay] Verification returned:', data);
+        // Enforcement of server verification param
+        if (verified !== 'true') {
+            document.getElementById('content').innerHTML = `
+                <div class="icon" style="color:#dc3545">⚠️</div>
+                <h2 class="error-msg">Unverified Access</h2>
+                <p>This payment has not been verified yet.</p>
+                <a href="https://sandeepkumarjha.com.np" class="btn" style="background-color:#6c757d">Return to Home</a>
+            `;
+        } else if (txid) {
+            document.getElementById('txnContainer').style.display = 'block';
+            document.getElementById('txnIdDisplay').textContent = txid;
         }
-      });
-    } else {
-      // No txnId — this can happen if bundle didn't append it; treat page load as success
-      verifyStatus.textContent = 'No transaction ID found in URL. Payment may still have succeeded — check your email.';
-      verifyStatus.style.color = '#f59e0b';
-      console.warn('[GetPay] No txnId in URL params. Full URL:', window.location.href);
-    }
-  </script>
+    </script>
 </body>
 </html>

@@ -1,119 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
-  <title>Payment Success</title>
-  <style>
-    body {
-      font-family: 'Inter', Arial, sans-serif;
-      background: #f8f9ff;
-      color: #1a1a2e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-      padding: 20px;
-    }
-    .message-box {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 15px 30px rgba(86, 98, 255, 0.15);
-    }
-    h1 { color: #10b981; font-size: 36px; margin-bottom: 16px; }
-    p { font-size: 18px; margin-bottom: 20px; }
-    button {
-      padding: 12px 30px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: none;
-      background: #5662FF;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover { background: #3e4dcc; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetPay Secure Payment</title>
+    <!-- Iframe buster script (CRITICAL) -->
+    <script>
+        // FILE: payment.html | GetPay Integration
+        if (window.top !== window.self) {
+            window.top.location = window.self.location.href;
+        }
+        
+        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+        
+        // If we land here via GetPay automatic redirection with a token attached
+        const hash = window.frames[0]?.location.hash || window.location.hash || window.location.search;
+        if (hash && hash.includes("token=")) {
+            // Forward directly to transaction processing
+            window.location.href = WEBSITE_DOMAIN + "/transaction.html" + hash;
+        }
+    </script>
+    <!-- TODO: replace with Bundle.js URL from NCHL -->
+    <script defer src="https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/js/Bundle.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .payment-container { width: 100%; max-width: 500px; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 50px; }
+        .heading { text-align: center; color: #333; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-
-<div class="message-box">
-  <h1>Payment Successful!</h1>
-  <p>Thank you for your order. Your payment has been processed successfully.</p>
-  <button onclick="window.location.href='https://sandeepkumarjha.com.np'">Back to Store</button>
-  <div id="checkout"></div>
-</div>
-
-<script>
-  // Ensure page is not in an iframe (important for 3DS flow)
-  if (window.top !== window.self) {
-    window.top.location = window.self.location.href;
-  }
-
-  // Extract txnId and token from URL params
-  const urlParams = new URLSearchParams(window.location.search);
-  const txnId = urlParams.get('txnId');
-  
-  if (txnId) {
-    console.log('Verifying Transaction ID:', txnId);
-    
-    // Simulate Final Verification: The success page extracts the txnId from the URL 
-    // and performs a final POST request to the NCHL merchant-status endpoint
-    const verificationUrl = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/status";
-    const requestBody = {
-      txnId: txnId,
-      papInfo: "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==" // From getpay.html
-    };
-
-    // Note: In a real environment, CORS might block this client-side call, 
-    // and this should ideally be done on the backend.
-    fetch(verificationUrl, { 
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody) 
-    })
-    .then(response => response.json())
-    .catch(error => {
-      console.warn("Could not reach NCHL verification endpoint. Simulating success for testing.", error);
-      return { status: "SUCCESS", txnId: txnId, amount: 4500 };
-    })
-    .then(data => {
-      console.log('Payment Verification Data:', data);
-      const isSuccess = data.status === "SUCCESS" || data.status === "000";
-      
-      // Save to localStorage
-      const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-      transactions.unshift({
-        id: txnId,
-        date: new Date().toLocaleString(),
-        amount: data.amount || 4500,
-        status: isSuccess ? 'Completed' : 'Failed',
-        raw: data
-      });
-      localStorage.setItem('transactions', JSON.stringify(transactions));
-      
-      if(isSuccess) {
-         // Optionally update UI here to confirm verification passed
-         document.querySelector('p').innerHTML = `Thank you for your order. Transaction <strong>${txnId}</strong> verified successfully.`;
-      } else {
-         document.querySelector('p').innerHTML = `Transaction <strong>${txnId}</strong> verification failed.`;
-         document.body.style.background = '#fef2f2';
-         document.querySelector('h1').style.color = '#ef4444';
-         document.querySelector('h1').innerText = 'Verification Failed';
-      }
-    });
-  } else {
-    // Attempt fallback from token hash if applicable from older code
-    const hash = window.location.hash || '';
-    const hashParams = new URLSearchParams(hash.replace('#','?'));
-    const token = hashParams.get('token');
-    if(token) console.log('Payment Success Token:', token);
-  }
-</script>
-
+    <div class="payment-container">
+        <h3 class="heading">Complete Your Payment</h3>
+        <!-- Required NO HIDDEN attribute here to render the flex form -->
+        <div id="checkout"></div>
+    </div>
 </body>
 </html>

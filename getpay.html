@@ -1,412 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
-  <title>Checkout – Java Mastery Course (GetPay Test)</title>
-
-  <!-- Load test bundle (defer as per sample) -->
-  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
-
-  <!-- Google Font + icons (optional, used by UI) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    :root {
-      --primary: #5662FF;
-      --primary-dark: #3e4dcc;
-      --text: #1a1a2e;
-      --light: #f8f9ff;
-      --gray: #94a3b8;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', Arial, sans-serif;
-      background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .container {
-      background: white;
-      max-width: 480px;
-      width: 100%;
-      border: 1px solid #e2e8f0;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(86, 98, 255, 0.15);
-    }
-
-    .header {
-      background: linear-gradient(135deg, var(--primary), #7b85ff);
-      color: white;
-      padding: 30px 20px;
-      text-align: center;
-    }
-
-    .header h1 {
-      font-size: 28px;
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
-
-    .header p {
-      opacity: 0.9;
-      font-size: 16px;
-    }
-
-    .content {
-      padding: 30px;
-    }
-
-    .course-card {
-      display: flex;
-      align-items: center;
-      background: #f8f9ff;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 25px;
-      border: 1px solid #e6eaff;
-    }
-
-    .course-card img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-right: 16px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .course-info h3 {
-      font-size: 18px;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-
-    .price {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .btn-pay {
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      font-weight: 600;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn-pay:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(86, 98, 255, 0.3);
-    }
-
-    .btn-pay:disabled {
-      background: #94a3b8;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .secure-note {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: var(--gray);
-    }
-
-    .secure-note i {
-      color: #10b981;
-      margin-right: 6px;
-    }
-
-    @media (max-width: 480px) {
-      .header h1 {
-        font-size: 24px;
-      }
-
-      .course-card {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .course-card img {
-        margin-bottom: 12px;
-        margin-right: 0;
-      }
-    }
-
-    /* small status area for debugging / runtime feedback */
-    #integration-status {
-      padding: 12px 20px;
-      font-size: 13px;
-      color: #374151;
-      text-align: center;
-    }
-
-    #integration-status.err {
-      color: #b91c1c;
-    }
-
-    #integration-status.warn {
-      color: #b45309;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetPay Checkout</title>
+    <!-- TODO: replace with Bundle.js URL from NCHL -->
+    <script defer src="https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/js/Bundle.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .checkout-card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .btn { background-color: #5662FF; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 4px; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s; }
+        .btn:hover { background-color: #4550e6; }
+    </style>
 </head>
-
 <body>
-
-  <div class="container">
-    <div class="header">
-      <h1>Java Mastery Course</h1>
-      <p>Learn Java from scratch to advanced level</p>
+    <div class="checkout-card">
+        <h2>Demo Payment</h2>
+        <p>Amount to pay: NPR 10.00</p>
+        <button id="payBtn" class="btn">Pay with GetPay</button>
     </div>
+    
+    <!-- Required hidden div for checkout initialization -->
+    <div id="checkout" hidden></div>
 
-    <div class="content">
-      <div class="course-card">
-        <img src="https://sandeepkumarjha.com.np/img/java.png" alt="Java Course">
-        <div class="course-info">
-          <h3>JAVA FULL COURSE</h3>
-          <div class="price">Rs 4,500</div>
-        </div>
-      </div>
+    <script>
+        // FILE: getpay.html | GetPay Integration
+        const PAP_INFO  = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+        const OPR_KEY   = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
+        const INS_KEY   = ""; 
+        const BASE_URL  = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
+        const BASE_DOMAIN = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout";
+        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
 
-      <!-- Required DIV the GetPay bundle expects (per sample). Keep hidden initially. -->
-      <div id="checkout" hidden></div>
-
-      <button id="checkout-btn" class="btn-pay" aria-live="polite">
-        <i class="fas fa-lock"></i>
-        <span id="btn-text">Proceed to Pay Securely</span>
-      </button>
-
-      <p class="secure-note">
-        <i class="fas fa-shield-alt"></i>
-        Secured by NCHL GetPay • 256-bit SSL Encryption
-      </p>
-
-      <div id="integration-status">Waiting for checkout…</div>
-    </div>
-  </div>
-
-  <script>
-    /*************************************************************************
-     * YOUR TEST CREDENTIALS & ENDPOINTS (as requested)
-     *************************************************************************/
-    const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-    const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-    const INS_KEY = ""; // intentionally empty
-    const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
-    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-
-    const statusEl = document.getElementById('integration-status');
-    const btn = document.getElementById('checkout-btn');
-    const btnText = document.getElementById('btn-text');
-
-    function setStatus(text, cls = '') {
-      statusEl.textContent = text;
-      statusEl.className = cls ? ' ' + cls : '';
-    }
-
-    // Small helper to detect if the GetPay constructor is available
-    function hasGetPayConstructor() {
-      return typeof window.GetPay === 'function' || typeof window.GetPay === 'object';
-    }
-
-    // Immediately report a helpful message to console in case browser blocks analytics or bundle
-    window.addEventListener('load', () => {
-      // check the bundle loaded (bundle may still execute and create GetPay asynchronously)
-      setTimeout(() => {
-        if (!hasGetPayConstructor()) {
-          // keep message visible — often adblock/CSP blocks parts of bundle; user needs to allow domain
-          setStatus('Warning: GetPay bundle loaded but `window.GetPay` constructor not found. If you see bundle.js errors in console, try disabling adblock or allow the minio domain.', 'warn');
-          console.warn('[GetPay] window.GetPay not found on window. Globals:', {
-            GetPay: window.GetPay,
-            GetPayCheckout: window.GetPayCheckout,
-            getpay: window.getpay
-          });
-        } else {
-          setStatus('GetPay is available. Ready to checkout.');
-        }
-      }, 350);
-    });
-
-    /*************************************************************************
-     * Click handler — follows the sample code you provided.
-     * - Builds `options` object using your parameters
-     * - Instantiates `new GetPay(options)`
-     * - Calls `getpay.initialize()`
-     *
-     * Notes:
-     * - If `GetPay` is not present, we show a clear error and log details.
-     *************************************************************************/
-    document.getElementById('checkout-btn').onclick = function (e) {
-      e.preventDefault();
-
-      // UI feedback
-      btn.disabled = true;
-      btnText.innerText = 'Initializing…';
-
-      // Minimal wait to let bundle attach globals if it's still running
-      setTimeout(() => {
-        if (!hasGetPayConstructor()) {
-          const errMsg = 'window.GetPay not available. See console for bundle errors.';
-          setStatus(errMsg, 'err');
-          console.error('[GetPay] Error: window.GetPay not available. Globals:', {
-            GetPay: window.GetPay,
-            GetPayCheckout: window.GetPayCheckout,
-            getpay: window.getpay
-          });
-          alert('Payment initialization failed: GetPay constructor is not available.');
-          btn.disabled = false;
-          btnText.innerText = 'Proceed to Pay Securely';
-          return;
-        }
-
-        // Build options exactly as sample expects (use your credentials)
-        const options = {
-          // userInfo optional
-          userInfo: {
-            name: "Sandeep Kumar Jha",
-            email: "zhasandeep7@gmail.com",
-            state: "Bagmati",
-            country: "NP",
-            zipcode: "44600",
-            city: "Kathmandu",
-            address: "Maitidevi"
-          },
-
-          // clientRequestId: optional — include unique id for the merchant order
-          clientRequestId: "ORDER001-JAVA-" + Date.now(),
-
-          // credentials & keys
-          papInfo: PAP_INFO,
-          oprKey: OPR_KEY,
-          insKey: INS_KEY,
-
-          websiteDomain: WEBSITE_DOMAIN,
-          price: 4500.55,
-          businessName: "Sandeep Store - Learn Smart",
-          imageUrl: "https://sandeepkumarjha.com.np/img/java.png",
-          currency: "NPR",
-
-          // prefill and disable fields
-          prefill: {
-            name: true,
-            email: true,
-            state: true,
-            city: true,
-            address: true,
-            zipcode: true,
-            country: true,
-            address: true,
-            state: true
-          },
-
-          disableFields: {
-
-          },
-
-          // callback URLs — the bundle redirects the browser here after 3DS completes
-          callbackUrl: {
-            successUrl: WEBSITE_DOMAIN + "/payment.html",
-            failUrl: WEBSITE_DOMAIN + "/fail.html"
-          },
-
-          themeColor: "#5662FF",
-
-          orderInformationUI: `
-            <div style="font-family:Inter,Arial,sans-serif;padding:12px;background:#f8f9ff;border-radius:10px;">
-              <h3 style="margin:0 0 8px 0;color:#1a1a2e;">Order Summary</h3>
-              <div style="display:flex;align-items:center;gap:12px;">
-                <img style="width:52px;height:52px;border-radius:8px;object-fit:cover;" src="https://sandeepkumarjha.com.np/img/java.png" />
-                <div>
-                  <p style="margin:0;font-weight:600;">JAVA MASTERY COURSE</p>
-                  <strong style="color:#5662FF;">Rs 4,500.00</strong>
-                </div>
-              </div>
-            </div>`,
-
-          // IMPORTANT: provide baseUrl here prior to initialize (sample sets it right before new GetPay)
-          baseUrl: BASE_URL,
-
-          // The GetPay bundle automatically handles the redirection for 3DS authentication.
-          // Once 3DS is complete, it will submit to either successUrl or failUrl defined above.
-          // The final verification step (merchant-status) should ideally be done on the 
-          // actual destination pages (e.g. within payment.html or on a backend server).
-          
-          onSuccess: function (response) {
-            console.log('GetPay.onSuccess callback fired:', response);
-            // Most of the time in a standard 3DS flow, the page is navigated away to 
-            // the bank ACS before this is even reached or this is fired strictly for non-3DS flows.
-            // So we simply allow the bundle's native redirection or fallback to redirect manually
-            const txnId = response.transactionId || response.id || response.txnId || response.clientRequestId;
+        document.getElementById("payBtn").addEventListener("click", () => {
+            console.log("Pay button clicked, initializing GetPay...");
             
-            if (txnId) {
-                // If there's a need to pass the txnId manually, we append it to the success URL
-                window.location.href = WEBSITE_DOMAIN + "/payment.html?txnId=" + txnId;
+            const options = {
+                userInfo: { 
+                    name: "John Doe", email: "john@example.com", state: "Bagmati", 
+                    country: "Nepal", zipcode: "44600", city: "Kathmandu", address: "Nepal" 
+                },
+                clientRequestId: "TXN-" + Date.now(),
+                papInfo: PAP_INFO,
+                oprKey: OPR_KEY,
+                insKey: INS_KEY,
+                websiteDomain: WEBSITE_DOMAIN,
+                price: "10.00",
+                businessName: "Sandeep Kumar Jha - Payment Demo",
+                imageUrl: WEBSITE_DOMAIN + "/logo.png",
+                currency: "NPR",
+                prefill: { name: true, email: true, state: true, city: true, address: true, zipcode: true, country: true },
+                disableFields: { state: true, address: true },
+                callbackUrl: {
+                    successUrl: WEBSITE_DOMAIN + "/payment.html",
+                    failUrl:    WEBSITE_DOMAIN + "/fail.html",
+                },
+                themeColor: "#5662FF",
+                baseUrl: BASE_DOMAIN, // Use the base without specific path
+                onSuccess: (options) => {
+                    console.log("GetPay Init Success", options);
+                    window.location.href = WEBSITE_DOMAIN + "/payment.html";
+                },
+                onError: (error) => {
+                    console.error("GetPay Init Error:", error);
+                    window.location.href = WEBSITE_DOMAIN + "/fail.html";
+                }
+            };
+
+            if (window.getpay && window.getpay.initialize) {
+                window.getpay.initialize(options);
             } else {
-                window.location.href = WEBSITE_DOMAIN + "/payment.html";
+                console.error("GetPay SDK not loaded");
+                alert("Payment gateway SDK is not loaded correctly. Check documentation or network.");
             }
-          },
-
-          onError: function (error) {
-            console.error('GetPay.onError fired:', error);
-            // In case of a direct cancel or failure that didn't trigger a 3DS redirect:
-            alert('Payment initialization or processing failed. Check console for details.');
-            btn.disabled = false;
-            btnText.innerText = 'Proceed to Pay Securely';
-            window.location.href = WEBSITE_DOMAIN + "/fail.html";
-          }
-        };
-
-        // Instantiate GetPay constructor
-        try {
-          const getpayInstance = new window.GetPay(options);
-          
-          if (typeof getpayInstance.initialize === 'function') {
-            getpayInstance.initialize();
-            console.info('[GetPay] Called getpayInstance.initialize()');
-          } else if (typeof getpayInstance.init === 'function') {
-            getpayInstance.init();
-            console.info('[GetPay] Called getpayInstance.init()');
-          } else {
-            console.info('[GetPay] Instantiated GetPay; no explicit initialize() method found.');
-          }
-          
-          setStatus('Checkout opened. Follow the checkout UI.', '');
-        } catch (err) {
-          console.error('[GetPay] Error initializing checkout:', err);
-          alert('Payment initialization failed. See console for details.');
-          btn.disabled = false;
-          btnText.innerText = 'Proceed to Pay Securely';
-          setStatus('Payment initialization failed. See console.', 'err');
-        }
-      }, 300); // small delay
-    };
-  </script>
+        });
+    </script>
 </body>
-
 </html>

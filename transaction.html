@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying Transaction</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #5662FF; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .message { font-size: 18px; color: #333; margin-bottom: 20px; text-align: center; padding: 0 20px; }
+        
+        .debug-panel { margin-top: 30px; width: 90%; max-width: 600px; background: #222; color: #0f0; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; display: none; overflow-x: auto; }
+        .debug-toggle { cursor: pointer; color: #5662FF; text-decoration: underline; font-size: 14px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="spinner" id="spinner"></div>
+    <div class="message" id="statusMessage">Verifying your payment, please wait...</div>
+    
+    <div class="debug-toggle" onclick="document.getElementById('debugPanel').style.display='block'">Show Debug Info</div>
+    <div class="debug-panel" id="debugPanel">
+        <strong>DEBUG LOGS:</strong><br>
+        <pre id="debugContent"></pre>
+    </div>
+
+    <script>
+        // FILE: transaction.html | GetPay Integration
+        const PAP_INFO  = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+        const VERIFY_API = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
+        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+        
+        const debugContent = document.getElementById("debugContent");
+        function appendDebug(msg, data) {
+            console.log(msg, data);
+            debugContent.innerHTML += msg + (data ? ": " + JSON.stringify(data, null, 2) : "") + "\n\n";
+        }
+
+        async function verifyTransaction() {
+            try {
+                // a) Extract token from URL hash or query params
+                const url = window.location.hash || window.location.search;
+                const urlParams = new URLSearchParams(url.replace(/^#|^\?/, ""));
+                const token = urlParams.get("token");
+                appendDebug("Extracted Token", token);
+
+                if (!token) {
+                    document.getElementById("spinner").style.display = "none";
+                    document.getElementById("statusMessage").innerHTML = "Error: Invalid return URL. Token is missing.<br><br>Please contact support.";
+                    return;
+                }
+
+                // b) Decode Base64 token -> get "id"
+                let decoded = null;
+                try {
+                    decoded = JSON.parse(atob(token));
+                    appendDebug("Decoded Token Data", decoded);
+                } catch(e) {
+                    appendDebug("Token decode error", e.message);
+                }
+
+                const txnId = decoded?.id || decoded?.transactionId || decoded?.txnId;
+                if (!txnId) {
+                    document.getElementById("spinner").style.display = "none";
+                    document.getElementById("statusMessage").innerHTML = "Error: Invalid token payload. Transaction ID missing.<br><br>Please contact support.";
+                    return;
+                }
+
+                // c) POST to merchant-status API
+                const payload = { id: txnId, papInfo: PAP_INFO };
+                appendDebug("Request Payload to Status API", payload);
+
+                const response = await fetch(VERIFY_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                appendDebug("Status API Response", data);
+                
+                // d) Parse response
+                const status = (data.status || data.transactionStatus || "").toUpperCase();
+                
+                if (status === "SUCCESS" || status === "APPROVED") {
+                    window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + txnId;
+                } else if (status === "FAILED" || status === "DECLINED") {
+                    window.location.href = WEBSITE_DOMAIN + "/fail.html?verified=true&txid=" + txnId;
+                } else {
+                    document.getElementById("spinner").style.display = "none";
+                    document.getElementById("statusMessage").innerHTML = "Payment Pending / Unknown Status.<br><br>Status: " + status + "<br>Please contact support with Transaction ID: " + txnId;
+                }
+
+            } catch (error) {
+                appendDebug("Network/Processing Error", error.message);
+                document.getElementById("spinner").style.display = "none";
+                document.getElementById("statusMessage").innerHTML = "Unable to verify payment due to a network error.<br><br>Please contact support.";
+            }
+        }
+
+        window.onload = verifyTransaction;
+    </script>
+</body>
+</html>
