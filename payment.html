@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Secure Checkout | GetPay</title>
-    
-    <!-- Prevent clickjacking / framing -->
+
+    <!-- Prevent clickjacking -->
     <script>
         if (window.top !== window.self) {
             window.top.location = window.self.location.href;
@@ -16,70 +16,159 @@
 
     <style>
         :root {
-            --primary: #5662FF;
-            --bg: #f4f7ff;
-            --error: #e63946;
-            --success: #2ecc71;
+            --primary: #6366f1;       /* modern indigo */
+            --primary-dark: #4f46e5;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --error: #ef4444;
+            --success: #10b981;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.08);
         }
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: var(--bg);
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(to bottom, var(--bg), #e2e8f0);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body {
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
             min-height: 100vh;
         }
+
         .payment-wrapper {
             width: 100%;
-            max-width: 520px;
-            background: white;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            margin: 40px auto;
+            max-width: 480px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem 1.5rem;
+            margin: 32px auto;
             text-align: center;
+            transition: transform 0.2s ease;
         }
+
+        .logo-area {
+            margin-bottom: 1.8rem;
+        }
+
+        .logo-area h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: -0.5px;
+        }
+
         .loader {
-            border: 5px solid #f3f3f3;
+            border: 5px solid #e2e8f0;
             border-top: 5px solid var(--primary);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             animation: spin 1s linear infinite;
-            margin: 30px auto;
+            margin: 2.5rem auto;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
         #checkout {
-            min-height: 480px;
+            min-height: 420px;
+            width: 100%;
+            overflow-x: hidden;
         }
+
+        #status-message {
+            padding: 2rem 1rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            color: var(--text);
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.98rem;
+        }
+
         .error-message {
+            margin: 1.5rem 0;
+            padding: 1rem 1.2rem;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: var(--radius);
             color: var(--error);
-            margin: 20px 0;
-            padding: 12px;
-            background: #ffebee;
-            border-radius: 8px;
+            font-size: 0.95rem;
+            text-align: left;
         }
-        h2 { margin: 0.8em 0 0.4em; color: #333; }
-        p { color: #555; line-height: 1.5; }
+
+        /* Better touch targets */
+        button, input, select, a {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+            .payment-wrapper {
+                padding: 1.6rem 1.2rem;
+                margin: 20px auto;
+                border-radius: 14px;
+                box-shadow: 0 6px 24px rgba(0,0,0,0.07);
+            }
+            .logo-area h1 {
+                font-size: 1.45rem;
+            }
+            h2 {
+                font-size: 1.35rem;
+            }
+            #checkout {
+                min-height: 380px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="payment-wrapper">
+
+    <div class="logo-area">
+        <h1>GetPay</h1>
+    </div>
+
     <div id="status-message" style="display: none;">
         <h2 id="status-title">Processing Payment</h2>
         <p id="status-desc">Please wait while we securely verify your transaction with NCHL...</p>
+        <div class="loader"></div>
     </div>
 
-    <div id="checkout">
-
-    </div>
+    <div id="checkout"></div>
 
     <div id="error-display" class="error-message" style="display: none;"></div>
+
 </div>
 
 <script>
@@ -126,7 +215,6 @@
                 return;
             }
 
-            // Safer amount comparison
             const received = Number(data.amount);
             if (Math.abs(received - EXPECTED_AMOUNT) > 0.011) {
                 console.warn("Amount mismatch", { expected: EXPECTED_AMOUNT, received });
@@ -134,7 +222,6 @@
                 return;
             }
 
-            // Success
             window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${encodeURIComponent(txnId)}`;
         } catch (err) {
             console.error("[VERIFY] Failed:", err);
@@ -149,15 +236,12 @@
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
 
-        // Case 1: Returning from bank (3DS/ACS redirect)
+        // Returning from bank redirect
         if (token) {
             console.log("[REDIRECT] Token received:", token);
             try {
                 const decodedStr = atob(token);
-                console.log("[REDIRECT] Decoded:", decodedStr);
                 const payload = JSON.parse(decodedStr);
-                console.log("[REDIRECT] Parsed:", payload);
-
                 const txnId = payload.id || payload.transactionId || payload.txnId || payload.transaction_id;
 
                 if (txnId) {
@@ -173,11 +257,11 @@
             }
         }
 
-        // Case 2: Fresh checkout → wait for SDK
+        // Fresh checkout
         function attemptInitialize() {
             if (typeof GetPay === 'undefined') {
                 if (document.readyState === 'complete') {
-                    showError("Payment module failed to load. Please check your internet connection and try again.");
+                    showError("Payment module failed to load. Please check your internet and try again.");
                 } else {
                     setTimeout(attemptInitialize, 400);
                 }
@@ -214,7 +298,7 @@
                     console.warn("[SDK] Error:", err);
                     setTimeout(() => {
                         if (document.getElementById('checkout').innerHTML.includes("Loading")) {
-                            showError("Payment form took too long to initialize. Please refresh or try again later.");
+                            showError("Payment form is taking too long. Please refresh or try again later.");
                         }
                     }, 12000);
                 }
@@ -225,7 +309,7 @@
                 (gp.initialize || gp.init || gp.start)?.();
             } catch (e) {
                 console.error("[SDK] Initialization failed:", e);
-                showError("Failed to start payment module. Please try again.");
+                showError("Failed to start payment. Please try again.");
             }
         }
 
