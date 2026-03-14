@@ -4,106 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Checkout | GetPay</title>
-    
     <script>
-        if (window.top !== window.self) {
-            window.top.location = window.self.location.href;
-        }
+        if (window.top !== window.self) { window.top.location = window.self.location.href; }
     </script>
-
     <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
-
     <style>
         :root { --primary: #5662FF; --bg: #f4f7ff; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg); 
-            margin: 0; padding: 15px; 
-            display: flex; justify-content: center; 
-        }
-        .payment-wrapper { 
-            width: 100%; max-width: 500px; 
-            background: white; padding: 2rem; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
-            margin-top: 40px; 
-        }
-        .status-text { text-align: center; color: #64748b; padding: 40px; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .payment-wrapper { width: 100%; max-width: 500px; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-top: 40px; text-align: center;}
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #checkout { min-height: 400px; }
     </style>
 </head>
 <body>
 
     <div class="payment-wrapper">
+        <div id="status-message" style="display: none;">
+            <div class="loader"></div>
+            <h3 id="status-title">Verifying Payment...</h3>
+            <p id="status-desc">Please wait while we confirm your transaction with the bank.</p>
+        </div>
+
         <div id="checkout">
-            <div class="status-text">
-                <p id="msg">Initializing secure payment module...</p>
-            </div>
+            <p>Initializing secure payment module...</p>
         </div>
     </div>
 
     <script>
         const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
         const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-        const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
+        const VERIFY_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
         const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+        const EXPECTED_AMOUNT = 4500.55;
+
+        async function verifyAndRedirect(txnId) {
+            document.getElementById('checkout').style.display = 'none';
+            document.getElementById('status-message').style.display = 'block';
+
+            try {
+                const response = await fetch(VERIFY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: txnId })
+                });
+
+                const result = await response.json();
+                console.log("Verification Response:", result);
+
+                // Use the specific path result.data.status and result.data.amount
+                if (result.data && result.data.status === "SUCCESS" && parseFloat(result.data.amount) === EXPECTED_AMOUNT) {
+                    window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
+                } else {
+                    const reason = result.data ? result.data.remarks : "Payment Failed";
+                    window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(reason)}`;
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=NetworkError`;
+            }
+        }
 
         window.addEventListener('load', () => {
-            // STEP 1: Check if we are returning from the bank (ACS Redirect)
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
 
+            // CASE 1: Returning from Bank (token present)
             if (token) {
-                document.getElementById('msg').innerText = "Processing Bank Authentication...";
                 try {
-                    // Decode Base64 Token
                     const decoded = JSON.parse(atob(token));
-                    const txnId = decoded.id;
-                    if (txnId) {
-                        // Redirect to success page for final API verification
-                        window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + txnId;
-                        return; // Stop further execution
+                    if (decoded.id) {
+                        verifyAndRedirect(decoded.id);
+                        return;
                     }
                 } catch (e) {
-                    console.error("Token decode failed", e);
+                    console.error("Token decoding error", e);
                 }
             }
 
-            // STEP 2: Normal SDK Initialization (First Load)
+            // CASE 2: Initial Load (no token)
             setTimeout(() => {
                 if (typeof GetPay !== 'undefined') {
                     const options = {
-                        userInfo: {
-                            name: "Sandeep Kumar Jha",
-                            email: "zhasandeep7@gmail.com",
-                            city: "Kathmandu",
-                            address: "Maitidevi"
-                        },
+                        userInfo: { name: "Sandeep Kumar Jha", email: "zhasandeep7@gmail.com", city: "Kathmandu", address: "Maitidevi" },
                         clientRequestId: "TXN-" + Date.now(),
                         papInfo: PAP_INFO,
                         oprKey: OPR_KEY,
                         insKey: "", 
                         websiteDomain: WEBSITE_DOMAIN,
-                        price: 4500.55,
+                        price: EXPECTED_AMOUNT,
                         currency: "NPR",
-                        baseUrl: BASE_URL,
-                        onSuccess: function (res) {
-                            const txid = res.transactionId || res.id;
-                            if (txid) {
-                                window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + txid;
-                            }
-                        },
-                        onError: function (err) {
-                            window.location.href = WEBSITE_DOMAIN + "/fail.html";
-                        }
+                        baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+                        onSuccess: (res) => { verifyAndRedirect(res.transactionId || res.id); },
+                        onError: (err) => { window.location.href = WEBSITE_DOMAIN + "/fail.html"; }
                     };
-
-                    try {
-                        const gp = new GetPay(options);
-                        gp.initialize ? gp.initialize() : gp.init();
-                    } catch (e) {
-                        console.error("SDK Initialization failed", e);
-                    }
+                    const gp = new GetPay(options);
+                    gp.initialize ? gp.initialize() : gp.init();
                 }
             }, 800);
         });
