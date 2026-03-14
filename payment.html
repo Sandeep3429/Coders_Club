@@ -3,19 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GetPay Secure Payment | Java Mastery</title>
+    <title>Secure Payment | GetPay</title>
+    
     <script>
-        if (window.top !== window.self) { window.top.location = window.self.location.href; }
+        if (window.top !== window.self) {
+            window.top.location = window.self.location.href;
+        }
     </script>
+
     <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+
     <style>
-        :root { --primary: #5662FF; --bg: #f5f7ff; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); display: flex; justify-content: center; padding: 20px; }
-        .payment-container { width: 100%; max-width: 500px; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-top: 30px; }
-        .heading { text-align: center; color: #1a1a2e; margin-bottom: 24px; font-weight: 700; }
+        :root { --primary: #5662FF; --bg: #f4f7ff; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; padding: 15px; 
+            display: flex; justify-content: center; 
+        }
+        .payment-wrapper { 
+            width: 100%; max-width: 500px; 
+            background: white; padding: 2rem; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            margin-top: 40px; 
+        }
+        .status-text { text-align: center; color: #64748b; padding: 40px; }
         #checkout { min-height: 400px; }
-        .loading { text-align: center; color: #64748b; padding: 40px; }
     </style>
 </head>
+<body>
 
+    <div class="payment-wrapper">
+        <div id="checkout">
+            <div class="status-text">
+                <p>Loading secure payment module...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constants matching your getpay.html
+        const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+        const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
+        const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
+        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (typeof GetPay !== 'undefined') {
+                    const options = {
+                        userInfo: {
+                            name: "Sandeep Kumar Jha",
+                            email: "zhasandeep7@gmail.com",
+                            city: "Kathmandu",
+                            address: "Maitidevi"
+                        },
+                        clientRequestId: "TXN-" + Date.now(),
+                        papInfo: PAP_INFO,
+                        oprKey: OPR_KEY,
+                        insKey: "", 
+                        websiteDomain: WEBSITE_DOMAIN,
+                        price: 4500.55,
+                        currency: "NPR",
+                        baseUrl: BASE_URL,
+                        
+                        // ON SUCCESS: Redirect to success.html with the Txn ID for validation
+                        onSuccess: function (res) {
+                            const txid = res.transactionId || res.id;
+                            if (txid) {
+                                window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + txid;
+                            }
+                        },
+                        
+                        // ON ERROR: Send to your fail page
+                        onError: function (err) {
+                            window.location.href = WEBSITE_DOMAIN + "/fail.html";
+                        }
+                    };
+
+                    try {
+                        const gp = new GetPay(options);
+                        gp.initialize ? gp.initialize() : gp.init();
+                    } catch (e) {
+                        console.error("SDK Initialization failed", e);
+                    }
+                }
+            }, 800);
+        });
+    </script>
+</body>
 </html>
