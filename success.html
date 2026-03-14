@@ -3,91 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifying Payment | Java Mastery</title>
+    <title>Payment Successful | Java Mastery</title>
     <style>
-        :root { --primary: #5662FF; --success: #28a745; --error: #dc3545; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .icon { font-size: 60px; margin-bottom: 20px; }
-        .txid { font-family: monospace; background: #eee; padding: 5px 10px; border-radius: 4px; display: block; margin: 15px 0; word-break: break-all; }
-        .btn { display: inline-block; background-color: var(--primary); color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
+        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; border-top: 6px solid #28a745; }
+        .icon { font-size: 60px; color: #28a745; margin-bottom: 20px; }
+        .txid { font-family: monospace; background: #eee; padding: 8px; border-radius: 4px; display: block; margin: 15px 0; word-break: break-all; font-size: 14px; }
+        .btn { display: inline-block; background-color: #5662FF; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-    <div class="card" id="mainCard">
-        <div id="verify-state">
-            <div class="loader"></div>
-            <h3>Verifying Your Payment</h3>
-            <p>Please do not refresh this page...</p>
-        </div>
-        <div id="result-state" style="display:none;"></div>
+    <div class="card">
+        <div class="icon">✅</div>
+        <h2>Enrollment Successful!</h2>
+        <p>Your payment of <strong>Rs. 4500.55</strong> has been verified.</p>
+        <p>Transaction ID:</p>
+        <span class="txid" id="displayTxid"></span>
+        <a href="https://sandeepkumarjha.com.np" class="btn">Start Learning Java</a>
     </div>
 
     <script>
-        const EXPECTED_AMOUNT = 4500.55;
-        const VERIFY_API = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
-
-        async function verify() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const txnId = urlParams.get('txid');
-            const resArea = document.getElementById('result-state');
-            const verifyArea = document.getElementById('verify-state');
-
-            if (!txnId) {
-                showFinalState(resArea, verifyArea, false, "Missing Transaction ID.");
-                return;
-            }
-
-            try {
-                const response = await fetch(VERIFY_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: txnId })
-                });
-
-                const data = await response.json();
-                const status = (data.status || data.transactionStatus || "").toUpperCase();
-                const actualAmount = parseFloat(data.amount || data.totalAmount || 0);
-
-                if ((status === "SUCCESS" || status === "APPROVED") && actualAmount === EXPECTED_AMOUNT) {
-                    showFinalState(resArea, verifyArea, true, txnId);
-                } else if (actualAmount !== EXPECTED_AMOUNT) {
-                    showFinalState(resArea, verifyArea, false, `Amount Mismatch. Paid: ${actualAmount}, Expected: ${EXPECTED_AMOUNT}`);
-                } else {
-                    showFinalState(resArea, verifyArea, false, `Status: ${status}`);
-                }
-            } catch (err) {
-                showFinalState(resArea, verifyArea, false, "Connectivity Error with Payment Gateway.");
-            }
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('verified') !== 'true') {
+            window.location.href = "/getpay.html";
+        } else {
+            document.getElementById('displayTxid').innerText = params.get('txid');
         }
-
-        function showFinalState(resArea, verifyArea, isSuccess, message) {
-            verifyArea.style.display = 'none';
-            resArea.style.display = 'block';
-            if (isSuccess) {
-                document.getElementById('mainCard').style.borderTop = "6px solid var(--success)";
-                resArea.innerHTML = `
-                    <div class="icon">✅</div>
-                    <h2 style="color:var(--success)">Payment Successful!</h2>
-                    <p>Transaction ID:</p>
-                    <span class="txid">${message}</span>
-                    <a href="/" class="btn" style="background:var(--success)">Access Course Now</a>
-                `;
-            } else {
-                document.getElementById('mainCard').style.borderTop = "6px solid var(--error)";
-                resArea.innerHTML = `
-                    <div class="icon">❌</div>
-                    <h2 style="color:var(--error)">Verification Failed</h2>
-                    <p>${message}</p>
-                    <a href="/getpay.html" class="btn" style="background:var(--error)">Try Again</a>
-                `;
-            }
-        }
-
-        window.onload = verify;
     </script>
 </body>
 </html>
