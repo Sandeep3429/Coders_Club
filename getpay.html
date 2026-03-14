@@ -66,6 +66,7 @@
                 }
             };
 
+            console.log("Payload being sent to GetPay:", options);
             if (window.getpay && window.getpay.initialize) {
                 try {
                     window.getpay.initialize(options);
