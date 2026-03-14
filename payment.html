@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Secure Checkout | getPay</title>
 
+  <!-- Prevent clickjacking -->
   <script>
     if (window.top !== window.self) {
       window.top.location = window.self.location.href;
     }
   </script>
 
+  <!-- GetPay bundle -->
   <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
 
+  <!-- Basic layout / responsive styles -->
   <style>
     * {
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -33,28 +37,88 @@
       padding: 24px 16px;
     }
 
-    .payment-wrapper {
+    .payment-page {
       width: 100%;
-      max-width: 720px;               /* ← key: matches your "half screen / good looking" width */
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.10);
-      overflow: hidden;
-      margin: 16px auto;
+      max-width: 960px;
+      margin: 0 auto;
     }
 
+    .page-header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .page-header h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      color: #111827;
+    }
+
+    .page-header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .payment-wrapper {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      margin: 16px auto;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    /* Top bar with NCHL logo and store name */
+    .payment-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      height: 36px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .brand-text {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #111827;
+    }
+
+    .gateway-badge {
+      font-size: 0.8rem;
+      color: #6b7280;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f3f4ff;
+    }
+
+    /* Container where GetPay injects its UI */
     #checkout {
       width: 100%;
-      min-height: 800px;              /* fallback – covers most tall forms even if sparse */
-      height: auto;
+      min-height: 820px;
       display: block;
     }
 
+    /* Loading overlay */
     #status-message {
-      position: absolute;
+      position: fixed;
       inset: 0;
       z-index: 20;
-      background: rgba(255,255,255,0.97);
+      background: rgba(255, 255, 255, 0.92);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -64,7 +128,7 @@
 
     .loader {
       border: 6px solid #f3f3f3;
-      border-top: 6px solid #5662FF;
+      border-top: 6px solid #5662ff;
       border-radius: 50%;
       width: 56px;
       height: 56px;
@@ -72,11 +136,13 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .error-message {
-      margin: 24px 16px;
+      margin-top: 16px;
       padding: 16px;
       background: #fee2e2;
       color: #dc2626;
@@ -84,155 +150,236 @@
       text-align: center;
       border: 1px solid #fecaca;
       display: none;
+      font-size: 0.9rem;
     }
 
-    @media (max-width: 760px) {
+    /* Optional extra information area with logo (maps to your information-section Xpath) */
+    .information-section {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .information-section .info-text {
+      flex: 1 1 auto;
+    }
+
+    .information-section .nchl-logo {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* Responsive tweaks */
+    @media (min-width: 768px) {
       .payment-wrapper {
-        max-width: 100%;              /* full width on smaller screens */
-        border-radius: 0;
-        margin: 0;
+        padding: 28px 32px;
       }
-      body {
-        padding: 16px 10px;
-      }
-      #checkout {
-        min-height: 820px;            /* little extra breathing on mobile */
+
+      .payment-page {
+        padding: 0 8px;
       }
     }
 
     @media (min-width: 1200px) {
+      /* Keep the form from looking too narrow on big monitors */
+      body {
+        padding-top: 40px;
+      }
+
       .payment-wrapper {
-        max-width: 720px;             /* do NOT grow wider than this */
+        max-width: 720px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 16px 8px;
+      }
+
+      .payment-wrapper {
+        border-radius: 12px;
+        margin-top: 8px;
+        padding: 20px 12px;
+      }
+
+      #checkout {
+        min-height: 860px;
+      }
+
+      .payment-header-bar {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
 </head>
 <body>
+  <div class="payment-page">
+    <header class="page-header">
+      <h1>Secure Payment</h1>
+      <p>Complete your payment safely via NCHL getPay</p>
+    </header>
 
-<div class="payment-wrapper">
+    <div class="payment-wrapper">
+      <div class="payment-header-bar">
+        <div class="brand-left">
+          <!-- NCHL / bank brand logo (update src to your hosted logo path) -->
+          <img
+            src="https://www.nchl.com.np/assets/images/nchl_logo.png"
+            alt="NCHL Logo"
+            class="brand-logo"
+          />
+          <span class="brand-text">Sandeep Store</span>
+        </div>
+        <span class="gateway-badge">Powered by NCHL getPay</span>
+      </div>
 
+      <!-- Main checkout container (xpath: /html/body/div/div[2]/main/div/div[4]) -->
+      <div id="checkout"></div>
+
+      <!-- Optional extra info area with NCHL brand logo (xpath /html/body/div/div[2]/main/div/div[3]) -->
+      <div class="information-section">
+        <div class="info-text">
+          Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
+        </div>
+        <img
+          src="https://www.nchl.com.np/assets/images/nchl_logo.png"
+          alt="NCHL"
+          class="nchl-logo"
+        />
+      </div>
+
+      <!-- Error container -->
+      <div id="error-display" class="error-message"></div>
+    </div>
+  </div>
+
+  <!-- Full‑page processing overlay -->
   <div id="status-message">
     <div class="loader"></div>
-    <h2>Processing Payment</h2>
+    <h2>Processing payment</h2>
     <p>Please wait while we verify your transaction…</p>
   </div>
 
-  <div id="checkout"></div>
+  <script>
+    const PAP_INFO =
+      "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+    const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
+    const VERIFY_URL =
+      "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
+    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+    const EXPECTED_AMOUNT = 4500.55;
 
-  <div id="error-display" class="error-message"></div>
+    function showError(msg) {
+      const el = document.getElementById("error-display");
+      el.textContent = msg;
+      el.style.display = "block";
+      document.getElementById("checkout").style.display = "none";
+      document.getElementById("status-message").style.display = "none";
+    }
 
-</div>
+    async function verifyAndRedirect(txnId) {
+      document.getElementById("checkout").style.display = "none";
+      document.getElementById("status-message").style.display = "flex";
 
+      try {
+        const res = await fetch(VERIFY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: txnId }),
+        });
 
-<script>
-const PAP_INFO       = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
-const OPR_KEY        = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-const VERIFY_URL     = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
-const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-const EXPECTED_AMOUNT = 4500.55;
+        if (!res.ok) throw new Error("HTTP " + res.status);
 
-function showError(msg) {
-  const el = document.getElementById("error-display");
-  el.textContent = msg;
-  el.style.display = "block";
-  document.getElementById("checkout").style.display = "none";
-  document.getElementById("status-message").style.display = "none";
-}
+        const result = await res.json();
+        const data = result.data || result;
 
-async function verifyAndRedirect(txnId) {
-  document.getElementById("checkout").style.display = "none";
-  document.getElementById("status-message").style.display = "flex";
+        if (!data || data.status !== "SUCCESS") {
+          const reason = data?.remarks || "Transaction failed";
+          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(
+            reason
+          )}`;
+          return;
+        }
 
-  try {
-    const res = await fetch(VERIFY_URL, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({id: txnId})
+        const received = Number(data.amount);
+        if (Math.abs(received - EXPECTED_AMOUNT) > 0.01) {
+          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount`;
+          return;
+        }
+
+        window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
+      } catch (err) {
+        console.error(err);
+        window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification`;
+      }
+    }
+
+    window.addEventListener("load", () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token));
+          const txnId = payload.id || payload.transactionId || payload.txnId;
+          if (txnId) {
+            verifyAndRedirect(txnId);
+            return;
+          }
+        } catch (e) {
+          showError("Invalid response from bank");
+          return;
+        }
+      }
+
+      function init() {
+        if (typeof GetPay === "undefined") {
+          setTimeout(init, 400);
+          return;
+        }
+
+        const options = {
+          userInfo: {},
+          clientRequestId: "ORD-" + Date.now(),
+          papInfo: PAP_INFO,
+          oprKey: OPR_KEY,
+          insKey: "",
+          websiteDomain: WEBSITE_DOMAIN,
+          price: EXPECTED_AMOUNT,
+          currency: "NPR",
+          baseUrl:
+            "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+          onSuccess: (res) => {
+            const tid = res.transactionId || res.id || res.txnId;
+            if (tid) verifyAndRedirect(tid);
+            else showError("Transaction ID missing");
+          },
+          onError: (err) => {
+            console.warn(err);
+            showError("Payment failed. Please try again.");
+          },
+        };
+
+        try {
+          const gp = new GetPay(options);
+          (gp.initialize || gp.init || gp.start)?.();
+        } catch (e) {
+          showError("Payment initialization failed");
+          console.error(e);
+        }
+      }
+
+      init();
     });
-
-    if (!res.ok) throw new Error("HTTP " + res.status);
-
-    const result = await res.json();
-    const data = result.data || result;
-
-    if (!data || data.status !== "SUCCESS") {
-      const reason = data?.remarks || "Transaction failed";
-      window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(reason)}`;
-      return;
-    }
-
-    const received = Number(data.amount);
-    if (Math.abs(received - EXPECTED_AMOUNT) > 0.01) {
-      window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount`;
-      return;
-    }
-
-    window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
-  } catch (err) {
-    console.error(err);
-    window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification`;
-  }
-}
-
-window.addEventListener("load", () => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
-
-  if (token) {
-    try {
-      const payload = JSON.parse(atob(token));
-      const txnId = payload.id || payload.transactionId || payload.txnId;
-      if (txnId) {
-        verifyAndRedirect(txnId);
-        return;
-      }
-    } catch (e) {
-      showError("Invalid response from bank");
-      return;
-    }
-  }
-
-  function init() {
-    if (typeof GetPay === "undefined") {
-      setTimeout(init, 400);
-      return;
-    }
-
-    const options = {
-      userInfo: { },
-      clientRequestId: "ORD-" + Date.now(),
-      papInfo: PAP_INFO,
-      oprKey: OPR_KEY,
-      insKey: "",
-      websiteDomain: WEBSITE_DOMAIN,
-      price: EXPECTED_AMOUNT,
-      currency: "NPR",
-      baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
-
-      onSuccess: (res) => {
-        const tid = res.transactionId || res.id || res.txnId;
-        if (tid) verifyAndRedirect(tid);
-        else showError("Transaction ID missing");
-      },
-
-      onError: (err) => {
-        console.warn(err);
-        showError("Payment failed. Please try again.");
-      }
-    };
-
-    try {
-      const gp = new GetPay(options);
-      (gp.initialize || gp.init || gp.start)?.();
-    } catch (e) {
-      showError("Payment initialization failed");
-      console.error(e);
-    }
-  }
-
-  init();
-});
-</script>
-
+  </script>
 </body>
 </html>
