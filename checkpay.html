@@ -29,36 +29,37 @@
     <h3>Response:</h3>
     <div id="response">Waiting for request...</div>
 
-    <script>
-        async function verifyPayment() {
-            const baseURL = "https://ecom-getpay.nchl.com.np/ecom-web-checkout";
-            
-            const txnId = document.getElementById('txnId').value;          
-            const responseDiv = document.getElementById('response');
+    <script type="module">
+        import { GetPayConfig } from './js/getpay-config.js';
 
-            responseDiv.innerText = "Sending request...";
-
-            const payload = {
-                id: txnId
-            };
-
-            try {
-                const response = await fetch(`${baseURL}/v1/secure-merchant/transactions/merchant-status`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Note: Browsers usually block setting 'User-Agent' for security
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await response.json();
-                responseDiv.innerText = JSON.stringify(data, null, 4);
-            } catch (error) {
-                responseDiv.innerText = "Error: " + error.message + 
-                "\n\n(This is likely a CORS block or the 403 Forbidden issue seen in your logs.)";
-            }
-        }
+        // Bind button directly since module scoping prevents global `onclick` attribution from HTML
+        document.getElementById('verifyBtn').addEventListener('click', async () => {
+             const txnId = document.getElementById('txnId').value;          
+             const responseDiv = document.getElementById('response');
+ 
+             responseDiv.innerText = "Sending request...";
+ 
+             const payload = {
+                 id: txnId,
+                 papInfo: GetPayConfig.PAP_INFO
+             };
+ 
+             try {
+                 const response = await fetch(GetPayConfig.VERIFY_API, {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(payload)
+                 });
+ 
+                 const data = await response.json();
+                 responseDiv.innerText = JSON.stringify(data, null, 4);
+             } catch (error) {
+                 responseDiv.innerText = "Error: " + error.message + 
+                 "\n\n(This is likely a CORS block or the 403/401 Forbidden issue seen in logs.)";
+             }
+        });
     </script>
 </body>
 </html>

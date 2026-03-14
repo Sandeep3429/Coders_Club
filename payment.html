@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GetPay Secure Payment</title>
     <!-- Iframe buster script (CRITICAL) -->
-    <script>
+    <script type="module">
         // FILE: payment.html | GetPay Integration
+        import { GetPayConfig } from './js/getpay-config.js';
+
         if (window.top !== window.self) {
             window.top.location = window.self.location.href;
         }
-        
-        const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
         
         // If we land here via GetPay automatic redirection with a token attached
         const hash = window.frames[0]?.location.hash || window.location.hash || window.location.search;
         if (hash && hash.includes("token=")) {
             // Forward directly to transaction processing
-            window.location.href = WEBSITE_DOMAIN + "/transaction.html" + hash;
+            window.location.href = GetPayConfig.WEBSITE_DOMAIN + "/transaction.html" + hash;
         }
     </script>
     <!-- TODO: replace with Bundle.js URL from NCHL -->
