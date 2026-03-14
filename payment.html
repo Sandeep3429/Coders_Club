@@ -4,99 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GetPay Secure Payment | Java Mastery</title>
-    
     <script>
-        if (window.top !== window.self) {
-            window.top.location = window.self.location.href;
-        }
+        if (window.top !== window.self) { window.top.location = window.self.location.href; }
     </script>
-
     <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
-
     <style>
-        :root {
-            --primary: #5662FF;
-            --bg: #f5f7ff;
-        }
-
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            background-color: var(--bg); 
-            margin: 0; 
-            padding: 15px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-
-        .payment-container { 
-            width: 100%; 
-            max-width: 500px; 
-            background: white; 
-            padding: 2rem; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            margin-top: 30px; 
-        }
-
-        .heading { 
-            text-align: center; 
-            color: #1a1a2e; 
-            margin-bottom: 24px;
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        /* Responsive adjustments for the GetPay injected UI */
-        #checkout {
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            color: #64748b;
-            font-size: 14px;
-            padding: 20px;
-        }
-
-        @media (max-width: 480px) {
-            .payment-container {
-                padding: 1.25rem;
-                margin-top: 10px;
-                border-radius: 12px;
-            }
-        }
+        :root { --primary: #5662FF; --bg: #f5f7ff; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .payment-container { width: 100%; max-width: 500px; background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-top: 30px; }
+        .heading { text-align: center; color: #1a1a2e; margin-bottom: 24px; font-weight: 700; }
+        #checkout { min-height: 400px; }
+        .loading { text-align: center; color: #64748b; padding: 40px; }
     </style>
 </head>
 <body>
-
     <div class="payment-container">
         <h3 class="heading">Secure Checkout</h3>
-        
         <div id="checkout">
-            <div class="loading-spinner">
-                <i class="fas fa-spinner fa-spin"></i> Loading secure payment modules...
-            </div>
+            <div class="loading">Initializing Secure Session...</div>
         </div>
     </div>
 
     <script>
-        // Configuration - Ensure these match your index page
         const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
         const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
         const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
         const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
 
         window.addEventListener('load', () => {
-            // Wait a moment for bundle to be ready
             setTimeout(() => {
                 if (typeof GetPay !== 'undefined') {
                     const options = {
-                        // User Info is often required by GetPay to generate the payment session
                         userInfo: {
                             name: "Sandeep Kumar Jha",
                             email: "zhasandeep7@gmail.com",
@@ -111,32 +49,23 @@
                         price: 4500.55,
                         currency: "NPR",
                         baseUrl: BASE_URL,
-                        
-                        // After bank ACS finishes, it returns here
                         onSuccess: function (res) {
-                            console.log("Success:", res);
-                            // Redirect to your final thank you page
-                            window.location.href = WEBSITE_DOMAIN + "/success.html";
+                            // Only redirect if there is a result/token from the successful payment
+                            if (res) {
+                                console.log("Payment completed:", res);
+                                // Forwarding with verified=true so success.html accepts it
+                                window.location.href = WEBSITE_DOMAIN + "/success.html?verified=true&txid=" + (res.transactionId || res.id || "N/A");
+                            }
                         },
                         onError: function (err) {
-                            console.error("Error:", err);
+                            console.error("Payment Error:", err);
+                            window.location.href = WEBSITE_DOMAIN + "/fail.html";
                         }
                     };
-
-                    try {
-                        const gp = new GetPay(options);
-                        if (gp.initialize) gp.initialize();
-                        else if (gp.init) gp.init();
-                        
-                        // Remove spinner once loaded
-                        document.querySelector('.loading-spinner').style.display = 'none';
-                    } catch (e) {
-                        console.error("SDK Init failed", e);
-                    }
-                } else {
-                    document.getElementById('checkout').innerHTML = "Failed to load payment module. Please refresh.";
+                    const gp = new GetPay(options);
+                    gp.initialize ? gp.initialize() : gp.init();
                 }
-            }, 800);
+            }, 1000);
         });
     </script>
 </body>
