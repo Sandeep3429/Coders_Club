@@ -14,6 +14,9 @@
 
   <!-- GetPay bundle -->
   <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
 
   <style>
     * {
@@ -99,7 +102,7 @@
       border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
 
@@ -135,7 +138,37 @@
       font-size: 1.15rem;
     }
 
-    /* Main GetPay mount point – let it define its own card width */
+    /* Beautiful Sandbox OTP Tip Box */
+    .sandbox-otp-tip {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .sandbox-otp-tip i {
+      color: #3b82f6;
+      font-size: 1.2rem;
+    }
+
+    .sandbox-otp-tip span {
+      background: #3b82f6;
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+
+    /* Main GetPay mount point */
     #checkout {
       width: 100%;
       min-height: 820px;
@@ -266,10 +299,18 @@
       </div>
     </div>
 
-    <!-- Main checkout container (xpath: /html/body/div/div[2]/main/div/div[4]) -->
+    <!-- Beautiful Sandbox OTP helper tip -->
+    <div class="sandbox-otp-tip" id="sandbox-otp-helper">
+      <i class="fa-solid fa-circle-info"></i>
+      <div>
+        <strong>Sandbox Testing:</strong> Use the OTP code <span>1234</span> when prompted to complete verification.
+      </div>
+    </div>
+
+    <!-- Main checkout container -->
     <div id="checkout"></div>
 
-    <!-- Information section with NCHL logo (xpath: /html/body/div/div[2]/main/div/div[3]) -->
+    <!-- Information section with NCHL logo -->
     <div class="information-section">
       <div class="info-text">
         Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
@@ -299,11 +340,13 @@
       el.style.display = "block";
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "none";
+      document.getElementById("sandbox-otp-helper").style.display = "none";
     }
 
     async function verifyAndRedirect(txnId, expectedAmount) {
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "flex";
+      document.getElementById("sandbox-otp-helper").style.display = "none";
 
       try {
         const res = await fetch(VERIFY_URL, {
