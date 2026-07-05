@@ -85,7 +85,7 @@
       align-items: start;
     }
 
-    /* Left Panel: Order Details (Ultra-premium FinTech Card) */
+    /* Left Panel: Order Details */
     .order-details-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -250,14 +250,14 @@
       margin-top: 4px;
     }
 
-    /* Right Panel: getPay Checkout Gateway Wrapper */
+    /* Right Panel: getPay Gateway */
     .gateway-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 24px;
       padding: 8px;
       backdrop-filter: blur(20px);
-      box-shadow: 0 20px 40px -15 rgba(0, 0, 0, 0.7);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
       min-height: 520px;
       display: flex;
       flex-direction: column;
@@ -371,8 +371,8 @@
         <div class="currency-selector-wrap">
           <span class="currency-selector-label">Payment Currency</span>
           <div class="currency-toggle">
-            <button class="toggle-btn active" id="toggle-usd" onclick="setCurrency('USD')">USD ($)</button>
-            <button class="toggle-btn" id="toggle-npr" onclick="setCurrency('NPR')">NPR (रू)</button>
+            <button class="toggle-btn" id="toggle-usd" onclick="setCurrency('USD')">USD ($)</button>
+            <button class="toggle-btn active" id="toggle-npr" onclick="setCurrency('NPR')">NPR (रू)</button>
           </div>
         </div>
 
@@ -383,18 +383,18 @@
               <span class="item-title" id="course-name-title">Course Loading...</span>
               <span class="item-subtitle" id="course-email-sub">customer@example.com</span>
             </div>
-            <span class="item-price" id="course-base-price">$0.00</span>
+            <span class="item-price" id="course-base-price">रू 0.00</span>
           </div>
         </div>
 
         <div class="breakdown-list">
           <div class="breakdown-row">
             <span>Subtotal</span>
-            <span id="breakdown-subtotal">$0.00</span>
+            <span id="breakdown-subtotal">रू 0.00</span>
           </div>
           <div class="breakdown-row">
             <span>Tax (0.00%)</span>
-            <span>$0.00</span>
+            <span>रू 0.00</span>
           </div>
           <div class="breakdown-row" id="conversion-row" style="display: none;">
             <span>Exchange Rate</span>
@@ -405,7 +405,7 @@
           </div>
           <div class="breakdown-row grand-total">
             <span>Grand Total</span>
-            <span id="breakdown-grand-total">$0.00</span>
+            <span id="breakdown-grand-total">रू 0.00</span>
           </div>
         </div>
       </div>
@@ -444,23 +444,25 @@
     const courseCatalog = {
       "oracle-plsql": {
         name: "Mastering Oracle PL/SQL for Financial Systems",
-        usdPrice: 49.00
+        usdPrice: 49.00,
+        nprPrice: 6500.00
       },
       "banking-etl": {
         name: "Banking Data Reconciliation Pipelines",
-        usdPrice: 79.00
+        usdPrice: 79.00,
+        nprPrice: 10500.00
       }
     };
 
     let activeCourse = "oracle-plsql";
-    let activeCurrency = "USD";
+    let activeCurrency = "NPR";
     let activeEmail = "customer@example.com";
     let activeOrderRef = "ORD-" + Date.now();
 
     function getExpectedAmount(courseId, currency) {
       const course = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
       if (currency === "NPR") {
-        return Math.round(course.usdPrice * EX_RATE * 100) / 100;
+        return course.nprPrice;
       }
       return course.usdPrice;
     }
@@ -472,7 +474,7 @@
       document.getElementById("course-email-sub").textContent = activeEmail;
 
       const usdPriceStr = "$" + course.usdPrice.toFixed(2);
-      const nprPriceStr = "रू " + (course.usdPrice * EX_RATE).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      const nprPriceStr = "रू " + course.nprPrice.toLocaleString('en-US', { minimumFractionDigits: 2 });
 
       if (activeCurrency === "USD") {
         document.getElementById("course-base-price").textContent = usdPriceStr;
@@ -499,12 +501,10 @@
       if (activeCurrency === curr) return;
       activeCurrency = curr;
       updateDOM();
-      
-      // Re-initialize Gateway with the new currency and dynamically calculated price
       initGateway();
     }
 
-    async function verifyAndRedirect(txnId, expectedAmount, currencyVal) {
+    async function verifyAndRedirect(txnId, expectedAmount) {
       document.getElementById("checkout").style.display = "none";
       document.getElementById("error-container-box").style.display = "none";
       document.getElementById("status-overlay").style.display = "flex";
@@ -552,35 +552,31 @@
         return;
       }
 
-      const course = courseCatalog[activeCourse] || courseCatalog["oracle-plsql"];
       const amount = getExpectedAmount(activeCourse, activeCurrency);
 
-      // Save expected details in localStorage with a unique key, to handle potential cross-site redirects safely
+      // Save expected details in localStorage with a unique key
       localStorage.setItem("getpay_expected_amount", amount);
       localStorage.setItem("getpay_expected_currency", activeCurrency);
       localStorage.setItem("getpay_expected_course", activeCourse);
 
       // Construct payment session options dynamically
       const options = {
-        userInfo: {
-          email: activeEmail
-        },
+        userInfo: {},
         clientRequestId: activeOrderRef,
         papInfo: PAP_INFO,
         oprKey: OPR_KEY,
         insKey: "",
         websiteDomain: WEBSITE_DOMAIN,
         price: amount,
-        currency: activeCurrency, // "USD" or "NPR" passed dynamically
+        currency: activeCurrency,
         baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
         callbackUrl: {
-          // Pass context parameters directly in the redirect URL to prevent loss of session
           successUrl: `${WEBSITE_DOMAIN}/payment.html?courseId=${activeCourse}&currency=${activeCurrency}&orderRef=${activeOrderRef}`,
           failUrl: `${WEBSITE_DOMAIN}/fail.html?courseId=${activeCourse}`
         },
         onSuccess: (res) => {
           const tid = res.transactionId || res.id || res.txnId;
-          if (tid) verifyAndRedirect(tid, amount, activeCurrency);
+          if (tid) verifyAndRedirect(tid, amount);
           else showErrorGateway("Transaction ID missing in gateway success payload.");
         },
         onError: (err) => {
@@ -611,7 +607,7 @@
 
       // Parse parameters or load from URL/Storage
       activeCourse = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
-      activeCurrency = params.get("currency") || localStorage.getItem("getpay_expected_currency") || "USD";
+      activeCurrency = params.get("currency") || localStorage.getItem("getpay_expected_currency") || "NPR";
       activeEmail = params.get("email") || "customer@example.com";
       activeOrderRef = params.get("orderRef") || "ORD-" + Date.now();
 
@@ -623,7 +619,7 @@
           const txnId = payload.id || payload.transactionId || payload.txnId;
           const expected = Number(localStorage.getItem("getpay_expected_amount")) || getExpectedAmount(activeCourse, activeCurrency);
           if (txnId) {
-            verifyAndRedirect(txnId, expected, activeCurrency);
+            verifyAndRedirect(txnId, expected);
             return;
           }
         } catch (e) {
