@@ -451,6 +451,11 @@
         name: "Banking Data Reconciliation Pipelines",
         usdPrice: 79.00,
         nprPrice: 10500.00
+      },
+      "java-mastery": {
+        name: "Java Mastery Course",
+        usdPrice: 34.00,
+        nprPrice: 4500.55
       }
     };
 
@@ -523,20 +528,20 @@
 
         if (!data || data.status !== "SUCCESS") {
           const reason = data?.remarks || "Transaction failed";
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(reason)}`;
+          window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=${encodeURIComponent(reason)}`;
           return;
         }
 
         const received = Number(data.amount);
         if (Math.abs(received - expectedAmount) > 0.05) {
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount_mismatch`;
+          window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=amount_mismatch`;
           return;
         }
 
-        window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
+        window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/success.html?verified=true&txid=${txnId}`;
       } catch (err) {
         console.error(err);
-        window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification_error`;
+        window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=verification_error`;
       }
     }
 
@@ -547,7 +552,7 @@
       mount.style.display = "block";
       document.getElementById("error-container-box").style.display = "none";
 
-      if (typeof GetPay === "undefined") {
+      if (typeof GetPay === "undefined" && typeof getpay === "undefined") {
         setTimeout(initGateway, 400);
         return;
       }
@@ -559,7 +564,7 @@
       localStorage.setItem("getpay_expected_currency", activeCurrency);
       localStorage.setItem("getpay_expected_course", activeCourse);
 
-      // Construct payment session options with EXACT UAT matching configuration
+      // Construct payment session options
       const options = {
         userInfo: {
           name: "Sandeep Kumar Jha",
@@ -584,24 +589,36 @@
         baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
         callbackUrl: {
           successUrl: `${WEBSITE_DOMAIN}/payment.html`,
-          failUrl: `${WEBSITE_DOMAIN}/fail.html`
+          failUrl: `${WEBSITE_DOMAIN}/projects/codersclub/fail.html`
         },
         onSuccess: function (response) {
           console.log('Success:', response);
-          window.location.href = `${WEBSITE_DOMAIN}/payment.html`;
+          // Redirect with token parameter back to payment.html
+          const tid = response.transactionId || response.id || response.txnId;
+          if (tid) {
+            verifyAndRedirect(tid, amount);
+          } else {
+            window.location.href = `${WEBSITE_DOMAIN}/payment.html`;
+          }
         },
         onError: function (error) {
           console.error('Error:', error);
-          alert('Payment Failed.');
+          showErrorGateway("Payment failed. Please try again.");
         },
       };
 
       try {
-        const gp = new GetPay(options);
-        if (typeof gp.initialize === 'function') {
-          gp.initialize();
-        } else if (typeof gp.init === 'function') {
-          gp.init();
+        // Initialize using the global window.getpay if defined, or via constructor.
+        // We pass options directly to initialize() to prevent the options-undefined crash.
+        if (window.getpay && typeof window.getpay.initialize === 'function') {
+          window.getpay.initialize(options);
+        } else {
+          const gp = new GetPay(options);
+          if (typeof gp.initialize === 'function') {
+            gp.initialize(options);
+          } else if (typeof gp.init === 'function') {
+            gp.init(options);
+          }
         }
       } catch (e) {
         showErrorGateway("Initialization of getpay.global checkout failed.");
