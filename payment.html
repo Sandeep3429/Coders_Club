@@ -93,6 +93,48 @@
       background: rgba(255, 255, 255, 0.7);
     }
 
+    /* Modern Order Summary Banner styling */
+    .order-summary-banner {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    .summary-details {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-item .label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .summary-item .value {
+      font-size: 0.95rem;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .summary-item.total .value {
+      color: #5662ff;
+      font-size: 1.15rem;
+    }
+
     /* Main GetPay mount point – let it define its own card width */
     #checkout {
       width: 100%;
@@ -182,6 +224,11 @@
         align-items: flex-start;
       }
 
+      .summary-details {
+        flex-direction: column;
+        gap: 16px;
+      }
+
       #checkout {
         min-height: 860px;
       }
@@ -199,6 +246,24 @@
         <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
       </div>
       <span class="gateway-badge">Powered by getPay</span>
+    </div>
+
+    <!-- Order Summary Banner -->
+    <div class="order-summary-banner" id="order-summary-box">
+      <div class="summary-details">
+        <div class="summary-item">
+          <span class="label">Course Name</span>
+          <span class="value" id="summary-course-name">Loading...</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Customer Email</span>
+          <span class="value" id="summary-email">Loading...</span>
+        </div>
+        <div class="summary-item total">
+          <span class="label">Amount to Pay</span>
+          <span class="value" id="summary-amount">Rs 0.00</span>
+        </div>
+      </div>
     </div>
 
     <!-- Main checkout container (xpath: /html/body/div/div[2]/main/div/div[4]) -->
@@ -279,14 +344,29 @@
 
       // Load course configuration details dynamically
       const courseCatalog = {
-        "oracle-plsql": 6500.00,
-        "banking-etl": 10500.00,
-        "java-mastery": 4500.55
+        "oracle-plsql": {
+          name: "Mastering Oracle PL/SQL for Financial Systems",
+          price: 6500.00
+        },
+        "banking-etl": {
+          name: "Banking Data Reconciliation Pipelines",
+          price: 10500.00
+        },
+        "java-mastery": {
+          name: "Java Mastery Course",
+          price: 4500.55
+        }
       };
 
       const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
-      const expectedAmount = courseCatalog[courseId] || 6500.00;
+      const courseData = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
+      const expectedAmount = courseData.price;
       const userEmail = params.get("email") || "customer@example.com";
+
+      // Render Order Details inside the summary banner
+      document.getElementById("summary-course-name").textContent = courseData.name;
+      document.getElementById("summary-email").textContent = userEmail;
+      document.getElementById("summary-amount").textContent = "Rs " + expectedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
 
       if (token) {
         try {
