@@ -14,6 +14,9 @@
 
   <!-- GetPay bundle -->
   <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
 
   <style>
     * {
@@ -93,7 +96,79 @@
       background: rgba(255, 255, 255, 0.7);
     }
 
-    /* Main GetPay mount point – let it define its own card width */
+    /* Modern Order Summary Banner styling */
+    .order-summary-banner {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    .summary-details {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-item .label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .summary-item .value {
+      font-size: 0.95rem;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .summary-item.total .value {
+      color: #5662ff;
+      font-size: 1.15rem;
+    }
+
+    /* Beautiful Sandbox OTP Tip Box */
+    .sandbox-otp-tip {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .sandbox-otp-tip i {
+      color: #3b82f6;
+      font-size: 1.2rem;
+    }
+
+    .sandbox-otp-tip span {
+      background: #3b82f6;
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+
+    /* Main GetPay mount point */
     #checkout {
       width: 100%;
       min-height: 820px;
@@ -182,6 +257,11 @@
         align-items: flex-start;
       }
 
+      .summary-details {
+        flex-direction: column;
+        gap: 16px;
+      }
+
       #checkout {
         min-height: 860px;
       }
@@ -201,10 +281,36 @@
       <span class="gateway-badge">Powered by getPay</span>
     </div>
 
-    <!-- Main checkout container (xpath: /html/body/div/div[2]/main/div/div[4]) -->
+    <!-- Order Summary Banner -->
+    <div class="order-summary-banner" id="order-summary-box">
+      <div class="summary-details">
+        <div class="summary-item">
+          <span class="label">Course Name</span>
+          <span class="value" id="summary-course-name">Loading...</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Customer Email</span>
+          <span class="value" id="summary-email">Loading...</span>
+        </div>
+        <div class="summary-item total">
+          <span class="label">Amount to Pay</span>
+          <span class="value" id="summary-amount">Rs 0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Beautiful Sandbox OTP helper tip -->
+    <div class="sandbox-otp-tip" id="sandbox-otp-helper">
+      <i class="fa-solid fa-circle-info"></i>
+      <div>
+        <strong>Sandbox Testing:</strong> Use the OTP code <span>1234</span> when prompted to complete verification.
+      </div>
+    </div>
+
+    <!-- Main checkout container -->
     <div id="checkout"></div>
 
-    <!-- Information section with NCHL logo (xpath: /html/body/div/div[2]/main/div/div[3]) -->
+    <!-- Information section with NCHL logo -->
     <div class="information-section">
       <div class="info-text">
         Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
@@ -223,13 +329,10 @@
   </div>
 
   <script>
-    const PAP_INFO =
-      "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+    const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
     const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-    const VERIFY_URL =
-      "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
+    const VERIFY_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
     const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-    const EXPECTED_AMOUNT = 4500.55;
 
     function showError(msg) {
       const el = document.getElementById("error-display");
@@ -237,11 +340,13 @@
       el.style.display = "block";
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "none";
+      document.getElementById("sandbox-otp-helper").style.display = "none";
     }
 
-    async function verifyAndRedirect(txnId) {
+    async function verifyAndRedirect(txnId, expectedAmount) {
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "flex";
+      document.getElementById("sandbox-otp-helper").style.display = "none";
 
       try {
         const res = await fetch(VERIFY_URL, {
@@ -257,22 +362,20 @@
 
         if (!data || data.status !== "SUCCESS") {
           const reason = data?.remarks || "Transaction failed";
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(
-            reason
-          )}`;
+          window.location.href = `fail.html?reason=${encodeURIComponent(reason)}`;
           return;
         }
 
         const received = Number(data.amount);
-        if (Math.abs(received - EXPECTED_AMOUNT) > 0.01) {
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount`;
+        if (Math.abs(received - expectedAmount) > 0.05) {
+          window.location.href = `fail.html?reason=amount`;
           return;
         }
 
-        window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
+        window.location.href = `success.html?verified=true&txid=${txnId}`;
       } catch (err) {
         console.error(err);
-        window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification`;
+        window.location.href = `fail.html?reason=verification`;
       }
     }
 
@@ -280,12 +383,38 @@
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
 
+      // Load course configuration details dynamically
+      const courseCatalog = {
+        "oracle-plsql": {
+          name: "Mastering Oracle PL/SQL for Financial Systems",
+          price: 6500.00
+        },
+        "banking-etl": {
+          name: "Banking Data Reconciliation Pipelines",
+          price: 10500.00
+        },
+        "java-mastery": {
+          name: "Java Mastery Course",
+          price: 4500.55
+        }
+      };
+
+      const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
+      const courseData = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
+      const expectedAmount = courseData.price;
+      const userEmail = params.get("email") || "customer@example.com";
+
+      // Render Order Details inside the summary banner
+      document.getElementById("summary-course-name").textContent = courseData.name;
+      document.getElementById("summary-email").textContent = userEmail;
+      document.getElementById("summary-amount").textContent = "Rs " + expectedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
       if (token) {
         try {
           const payload = JSON.parse(atob(token));
           const txnId = payload.id || payload.transactionId || payload.txnId;
           if (txnId) {
-            verifyAndRedirect(txnId);
+            verifyAndRedirect(txnId, expectedAmount);
             return;
           }
         } catch (e) {
@@ -295,26 +424,43 @@
       }
 
       function init() {
-        if (typeof GetPay === "undefined") {
+        if (typeof GetPay === "undefined" && typeof getpay === "undefined") {
           setTimeout(init, 400);
           return;
         }
 
+        localStorage.setItem("getpay_expected_amount", expectedAmount);
+        localStorage.setItem("getpay_expected_course", courseId);
+
         const options = {
-          userInfo: {},
+          userInfo: {
+            name: "Sandeep Kumar Jha",
+            email: userEmail,
+            state: "Bagmati",
+            country: "Nepal",
+            zipcode: "44600",
+            city: "Kathmandu",
+            address: "Maitidevi"
+          },
           clientRequestId: "ORD-" + Date.now(),
           papInfo: PAP_INFO,
           oprKey: OPR_KEY,
           insKey: "",
           websiteDomain: WEBSITE_DOMAIN,
-          price: EXPECTED_AMOUNT,
+          price: expectedAmount,
+          businessName: "Sandeep Store",
+          imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/java.png",
           currency: "NPR",
-          baseUrl:
-            "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+          prefill: { name: true, email: true, state: true, city: true, address: true },
+          themeColor: "#5662FF",
+          baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+          callbackUrl: {
+            successUrl: `${window.location.origin}${window.location.pathname}`,
+            failUrl: `${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/fail.html`
+          },
           onSuccess: (res) => {
             const tid = res.transactionId || res.id || res.txnId;
-            if (tid) verifyAndRedirect(tid);
-            else showError("Transaction ID missing");
+            if (tid) verifyAndRedirect(tid, expectedAmount);
           },
           onError: (err) => {
             console.warn(err);
@@ -323,8 +469,16 @@
         };
 
         try {
-          const gp = new GetPay(options);
-          (gp.initialize || gp.init || gp.start)?.();
+          if (window.getpay && typeof window.getpay.initialize === 'function') {
+            window.getpay.initialize(options);
+          } else {
+            const gp = new GetPay(options);
+            if (typeof gp.initialize === 'function') {
+              gp.initialize(options);
+            } else if (typeof gp.init === 'function') {
+              gp.init(options);
+            }
+          }
         } catch (e) {
           showError("Payment initialization failed");
           console.error(e);

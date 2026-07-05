@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful | Java Mastery</title>
+    <title>Payment Successful</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; border-top: 6px solid #28a745; }
@@ -16,18 +16,40 @@
     <div class="card">
         <div class="icon">✅</div>
         <h2>Enrollment Successful!</h2>
-        <p>Your payment of <strong>Rs. 4500.55</strong> has been verified.</p>
+        <p>Your payment of <strong id="displayAmount">Rs. 0.00</strong> has been verified.</p>
         <p>Transaction ID:</p>
         <span class="txid" id="displayTxid"></span>
-        <a href="https://sandeepkumarjha.com.np" class="btn">Start Learning Java</a>
+        <a href="https://sandeepkumarjha.com.np" class="btn" id="learningBtn">Start Learning</a>
     </div>
 
     <script>
         const params = new URLSearchParams(window.location.search);
         if (params.get('verified') !== 'true') {
-            window.location.href = "/getpay.html";
+            window.location.href = "getpay.html";
         } else {
-            document.getElementById('displayTxid').innerText = params.get('txid');
+            document.getElementById('displayTxid').innerText = params.get('txid') || 'N/A';
+
+            // Dynamic course catalog mapping
+            const courseCatalog = {
+              "oracle-plsql": {
+                price: 6500.00,
+                btnText: "Start Learning Oracle PL/SQL"
+              },
+              "banking-etl": {
+                price: 10500.00,
+                btnText: "Start Learning Banking ETL"
+              },
+              "java-mastery": {
+                price: 4500.55,
+                btnText: "Start Learning Java"
+              }
+            };
+
+            const courseId = localStorage.getItem("getpay_expected_course") || "oracle-plsql";
+            const courseData = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
+
+            document.getElementById('displayAmount').innerText = "Rs. " + courseData.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
+            document.getElementById('learningBtn').innerText = courseData.btnText;
         }
     </script>
 </body>
