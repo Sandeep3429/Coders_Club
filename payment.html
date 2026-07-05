@@ -594,12 +594,9 @@
         },
         onSuccess: function (response) {
           console.log('Success:', response);
-          // Redirect with token parameter back to payment.html
           const tid = response.transactionId || response.id || response.txnId;
           if (tid) {
             verifyAndRedirect(tid, amount);
-          } else {
-            window.location.href = `${WEBSITE_DOMAIN}/payment.html`;
           }
         },
         onError: function (error) {
