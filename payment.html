@@ -25,46 +25,51 @@
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #eef2ff;
+      background: #0a0c10;
+      color: #e2e8f0;
       min-height: 100vh;
     }
 
     body {
       display: flex;
       justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top, #161c2d 0%, #0a0c10 100%);
     }
 
-    /* Single centered column, no extra wrapper card */
+    /* Centered premium container */
     .payment-page {
       width: 100%;
-      max-width: 960px;
-      padding: 24px 16px 40px;
+      max-width: 640px;
+      padding: 40px 20px;
     }
 
     .page-header {
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
 
     .page-header h1 {
-      margin: 0 0 4px;
-      font-size: 1.4rem;
-      color: #111827;
+      margin: 0 0 6px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.025em;
     }
 
     .page-header p {
       margin: 0;
-      font-size: 0.9rem;
-      color: #6b7280;
+      font-size: 0.95rem;
+      color: #94a3b8;
     }
 
-    /* Thin top bar only, rest is native GetPay layout */
+    /* Thin top bar */
     .payment-header-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
-      gap: 12px;
+      margin-bottom: 20px;
+      padding: 0 4px;
     }
 
     .brand-left {
@@ -74,74 +79,78 @@
     }
 
     .brand-logo {
-      height: 32px;
+      height: 36px;
       width: auto;
       object-fit: contain;
     }
 
-    .brand-text {
-      font-weight: 600;
-      font-size: 1rem;
-      color: #111827;
-    }
-
     .gateway-badge {
       font-size: 0.8rem;
-      color: #6b7280;
-      padding: 4px 8px;
+      color: #94a3b8;
+      padding: 6px 12px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
     }
 
-    /* Main GetPay mount point – let it define its own card width */
+    /* Main GetPay mount point */
     #checkout {
       width: 100%;
-      min-height: 820px;
+      min-height: 520px;
       display: block;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
-    /* Information / logo strip below (maps to your information-section path) */
+    /* Information strip below */
     .information-section {
-      margin-top: 20px;
-      padding-top: 12px;
-      border-top: 1px solid #d1d5db;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
       font-size: 0.85rem;
-      color: #4b5563;
+      color: #94a3b8;
     }
 
     .information-section .info-text {
       flex: 1 1 auto;
+      line-height: 1.5;
     }
 
     .information-section .nchl-logo {
       height: 26px;
       width: auto;
       object-fit: contain;
+      filter: brightness(0.9) contrast(1.1);
     }
 
     .error-message {
       margin-top: 16px;
       padding: 16px;
-      background: #fee2e2;
-      color: #dc2626;
-      border-radius: 10px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-radius: 12px;
       text-align: center;
-      border: 1px solid #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.2);
       display: none;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
 
     /* Full‑page processing overlay */
     #status-message {
       position: fixed;
       inset: 0;
-      z-index: 20;
-      background: rgba(255, 255, 255, 0.92);
+      z-index: 100;
+      background: rgba(10, 12, 16, 0.95);
+      backdrop-filter: blur(10px);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -150,12 +159,12 @@
     }
 
     .loader {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #5662ff;
+      border: 4px solid rgba(255, 255, 255, 0.05);
+      border-top: 4px solid #5662ff;
       border-radius: 50%;
-      width: 56px;
-      height: 56px;
-      animation: spin 1.1s linear infinite;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
@@ -164,26 +173,25 @@
       }
     }
 
-    /* Responsive tweaks */
-    @media (min-width: 1200px) {
-      .payment-page {
-        max-width: 1100px;
-        padding-top: 32px;
-      }
+    #status-message h2 {
+      font-size: 1.5rem;
+      margin: 0;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    #status-message p {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 1rem;
     }
 
     @media (max-width: 640px) {
       .payment-page {
-        padding: 16px 10px 28px;
+        padding: 20px 16px;
       }
-
-      .payment-header-bar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
       #checkout {
-        min-height: 860px;
+        min-height: 580px;
       }
     }
   </style>
@@ -191,7 +199,8 @@
 <body>
   <main class="payment-page">
     <header class="page-header">
-      <p>Complete your payment safely via getPay</p>
+      <h1>Secure Checkout</h1>
+      <p>Complete your payment safely via NCHL getPay</p>
     </header>
 
     <div class="payment-header-bar">
@@ -199,6 +208,18 @@
         <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
       </div>
       <span class="gateway-badge">Powered by getPay</span>
+    </div>
+
+    <!-- Dynamic Course Summary Card -->
+    <div id="course-summary-card" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; gap: 20px; backdrop-filter: blur(10px);">
+      <div>
+        <h2 id="summary-course-name" style="margin: 0 0 6px; font-size: 1.15rem; color: #ffffff; font-weight: 700;">Course</h2>
+        <p id="summary-course-email" style="margin: 0; font-size: 0.85rem; color: #94a3b8;">your@email.com</p>
+      </div>
+      <div style="text-align: right;">
+        <span style="font-size: 0.8rem; color: #94a3b8; display: block; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 2px;">Amount</span>
+        <span id="summary-course-price" style="font-size: 1.4rem; font-weight: 750; color: #f59e0b;">Rs 0.00</span>
+      </div>
     </div>
 
     <!-- Main checkout container -->
@@ -218,18 +239,27 @@
   <!-- Full‑page processing overlay -->
   <div id="status-message">
     <div class="loader"></div>
-    <h2>Processing payment</h2>
-    <p>Please wait while we verify your transaction…</p>
+    <h2>Verifying Payment</h2>
+    <p>Please wait while we verify your transaction with the bank...</p>
   </div>
 
   <script>
-    const PAP_INFO =
-      "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
+    const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
     const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-    const VERIFY_URL =
-      "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
+    const VERIFY_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
     const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-    const EXPECTED_AMOUNT = 4500.55;
+
+    // Course mapping config
+    const courses = {
+      "oracle-plsql": {
+        name: "Mastering Oracle PL/SQL for Financial Systems",
+        price: 6500.00
+      },
+      "banking-etl": {
+        name: "Banking Data Reconciliation Pipelines",
+        price: 10500.00
+      }
+    };
 
     function showError(msg) {
       const el = document.getElementById("error-display");
@@ -237,11 +267,15 @@
       el.style.display = "block";
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "none";
+      document.getElementById("course-summary-card").style.display = "none";
     }
 
     async function verifyAndRedirect(txnId) {
       document.getElementById("checkout").style.display = "none";
+      document.getElementById("course-summary-card").style.display = "none";
       document.getElementById("status-message").style.display = "flex";
+
+      const expectedAmount = Number(sessionStorage.getItem("expected_amount")) || 6500.00;
 
       try {
         const res = await fetch(VERIFY_URL, {
@@ -257,14 +291,12 @@
 
         if (!data || data.status !== "SUCCESS") {
           const reason = data?.remarks || "Transaction failed";
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(
-            reason
-          )}`;
+          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(reason)}`;
           return;
         }
 
         const received = Number(data.amount);
-        if (Math.abs(received - EXPECTED_AMOUNT) > 0.01) {
+        if (Math.abs(received - expectedAmount) > 0.01) {
           window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount`;
           return;
         }
@@ -294,6 +326,21 @@
         }
       }
 
+      // Read query params for initiating checkout
+      const courseId = params.get("courseId") || "oracle-plsql";
+      const userEmail = params.get("email") || "customer@example.com";
+      const selectedCourse = courses[courseId] || courses["oracle-plsql"];
+
+      // Save expected details for success validation redirect
+      sessionStorage.setItem("expected_amount", selectedCourse.price);
+
+      // Render Summary Card
+      const summaryCard = document.getElementById("course-summary-card");
+      document.getElementById("summary-course-name").textContent = selectedCourse.name;
+      document.getElementById("summary-course-email").textContent = userEmail;
+      document.getElementById("summary-course-price").textContent = "Rs " + selectedCourse.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      summaryCard.style.display = "flex";
+
       function init() {
         if (typeof GetPay === "undefined") {
           setTimeout(init, 400);
@@ -301,16 +348,17 @@
         }
 
         const options = {
-          userInfo: {},
+          userInfo: {
+            email: userEmail
+          },
           clientRequestId: "ORD-" + Date.now(),
           papInfo: PAP_INFO,
           oprKey: OPR_KEY,
           insKey: "",
           websiteDomain: WEBSITE_DOMAIN,
-          price: EXPECTED_AMOUNT,
+          price: selectedCourse.price,
           currency: "NPR",
-          baseUrl:
-            "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+          baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
           onSuccess: (res) => {
             const tid = res.transactionId || res.id || res.txnId;
             if (tid) verifyAndRedirect(tid);

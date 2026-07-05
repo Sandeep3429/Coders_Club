@@ -152,36 +152,15 @@ async function handleSubscribe(event) {
     }
 }
 
-async function handleCheckout(event, courseId) {
+function handleCheckout(event, courseId) {
     event.preventDefault();
     const emailInput = document.getElementById(`email-${courseId}`);
     const email = emailInput.value;
 
     const originalButton = event.target.querySelector('button');
-    const originalText = originalButton.textContent;
-    originalButton.textContent = 'Connecting...';
+    originalButton.textContent = 'Redirecting to getPay...';
     originalButton.disabled = true;
 
-    try {
-        const response = await fetch('/api/checkout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ courseId, email })
-        });
-        const data = await response.json();
-
-        if (data.success && data.url) {
-            // Redirect to Stripe Checkout session
-            window.location.href = data.url;
-        } else {
-            alert(data.message || 'Checkout failed. Please try again.');
-            originalButton.textContent = originalText;
-            originalButton.disabled = false;
-        }
-    } catch (err) {
-        alert('Server connection failed. Try again later.');
-        originalButton.textContent = originalText;
-        originalButton.disabled = false;
-    }
+    window.location.href = `payment.html?courseId=${encodeURIComponent(courseId)}&email=${encodeURIComponent(email)}`;
 }
 
