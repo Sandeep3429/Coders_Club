@@ -548,7 +548,6 @@
       document.getElementById("error-container-box").style.display = "none";
 
       if (typeof GetPay === "undefined") {
-        setStatusText("Loading getPay SDK bundle...");
         setTimeout(initGateway, 400);
         return;
       }
@@ -587,14 +586,13 @@
           successUrl: `${WEBSITE_DOMAIN}/payment.html`,
           failUrl: `${WEBSITE_DOMAIN}/fail.html`
         },
-        onSuccess: (res) => {
-          const tid = res.transactionId || res.id || res.txnId;
-          if (tid) verifyAndRedirect(tid, amount);
-          else showErrorGateway("Transaction ID missing in gateway success payload.");
+        onSuccess: function (response) {
+          console.log('Success:', response);
+          window.location.href = `${WEBSITE_DOMAIN}/payment.html`;
         },
-        onError: (err) => {
-          console.warn(err);
-          showErrorGateway("Checkout gateway handshake failed. Please try again.");
+        onError: function (error) {
+          console.error('Error:', error);
+          alert('Payment Failed.');
         },
       };
 
@@ -609,10 +607,6 @@
         showErrorGateway("Initialization of getpay.global checkout failed.");
         console.error(e);
       }
-    }
-
-    function setStatusText(txt) {
-      // Stub function to support logging without crashing
     }
 
     function showErrorGateway(msg) {
