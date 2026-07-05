@@ -228,8 +228,7 @@
     const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
     const VERIFY_URL =
       "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
-    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-    const EXPECTED_AMOUNT = 4500.55;
+    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np/projects/codersclub/";
 
     function showError(msg) {
       const el = document.getElementById("error-display");
@@ -242,6 +241,8 @@
     async function verifyAndRedirect(txnId) {
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "flex";
+
+      const expectedAmount = Number(localStorage.getItem("getpay_expected_amount")) || 6500.00;
 
       try {
         const res = await fetch(VERIFY_URL, {
@@ -257,22 +258,22 @@
 
         if (!data || data.status !== "SUCCESS") {
           const reason = data?.remarks || "Transaction failed";
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=${encodeURIComponent(
+          window.location.href = `${WEBSITE_DOMAIN}fail.html?reason=${encodeURIComponent(
             reason
           )}`;
           return;
         }
 
         const received = Number(data.amount);
-        if (Math.abs(received - EXPECTED_AMOUNT) > 0.01) {
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount`;
+        if (Math.abs(received - expectedAmount) > 0.05) {
+          window.location.href = `${WEBSITE_DOMAIN}fail.html?reason=amount`;
           return;
         }
 
-        window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
+        window.location.href = `${WEBSITE_DOMAIN}success.html?verified=true&txid=${txnId}`;
       } catch (err) {
         console.error(err);
-        window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification`;
+        window.location.href = `${WEBSITE_DOMAIN}fail.html?reason=verification`;
       }
     }
 
@@ -300,15 +301,30 @@
           return;
         }
 
+        const expectedAmount = Number(localStorage.getItem("getpay_expected_amount")) || 6500.00;
+        const courseId = localStorage.getItem("getpay_expected_course") || "oracle-plsql";
+
         const options = {
-          userInfo: {},
+          userInfo: {
+            name: "Sandeep Kumar Jha",
+            email: "zhasandeep7@gmail.com",
+            state: "Bagmati",
+            country: "Nepal",
+            zipcode: "44600",
+            city: "Kathmandu",
+            address: "Maitidevi"
+          },
           clientRequestId: "ORD-" + Date.now(),
           papInfo: PAP_INFO,
           oprKey: OPR_KEY,
           insKey: "",
           websiteDomain: WEBSITE_DOMAIN,
-          price: EXPECTED_AMOUNT,
+          price: expectedAmount,
+          businessName: "Sandeep Store",
+          imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/java.png",
           currency: "NPR",
+          prefill: { name: true, email: true, state: true, city: true, address: true },
+          themeColor: "#5662FF",
           baseUrl:
             "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
           onSuccess: (res) => {

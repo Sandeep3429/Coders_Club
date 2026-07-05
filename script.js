@@ -161,6 +161,6 @@ function handleCheckout(event, courseId) {
     originalButton.textContent = 'Redirecting to getPay...';
     originalButton.disabled = true;
 
-    window.location.href = `payment.html?courseId=${encodeURIComponent(courseId)}&email=${encodeURIComponent(email)}`;
+    window.location.href = `projects/codersclub/getpay.html?courseId=${encodeURIComponent(courseId)}&email=${encodeURIComponent(email)}`;
 }
 

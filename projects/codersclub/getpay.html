@@ -11,42 +11,105 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    :root { --primary: #5662FF; --primary-dark: #3e4dcc; --text: #1a1a2e; --light: #f8f9ff; --gray: #94a3b8; }
+    :root { 
+      --primary: #5662FF; 
+      --primary-dark: #3e4dcc; 
+      --text: #1a1a2e; 
+      --light: #f8f9ff; 
+      --gray: #94a3b8; 
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', Arial, sans-serif; background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .container { background: white; max-width: 480px; width: 100%; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(86, 98, 255, 0.15); }
-    .header { background: linear-gradient(135deg, var(--primary), #7b85ff); color: white; padding: 30px 20px; text-align: center; }
+    body { 
+      font-family: 'Inter', Arial, sans-serif; 
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+      color: #f1f5f9; 
+      min-height: 100vh; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 20px; 
+    }
+    .container { 
+      background: #1e293b; 
+      max-width: 480px; 
+      width: 100%; 
+      border: 1px solid rgba(255, 255, 255, 0.08); 
+      border-radius: 20px; 
+      overflow: hidden; 
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
+    }
+    .header { 
+      background: linear-gradient(135deg, var(--primary), #7b85ff); 
+      color: white; 
+      padding: 30px 20px; 
+      text-align: center; 
+    }
     .header h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
     .header p { opacity: 0.9; font-size: 16px; }
     .content { padding: 30px; }
-    .course-card { display: flex; align-items: center; background: #f8f9ff; border-radius: 12px; padding: 16px; margin-bottom: 25px; border: 1px solid #e6eaff; }
-    .course-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-right: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .course-info h3 { font-size: 18px; margin-bottom: 6px; color: var(--text); }
-    .price { font-size: 24px; font-weight: 700; color: var(--primary); }
-    .btn-pay { width: 100%; padding: 16px; font-size: 18px; font-weight: 600; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display:flex; gap:10px; align-items:center; justify-content:center; }
-    .btn-pay:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(86,98,255,0.3); }
-    .btn-pay:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+    .course-card { 
+      display: flex; 
+      align-items: center; 
+      background: rgba(255, 255, 255, 0.02); 
+      border-radius: 12px; 
+      padding: 16px; 
+      margin-bottom: 25px; 
+      border: 1px solid rgba(255, 255, 255, 0.08); 
+    }
+    .course-card img { 
+      width: 80px; 
+      height: 80px; 
+      object-fit: cover; 
+      border-radius: 10px; 
+      margin-right: 16px; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    }
+    .course-info h3 { font-size: 18px; margin-bottom: 6px; color: #f1f5f9; }
+    .price { font-size: 24px; font-weight: 700; color: #f59e0b; }
+    .btn-pay { 
+      width: 100%; 
+      padding: 16px; 
+      font-size: 18px; 
+      font-weight: 600; 
+      background: var(--primary); 
+      color: white; 
+      border: none; 
+      border-radius: 12px; 
+      cursor: pointer; 
+      transition: all 0.3s ease; 
+      display:flex; 
+      gap:10px; 
+      align-items:center; 
+      justify-content:center; 
+      box-shadow: 0 4px 12px rgba(86, 98, 255, 0.3);
+    }
+    .btn-pay:hover { 
+      background: var(--primary-dark); 
+      transform: translateY(-2px); 
+      box-shadow: 0 10px 20px rgba(86,98,255,0.4); 
+    }
+    .btn-pay:disabled { background: #64748b; cursor: not-allowed; transform: none; }
     .secure-note { text-align:center; margin-top:20px; font-size:14px; color:var(--gray); }
     .secure-note i { color:#10b981; margin-right:6px; }
-    #integration-status { padding: 12px 20px; font-size:13px; color:#374151; text-align:center; }
-    #integration-status.err { color:#b91c1c; }
-    #integration-status.warn { color:#b45309; }
+    #integration-status { padding: 12px 20px; font-size:13px; color:#94a3b8; text-align:center; }
+    #integration-status.err { color:#ef4444; }
+    #integration-status.warn { color:#f59e0b; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <div class="header">
-      <h1>Java Mastery Course</h1>
-      <p>Learn Java from scratch to advanced level</p>
+      <h1 id="header-title">Java Mastery Course</h1>
+      <p id="header-subtitle">Learn Java from scratch to advanced level</p>
     </div>
 
     <div class="content">
       <div class="course-card">
-        <img src="https://sandeepkumarjha.com.np/img/java.png" alt="Java Course">
+        <img id="course-img" src="img/java.png" alt="Course Image">
         <div class="course-info">
-          <h3>JAVA FULL COURSE</h3>
-          <div class="price">Rs 4,500.55</div>
+          <h3 id="course-name">JAVA FULL COURSE</h3>
+          <div class="price" id="course-price">Rs 4,500.55</div>
         </div>
       </div>
 
@@ -71,7 +134,28 @@
     const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
     const INS_KEY = ""; 
     const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
-    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np/projects/codersclub/";
+
+    const courses = {
+      "oracle-plsql": {
+        name: "Mastering Oracle PL/SQL for Financial Systems",
+        subtitle: "Learn secure, scalable, and audit-compliant PL/SQL package optimization",
+        price: 6500.00,
+        imageUrl: "img/python.jpg"
+      },
+      "banking-etl": {
+        name: "Banking Data Reconciliation Pipelines",
+        subtitle: "Blueprint to build robust daily transaction matching networks and ETL design",
+        price: 10500.00,
+        imageUrl: "img/feature.jpg"
+      },
+      "java-mastery": {
+        name: "Java Mastery Course",
+        subtitle: "Learn Java from scratch to advanced level",
+        price: 4500.55,
+        imageUrl: "img/java.png"
+      }
+    };
 
     const statusEl = document.getElementById('integration-status');
     const btn = document.getElementById('checkout-btn');
@@ -81,6 +165,19 @@
       statusEl.textContent = text;
       statusEl.className = cls;
     }
+
+    // Read URL params
+    const params = new URLSearchParams(window.location.search);
+    const courseId = params.get("courseId") || "oracle-plsql";
+    const userEmail = params.get("email") || "zhasandeep7@gmail.com";
+    const selectedCourse = courses[courseId] || courses["oracle-plsql"];
+
+    // Update DOM
+    document.getElementById("header-title").textContent = selectedCourse.name;
+    document.getElementById("header-subtitle").textContent = selectedCourse.subtitle;
+    document.getElementById("course-name").textContent = selectedCourse.name;
+    document.getElementById("course-price").textContent = "Rs " + selectedCourse.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    document.getElementById("course-img").src = selectedCourse.imageUrl;
 
     // Check availability on load
     window.addEventListener('load', () => {
@@ -104,10 +201,14 @@
       btn.disabled = true;
       btnText.innerText = 'Initializing…';
 
+      // Save expected details in localStorage
+      localStorage.setItem("getpay_expected_amount", selectedCourse.price);
+      localStorage.setItem("getpay_expected_course", courseId);
+
       const options = {
         userInfo: {
           name: "Sandeep Kumar Jha",
-          email: "zhasandeep7@gmail.com",
+          email: userEmail,
           state: "Bagmati",
           country: "Nepal",
           zipcode: "44600",
@@ -119,20 +220,20 @@
         oprKey: OPR_KEY,
         insKey: INS_KEY,
         websiteDomain: WEBSITE_DOMAIN,
-        price: 4500.55,
-        businessName: "Sandeep Store",
-        imageUrl: "https://sandeepkumarjha.com.np/img/java.png",
+        price: selectedCourse.price,
+        businessName: selectedCourse.name,
+        imageUrl: WEBSITE_DOMAIN + selectedCourse.imageUrl,
         currency: "NPR",
         prefill: { name: true, email: true, state: true, city: true, address: true },
         themeColor: "#5662FF",
         baseUrl: BASE_URL,
         callbackUrl: {
-          successUrl: WEBSITE_DOMAIN + "/payment.html",
-          failUrl: WEBSITE_DOMAIN + "/fail.html"
+          successUrl: `${WEBSITE_DOMAIN}payment.html`,
+          failUrl: `${WEBSITE_DOMAIN}fail.html`
         },
         onSuccess: function (response) {
           console.log('Success:', response);
-          window.location.href = WEBSITE_DOMAIN + "/payment.html";
+          window.location.href = `${WEBSITE_DOMAIN}payment.html`;
         },
         onError: function (error) {
           console.error('Error:', error);
