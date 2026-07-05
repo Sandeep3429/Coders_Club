@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Secure Checkout | getPay</title>
+  <title>Secure FinTech Checkout | getPay</title>
 
   <!-- Prevent clickjacking -->
   <script>
@@ -14,143 +14,302 @@
 
   <!-- GetPay bundle -->
   <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --bg-main: #090d16;
+      --bg-card: rgba(17, 24, 39, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-emerald: #10b981;
+      --accent-gold: #f59e0b;
+      --text-primary: #ffffff;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --primary-blue: #5662ff;
+      --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
     * {
       box-sizing: border-box;
-    }
-
-    html,
-    body {
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0a0c10;
-      color: #e2e8f0;
-      min-height: 100vh;
     }
 
-    body {
+    html, body {
+      font-family: var(--font-family);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: radial-gradient(circle at top, #161c2d 0%, #0a0c10 100%);
+      background: radial-gradient(circle at top, #141b2d 0%, #060913 100%);
     }
 
-    /* Centered premium container */
-    .payment-page {
+    .checkout-container {
       width: 100%;
-      max-width: 640px;
-      padding: 40px 20px;
-    }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      margin: 0 0 6px;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.025em;
-    }
-
-    .page-header p {
-      margin: 0;
-      font-size: 0.95rem;
-      color: #94a3b8;
-    }
-
-    /* Thin top bar */
-    .payment-header-bar {
+      max-width: 1100px;
+      padding: 40px 24px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      padding: 0 4px;
+      flex-direction: column;
+      gap: 32px;
     }
 
-    .brand-left {
+    .checkout-header {
+      text-align: center;
+    }
+
+    .checkout-header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      background: linear-gradient(to right, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .checkout-header p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+    }
+
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Left Panel: Order Details (Ultra-premium FinTech Card) */
+    .order-details-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 32px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card-section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .brand-logo {
-      height: 36px;
-      width: auto;
-      object-fit: contain;
+    .card-section-title i {
+      color: var(--primary-blue);
     }
 
-    .gateway-badge {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(10px);
+    .order-meta-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    /* Main GetPay mount point */
-    #checkout {
-      width: 100%;
-      min-height: 520px;
-      display: block;
-      border-radius: 20px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    .order-id-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
     }
 
-    /* Information strip below */
-    .information-section {
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    .order-id-val {
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+
+    .currency-selector-wrap {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      font-size: 0.85rem;
-      color: #94a3b8;
-    }
-
-    .information-section .info-text {
-      flex: 1 1 auto;
-      line-height: 1.5;
-    }
-
-    .information-section .nchl-logo {
-      height: 26px;
-      width: auto;
-      object-fit: contain;
-      filter: brightness(0.9) contrast(1.1);
-    }
-
-    .error-message {
-      margin-top: 16px;
-      padding: 16px;
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
       border-radius: 12px;
-      text-align: center;
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      display: none;
-      font-size: 0.95rem;
+      padding: 8px 16px;
     }
 
-    /* Full‑page processing overlay */
-    #status-message {
+    .currency-selector-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .currency-toggle {
+      display: flex;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .toggle-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn.active {
+      background: var(--primary-blue);
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px rgba(86, 98, 255, 0.35);
+    }
+
+    /* Itemized Breakdown Grid */
+    .item-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .item-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .item-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+    }
+
+    .item-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .item-price {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .breakdown-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .breakdown-row.grand-total {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      padding-top: 16px;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .conversion-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      padding: 4px 10px;
+      border-radius: 6px;
+      align-self: flex-start;
+      margin-top: 4px;
+    }
+
+    /* Right Panel: getPay Checkout Gateway Wrapper */
+    .gateway-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 8px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px -15 rgba(0, 0, 0, 0.7);
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #checkout {
+      width: 100%;
+      min-height: 520px;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .info-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+      margin-top: auto;
+    }
+
+    .info-footer img {
+      height: 20px;
+      filter: grayscale(1) brightness(0.8);
+    }
+
+    /* Message Panels */
+    .error-container {
+      background: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      display: none;
+    }
+
+    .error-container h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #ef4444;
+    }
+
+    #status-overlay {
       position: fixed;
       inset: 0;
-      z-index: 100;
-      background: rgba(10, 12, 16, 0.95);
-      backdrop-filter: blur(10px);
+      z-index: 1000;
+      background: rgba(6, 9, 19, 0.96);
+      backdrop-filter: blur(15px);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -158,89 +317,121 @@
       gap: 20px;
     }
 
-    .loader {
+    .spin-loader {
       border: 4px solid rgba(255, 255, 255, 0.05);
-      border-top: 4px solid #5662ff;
+      border-top: 4px solid var(--primary-blue);
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
+      width: 64px;
+      height: 64px;
+      animation: spinner 0.8s linear infinite;
     }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    @keyframes spinner {
+      to { transform: rotate(360deg); }
     }
 
-    #status-message h2 {
-      font-size: 1.5rem;
-      margin: 0;
-      color: #ffffff;
-      font-weight: 700;
+    #status-overlay h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
     }
 
-    #status-message p {
-      margin: 0;
-      color: #94a3b8;
+    #status-overlay p {
+      color: var(--text-secondary);
       font-size: 1rem;
     }
 
-    @media (max-width: 640px) {
-      .payment-page {
-        padding: 20px 16px;
-      }
-      #checkout {
-        min-height: 580px;
+    @media (max-width: 900px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <main class="payment-page">
-    <header class="page-header">
-      <h1>Secure Checkout</h1>
-      <p>Complete your payment safely via NCHL getPay</p>
+
+  <div class="checkout-container">
+    <header class="checkout-header">
+      <h1>Payment Checkout</h1>
+      <p>Secure orchestrator powered by getpay.global</p>
     </header>
 
-    <div class="payment-header-bar">
-      <div class="brand-left">
-        <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
+    <div class="checkout-grid">
+      <!-- Left Panel: Order Details -->
+      <div class="order-details-card">
+        <div class="card-section-title">
+          <i class="fa-solid fa-receipt"></i> Order Summary
+        </div>
+
+        <div class="order-meta-info">
+          <span class="order-id-label">Order Reference</span>
+          <span class="order-id-val" id="order-ref-val">ORD-12345678</span>
+        </div>
+
+        <!-- Currency Selector -->
+        <div class="currency-selector-wrap">
+          <span class="currency-selector-label">Payment Currency</span>
+          <div class="currency-toggle">
+            <button class="toggle-btn active" id="toggle-usd" onclick="setCurrency('USD')">USD ($)</button>
+            <button class="toggle-btn" id="toggle-npr" onclick="setCurrency('NPR')">NPR (रू)</button>
+          </div>
+        </div>
+
+        <!-- Itemized breakdown -->
+        <div class="item-grid">
+          <div class="item-row">
+            <div class="item-main">
+              <span class="item-title" id="course-name-title">Course Loading...</span>
+              <span class="item-subtitle" id="course-email-sub">customer@example.com</span>
+            </div>
+            <span class="item-price" id="course-base-price">$0.00</span>
+          </div>
+        </div>
+
+        <div class="breakdown-list">
+          <div class="breakdown-row">
+            <span>Subtotal</span>
+            <span id="breakdown-subtotal">$0.00</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Tax (0.00%)</span>
+            <span>$0.00</span>
+          </div>
+          <div class="breakdown-row" id="conversion-row" style="display: none;">
+            <span>Exchange Rate</span>
+            <span>1 USD = 133.00 NPR</span>
+          </div>
+          <div class="conversion-badge" id="conversion-badge" style="display: none;">
+            <i class="fa-solid fa-circle-info"></i> Converted for local gateway processing
+          </div>
+          <div class="breakdown-row grand-total">
+            <span>Grand Total</span>
+            <span id="breakdown-grand-total">$0.00</span>
+          </div>
+        </div>
       </div>
-      <span class="gateway-badge">Powered by getPay</span>
+
+      <!-- Right Panel: Gateway Container -->
+      <div class="gateway-card">
+        <div id="checkout"></div>
+
+        <div class="error-container" id="error-container-box">
+          <h3>Payment Gateway Error</h3>
+          <p id="error-msg-text">Failed to initialize session. Please check details or try again later.</p>
+        </div>
+
+        <div class="info-footer">
+          <span>Protected by 256-bit encryption</span>
+          <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" />
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Dynamic Course Summary Card -->
-    <div id="course-summary-card" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between; gap: 20px; backdrop-filter: blur(10px);">
-      <div>
-        <h2 id="summary-course-name" style="margin: 0 0 6px; font-size: 1.15rem; color: #ffffff; font-weight: 700;">Course</h2>
-        <p id="summary-course-email" style="margin: 0; font-size: 0.85rem; color: #94a3b8;">your@email.com</p>
-      </div>
-      <div style="text-align: right;">
-        <span style="font-size: 0.8rem; color: #94a3b8; display: block; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 2px;">Amount</span>
-        <span id="summary-course-price" style="font-size: 1.4rem; font-weight: 750; color: #f59e0b;">Rs 0.00</span>
-      </div>
-    </div>
-
-    <!-- Main checkout container -->
-    <div id="checkout"></div>
-
-    <!-- Information section with NCHL logo -->
-    <div class="information-section">
-      <div class="info-text">
-        Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
-      </div>
-      <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL" class="nchl-logo" />
-    </div>
-
-    <div id="error-display" class="error-message"></div>
-  </main>
-
-  <!-- Full‑page processing overlay -->
-  <div id="status-message">
-    <div class="loader"></div>
-    <h2>Verifying Payment</h2>
-    <p>Please wait while we verify your transaction with the bank...</p>
+  <!-- Verification Overlay -->
+  <div id="status-overlay">
+    <div class="spin-loader"></div>
+    <h2 id="status-title">Verifying Payment</h2>
+    <p id="status-text">Confirming secure payment status with getPay...</p>
   </div>
 
   <script>
@@ -248,34 +439,75 @@
     const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
     const VERIFY_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
     const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+    const EX_RATE = 133.00; // Exchange rate USD -> NPR
 
-    // Course mapping config
-    const courses = {
+    const courseCatalog = {
       "oracle-plsql": {
         name: "Mastering Oracle PL/SQL for Financial Systems",
-        price: 6500.00
+        usdPrice: 49.00
       },
       "banking-etl": {
         name: "Banking Data Reconciliation Pipelines",
-        price: 10500.00
+        usdPrice: 79.00
       }
     };
 
-    function showError(msg) {
-      const el = document.getElementById("error-display");
-      el.textContent = msg;
-      el.style.display = "block";
-      document.getElementById("checkout").style.display = "none";
-      document.getElementById("status-message").style.display = "none";
-      document.getElementById("course-summary-card").style.display = "none";
+    let activeCourse = "oracle-plsql";
+    let activeCurrency = "USD";
+    let activeEmail = "customer@example.com";
+    let activeOrderRef = "ORD-" + Date.now();
+
+    function getExpectedAmount(courseId, currency) {
+      const course = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
+      if (currency === "NPR") {
+        return Math.round(course.usdPrice * EX_RATE * 100) / 100;
+      }
+      return course.usdPrice;
     }
 
-    async function verifyAndRedirect(txnId) {
-      document.getElementById("checkout").style.display = "none";
-      document.getElementById("course-summary-card").style.display = "none";
-      document.getElementById("status-message").style.display = "flex";
+    function updateDOM() {
+      const course = courseCatalog[activeCourse] || courseCatalog["oracle-plsql"];
+      document.getElementById("order-ref-val").textContent = activeOrderRef;
+      document.getElementById("course-name-title").textContent = course.name;
+      document.getElementById("course-email-sub").textContent = activeEmail;
 
-      const expectedAmount = Number(sessionStorage.getItem("expected_amount")) || 6500.00;
+      const usdPriceStr = "$" + course.usdPrice.toFixed(2);
+      const nprPriceStr = "रू " + (course.usdPrice * EX_RATE).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      if (activeCurrency === "USD") {
+        document.getElementById("course-base-price").textContent = usdPriceStr;
+        document.getElementById("breakdown-subtotal").textContent = usdPriceStr;
+        document.getElementById("breakdown-grand-total").textContent = usdPriceStr;
+        document.getElementById("conversion-row").style.display = "none";
+        document.getElementById("conversion-badge").style.display = "none";
+
+        document.getElementById("toggle-usd").classList.add("active");
+        document.getElementById("toggle-npr").classList.remove("active");
+      } else {
+        document.getElementById("course-base-price").textContent = nprPriceStr;
+        document.getElementById("breakdown-subtotal").textContent = nprPriceStr;
+        document.getElementById("breakdown-grand-total").textContent = nprPriceStr;
+        document.getElementById("conversion-row").style.display = "flex";
+        document.getElementById("conversion-badge").style.display = "inline-flex";
+
+        document.getElementById("toggle-usd").classList.remove("active");
+        document.getElementById("toggle-npr").classList.add("active");
+      }
+    }
+
+    function setCurrency(curr) {
+      if (activeCurrency === curr) return;
+      activeCurrency = curr;
+      updateDOM();
+      
+      // Re-initialize Gateway with the new currency and dynamically calculated price
+      initGateway();
+    }
+
+    async function verifyAndRedirect(txnId, expectedAmount, currencyVal) {
+      document.getElementById("checkout").style.display = "none";
+      document.getElementById("error-container-box").style.display = "none";
+      document.getElementById("status-overlay").style.display = "flex";
 
       try {
         const res = await fetch(VERIFY_URL, {
@@ -284,7 +516,7 @@
           body: JSON.stringify({ id: txnId }),
         });
 
-        if (!res.ok) throw new Error("HTTP " + res.status);
+        if (!res.ok) throw new Error("HTTP Status " + res.status);
 
         const result = await res.json();
         const data = result.data || result;
@@ -296,90 +528,111 @@
         }
 
         const received = Number(data.amount);
-        if (Math.abs(received - expectedAmount) > 0.01) {
-          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount`;
+        if (Math.abs(received - expectedAmount) > 0.05) {
+          window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=amount_mismatch`;
           return;
         }
 
         window.location.href = `${WEBSITE_DOMAIN}/success.html?verified=true&txid=${txnId}`;
       } catch (err) {
         console.error(err);
-        window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification`;
+        window.location.href = `${WEBSITE_DOMAIN}/fail.html?reason=verification_error`;
       }
+    }
+
+    function initGateway() {
+      // Clear previous iframe if any
+      const mount = document.getElementById("checkout");
+      mount.innerHTML = "";
+      mount.style.display = "block";
+      document.getElementById("error-container-box").style.display = "none";
+
+      if (typeof GetPay === "undefined") {
+        setTimeout(initGateway, 400);
+        return;
+      }
+
+      const course = courseCatalog[activeCourse] || courseCatalog["oracle-plsql"];
+      const amount = getExpectedAmount(activeCourse, activeCurrency);
+
+      // Save expected details in localStorage with a unique key, to handle potential cross-site redirects safely
+      localStorage.setItem("getpay_expected_amount", amount);
+      localStorage.setItem("getpay_expected_currency", activeCurrency);
+      localStorage.setItem("getpay_expected_course", activeCourse);
+
+      // Construct payment session options dynamically
+      const options = {
+        userInfo: {
+          email: activeEmail
+        },
+        clientRequestId: activeOrderRef,
+        papInfo: PAP_INFO,
+        oprKey: OPR_KEY,
+        insKey: "",
+        websiteDomain: WEBSITE_DOMAIN,
+        price: amount,
+        currency: activeCurrency, // "USD" or "NPR" passed dynamically
+        baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+        callbackUrl: {
+          // Pass context parameters directly in the redirect URL to prevent loss of session
+          successUrl: `${WEBSITE_DOMAIN}/payment.html?courseId=${activeCourse}&currency=${activeCurrency}&orderRef=${activeOrderRef}`,
+          failUrl: `${WEBSITE_DOMAIN}/fail.html?courseId=${activeCourse}`
+        },
+        onSuccess: (res) => {
+          const tid = res.transactionId || res.id || res.txnId;
+          if (tid) verifyAndRedirect(tid, amount, activeCurrency);
+          else showErrorGateway("Transaction ID missing in gateway success payload.");
+        },
+        onError: (err) => {
+          console.warn(err);
+          showErrorGateway("Checkout gateway handshake failed. Please try again.");
+        },
+      };
+
+      try {
+        const gp = new GetPay(options);
+        (gp.initialize || gp.init || gp.start)?.();
+      } catch (e) {
+        showErrorGateway("Initialization of getpay.global checkout failed.");
+        console.error(e);
+      }
+    }
+
+    function showErrorGateway(msg) {
+      document.getElementById("checkout").style.display = "none";
+      const box = document.getElementById("error-container-box");
+      document.getElementById("error-msg-text").textContent = msg;
+      box.style.display = "block";
     }
 
     window.addEventListener("load", () => {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
 
+      // Parse parameters or load from URL/Storage
+      activeCourse = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
+      activeCurrency = params.get("currency") || localStorage.getItem("getpay_expected_currency") || "USD";
+      activeEmail = params.get("email") || "customer@example.com";
+      activeOrderRef = params.get("orderRef") || "ORD-" + Date.now();
+
+      updateDOM();
+
       if (token) {
         try {
           const payload = JSON.parse(atob(token));
           const txnId = payload.id || payload.transactionId || payload.txnId;
+          const expected = Number(localStorage.getItem("getpay_expected_amount")) || getExpectedAmount(activeCourse, activeCurrency);
           if (txnId) {
-            verifyAndRedirect(txnId);
+            verifyAndRedirect(txnId, expected, activeCurrency);
             return;
           }
         } catch (e) {
-          showError("Invalid response from bank");
+          showErrorGateway("Verification parsing failure on token redirect.");
           return;
         }
       }
 
-      // Read query params for initiating checkout
-      const courseId = params.get("courseId") || "oracle-plsql";
-      const userEmail = params.get("email") || "customer@example.com";
-      const selectedCourse = courses[courseId] || courses["oracle-plsql"];
-
-      // Save expected details for success validation redirect
-      sessionStorage.setItem("expected_amount", selectedCourse.price);
-
-      // Render Summary Card
-      const summaryCard = document.getElementById("course-summary-card");
-      document.getElementById("summary-course-name").textContent = selectedCourse.name;
-      document.getElementById("summary-course-email").textContent = userEmail;
-      document.getElementById("summary-course-price").textContent = "Rs " + selectedCourse.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
-      summaryCard.style.display = "flex";
-
-      function init() {
-        if (typeof GetPay === "undefined") {
-          setTimeout(init, 400);
-          return;
-        }
-
-        const options = {
-          userInfo: {
-            email: userEmail
-          },
-          clientRequestId: "ORD-" + Date.now(),
-          papInfo: PAP_INFO,
-          oprKey: OPR_KEY,
-          insKey: "",
-          websiteDomain: WEBSITE_DOMAIN,
-          price: selectedCourse.price,
-          currency: "NPR",
-          baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
-          onSuccess: (res) => {
-            const tid = res.transactionId || res.id || res.txnId;
-            if (tid) verifyAndRedirect(tid);
-            else showError("Transaction ID missing");
-          },
-          onError: (err) => {
-            console.warn(err);
-            showError("Payment failed. Please try again.");
-          },
-        };
-
-        try {
-          const gp = new GetPay(options);
-          (gp.initialize || gp.init || gp.start)?.();
-        } catch (e) {
-          showError("Payment initialization failed");
-          console.error(e);
-        }
-      }
-
-      init();
+      initGateway();
     });
   </script>
 </body>
