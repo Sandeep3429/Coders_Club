@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
@@ -11,28 +12,152 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    :root { --primary: #5662FF; --primary-dark: #3e4dcc; --text: #1a1a2e; --light: #f8f9ff; --gray: #94a3b8; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', Arial, sans-serif; background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .container { background: white; max-width: 480px; width: 100%; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(86, 98, 255, 0.15); }
-    .header { background: linear-gradient(135deg, var(--primary), #7b85ff); color: white; padding: 30px 20px; text-align: center; }
-    .header h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
-    .header p { opacity: 0.9; font-size: 16px; }
-    .content { padding: 30px; }
-    .course-card { display: flex; align-items: center; background: #f8f9ff; border-radius: 12px; padding: 16px; margin-bottom: 25px; border: 1px solid #e6eaff; }
-    .course-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-right: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .course-info h3 { font-size: 18px; margin-bottom: 6px; color: var(--text); }
-    .price { font-size: 24px; font-weight: 700; color: var(--primary); }
-    .btn-pay { width: 100%; padding: 16px; font-size: 18px; font-weight: 600; background: var(--primary); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display:flex; gap:10px; align-items:center; justify-content:center; }
-    .btn-pay:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(86,98,255,0.3); }
-    .btn-pay:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-    .secure-note { text-align:center; margin-top:20px; font-size:14px; color:var(--gray); }
-    .secure-note i { color:#10b981; margin-right:6px; }
-    #integration-status { padding: 12px 20px; font-size:13px; color:#374151; text-align:center; }
-    #integration-status.err { color:#b91c1c; }
-    #integration-status.warn { color:#b45309; }
+    :root {
+      --primary: #5662FF;
+      --primary-dark: #3e4dcc;
+      --text: #1a1a2e;
+      --light: #f8f9ff;
+      --gray: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7ff 0%, #e6e9ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      max-width: 480px;
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(86, 98, 255, 0.15);
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), #7b85ff);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .course-card {
+      display: flex;
+      align-items: center;
+      background: #f8f9ff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 25px;
+      border: 1px solid #e6eaff;
+    }
+
+    .course-card img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .course-info h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .btn-pay {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-pay:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(86, 98, 255, 0.3);
+    }
+
+    .btn-pay:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secure-note {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    .secure-note i {
+      color: #10b981;
+      margin-right: 6px;
+    }
+
+    #integration-status {
+      padding: 12px 20px;
+      font-size: 13px;
+      color: #374151;
+      text-align: center;
+    }
+
+    #integration-status.err {
+      color: #b91c1c;
+    }
+
+    #integration-status.warn {
+      color: #b45309;
+    }
   </style>
 </head>
+
 <body>
 
   <div class="container">
@@ -69,9 +194,9 @@
   <script>
     const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
     const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
-    const INS_KEY = ""; 
+    const INS_KEY = "";
     const BASE_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions";
-    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
+    const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np/projects/codersclub/";
 
     const statusEl = document.getElementById('integration-status');
     const btn = document.getElementById('checkout-btn');
@@ -95,7 +220,7 @@
 
     btn.onclick = function (e) {
       e.preventDefault();
-      
+
       if (typeof window.GetPay === 'undefined') {
         alert('GetPay SDK not loaded.');
         return;
@@ -158,4 +283,5 @@
     };
   </script>
 </body>
+
 </html>
