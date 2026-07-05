@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying Transaction</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #5662FF; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .message { font-size: 18px; color: #333; margin-bottom: 20px; text-align: center; padding: 0 20px; }
+        
+        .debug-panel { margin-top: 30px; width: 90%; max-width: 600px; background: #222; color: #0f0; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; display: none; overflow-x: auto; }
+        .debug-toggle { cursor: pointer; color: #5662FF; text-decoration: underline; font-size: 14px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="spinner" id="spinner"></div>
+    <div class="message" id="statusMessage">Verifying your payment, please wait...</div>
+    
+    <div class="debug-toggle" onclick="document.getElementById('debugPanel').style.display='block'">Show Debug Info</div>
+    <div class="debug-panel" id="debugPanel">
+        <strong>DEBUG LOGS:</strong><br>
+        <pre id="debugContent"></pre>
+    </div>
+
+    <script type="module">
+        import { verifyTransaction } from './js/getpay-verify.js';
+        
+        function updateUI(msg, data) {
+            const debugContent = document.getElementById("debugContent");
+            console.log(msg, data);
+            debugContent.innerHTML += msg + (data ? ": " + JSON.stringify(data, null, 2) : "") + "\n\n";
+        }
+
+        async function initVerification() {
+            const result = await verifyTransaction(updateUI);
+            if (!result.success) {
+                document.getElementById("spinner").style.display = "none";
+                document.getElementById("statusMessage").innerHTML = result.message;
+            }
+        }
+
+        window.onload = initVerification;
+    </script>
+</body>
+</html>

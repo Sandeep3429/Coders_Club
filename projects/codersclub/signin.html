@@ -1,0 +1,742 @@
+
+
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="theme-color" content="#0f9d58" />
+ 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" async></script>
+  <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit' async defer></script>
+  <script src="https://apis.google.com/js/platform.js"></script>
+
+  <title>Login Coders Club</title>
+<!-- External CSS Links -->
+  <link rel="shortcut icon" href="img/codersclub_logo.jpeg" type="image/x-icon" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/socialmedia.css">
+ 
+  <style>
+    *,
+    *:after,
+    *:before{
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+  
+    html,
+    body{
+      position: relative;
+      min-height: 100%;
+      height: 100%;
+    }
+
+    html{
+      overflow: hidden;
+      margin: 0px;
+      padding: 0;
+      font-size: 62.5%;
+    }
+
+    body{
+      font-family: 'RobotoDraft', 'Roboto', 'Helvetica Neue, Helvetica, Arial', sans-serif;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 1.4rem;
+      line-height: 2rem;
+      letter-spacing: 0.01rem;
+      color: #212121;
+      background-color: #f5f5f5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    } 
+
+    form{
+      margin-bottom: 14px;
+    }
+
+    /* The Modal (background) */
+    .login-modal-div{
+      /*display: none;*/
+      position: fixed; /* Stay in place */
+      z-index: 1000; /* Sit on top */
+      padding-top: 70px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(46, 124, 15); /* Fallback color */
+      background-color: rgba(25, 70, 194, 0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .login-modal-div .modal-content{
+      background-color: #eff1f3;
+      margin: auto;
+      padding-top: 20px;
+      width: 550px;
+      border-radius: 5px;
+    }
+
+    /* The Close Button */
+    .login-modal-div .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .login-modal-div .close:hover,
+    .login-modal-div .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .login-modal-div img.logo{
+      width: 250px;
+    }
+
+    .login-modal-div .white-bg{
+      background-color: #fff;
+    }
+
+    .login-modal-div .close-div{
+      height: 30px;
+      padding: 0 20px;
+    }
+
+    .login-modal-div .modal-header{
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    .login-modal-div .center{
+      text-align: center;
+    }
+
+    .login-modal-div .alert{
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+    }
+
+    .login-modal-div #extra .alert-danger, .login-modal-div .extra .alert-danger{
+      color: #f1270b;
+      background-color: transparent; 
+      border-color: #f65039;
+      font-weight: 400;
+    }
+
+    .login-modal-div #extra .alert-info, .login-modal-div .extra .alert-info{
+      color: #1583ed;
+      background-color: transparent;
+      border-color: #418bf9;
+      font-weight: 400;
+    }
+
+    .login-modal-div input[type=text],
+    .login-modal-div input[type=email],
+    .login-modal-div input[type=password]{
+      border: 1px solid #C2C7D0;
+      border-top-color: rgb(194, 199, 208);
+      border-right-color: rgb(194, 199, 208);
+      border-bottom-color: rgb(194, 199, 208);
+      border-left-color: rgb(194, 199, 208);
+      border-radius: 5px;
+      box-shadow: inset 0 1px 2px rgba(151,159,175,0.1),inset 0 1px 15px rgba(151,159,175,0.05);
+      box-sizing: border-box;
+      color: #39424e;
+      display: inline-block;
+      font-size: 1em;
+      line-height: 1.5em;
+      margin-left: 0;
+      margin-right: 0;
+      margin-top: 0;
+      margin-bottom: 10px;
+      padding: 7px 10px;
+      -webkit-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .modal-form-group{
+      margin-top: 15px;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .modal-form-group .input-icon{
+      position: absolute;
+      z-index: 1;
+      left: 8px;
+      top: 8px;
+      color: #979faf;
+      font-size: 26px;
+    }
+
+    .modal-form-group .modal-form-input{
+      display: block !important;
+      padding: 8px 8px 8px 45px !important;
+      height: auto;
+      width: 450px;
+    }
+
+    .modal-form-group .modal-form-input:focus{
+      border-color: #0f9d58;
+      -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 5px rgba(78, 236, 141, 0.6);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 5px rgba(78, 236, 141, 0.6);
+    }
+
+    .modal-form-group .modal-form-input.error-focus, .modal-form-group .modal-form-input.error-focus:focus{
+      border-color: #ef1313;
+      -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 5px rgba(177, 74, 71, 0.6);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 5px rgba(177, 74, 71, 0.6);
+    }
+
+    .modal-form-group .modal-form-input::placeholder{
+      color: #999;
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    @media(max-width: 768px){
+      .login-modal-div{
+        padding-top: 30px;
+      }
+
+      .login-modal-div .modal-content{
+        width: 90%;
+      }
+
+      .modal-form-group .modal-form-input{
+        width: 100%;
+      }
+    }
+
+    .login-modal-div .modal-header section{
+      display: none;
+      padding: 20px 30px 30px 30px;
+      border: 1px solid #ddd;
+      border-bottom: none;
+    }
+
+    .login-modal-div .modal-header input[type=radio]{
+      display: none;
+    }
+
+    .login-modal-div .modal-header label.tab-label{
+      display: inline-block;
+      margin: 0 0 -1px;
+      padding: 15px 25px;
+      font-weight: 600;
+      text-align: center;
+      color: #888;
+      border: 1px solid transparent;
+      width: 50%;
+      padding-bottom: 12px;
+      font-size: 20px;
+      border-bottom-width: 4px;
+      background-color: #e9ebee;
+    }
+
+    .login-modal-div .modal-header label.tab-label:first-of-type{
+      float: left;
+    }
+
+    .login-modal-div .modal-header label.tab-label:before{
+      font-weight: normal;
+      margin-right: 10px;
+    }
+
+    .login-modal-div .modal-header label:hover{
+      color: #888;
+      cursor: pointer;
+    }
+
+    .login-modal-div .modal-header input:checked + label.tab-label{
+      color: #555;
+      border: 1px solid #ddd;
+      border-top: 2px solid #0f9d58;
+      border-bottom: 3px solid #fff;
+      background-color: #fff;
+    }
+
+    .login-modal-div .modal-header #tab1:checked ~ #content1,
+    .login-modal-div .modal-header #tab2:checked ~ #content2{
+      display: block;
+    }
+
+    @media screen and (max-width: 650px) {
+      .login-modal-div .modal-header label.tab-label:before{
+        margin: 0;
+        font-size: 18px;
+      }
+    }
+
+    @media screen and (max-width: 400px) {
+      .login-modal-div .modal-header label.tab-label{
+        padding: 15px;
+      }
+    }
+
+    /* css for overlay loading spinner */
+
+    /* Absolute Center Spinner */
+    .spinner-loading-overlay {
+      position: fixed;
+      display: none;
+      z-index: 1001;
+      height: 2em;
+      width: 2em;
+      overflow: show;
+      margin: auto;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    /* Transparent Overlay */
+    .spinner-loading-overlay:before {
+      content: '';
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(239,236,233,0.7);
+    }
+
+    .spinner-loading-overlay:not(:required):after {
+      content: '';
+      display: block;
+      font-size: 20px;
+      width: 0.6em;
+      height: 0.6em;
+      margin-top: -0.5em;
+      -webkit-animation: spinner 1500ms infinite linear;
+      -moz-animation: spinner 1500ms infinite linear;
+      -ms-animation: spinner 1500ms infinite linear;
+      -o-animation: spinner 1500ms infinite linear;
+      animation: spinner 1500ms infinite linear;
+      border-radius: 0.5em;
+      -webkit-box-shadow: rgba(15, 157, 88, 0.75) 1.5em 0 0 0, rgba(15, 157, 88, 0.75) 1.1em 1.1em 0 0, rgba(15, 157, 88, 0.75) 0 1.5em 0 0, rgba(15, 157, 88, 0.75) -1.1em 1.1em 0 0, rgba(15, 157, 88, 0.75) -1.5em 0 0 0, rgba(15, 157, 88, 0.75) -1.1em -1.1em 0 0, rgba(15, 157, 88, 0.75) 0 -1.5em 0 0, rgba(15, 157, 88, 0.75) 1.1em -1.1em 0 0;
+      box-shadow: rgba(15, 157, 88, 0.75) 1.5em 0 0 0, rgba(15, 157, 88, 0.75) 1.1em 1.1em 0 0, rgba(15, 157, 88, 0.75) 0 1.5em 0 0, rgba(15, 157, 88, 0.75) -1.1em 1.1em 0 0, rgba(15, 157, 88, 0.75) -1.5em 0 0 0, rgba(15, 157, 88, 0.75) -1.1em -1.1em 0 0, rgba(15, 157, 88, 0.75) 0 -1.5em 0 0, rgba(15, 157, 88, 0.75) 1.1em -1.1em 0 0;
+    }
+
+    /* Animation */
+
+    @-webkit-keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+    @-moz-keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+    @-o-keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+    @keyframes spinner {
+      0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+    /* css end for spinner loading */
+
+    .login-modal-div .left{
+      text-align: left;
+    }
+
+    .login-modal-div .right{
+      text-align: right;
+    }
+
+    .login-modal-div .pull-right{
+      float: right;
+    }
+
+    .login-modal-div .pull-left{
+      float: left;
+    }
+
+    .modal-form-label{
+      vertical-align: middle;
+      font-weight: 500;
+      color: #404040;
+    }
+
+    .login-modal-div a{
+      color: #979faf;
+    }
+
+    .login-modal-div a:hover{
+      color: #0f9d58;
+      text-decoration: underline;
+    }
+
+    .login-modal-div .btn{
+      background-color: whitesmoke;
+      background-image: -webkit-gradient(linear, top left, bottom left, color-stop(0, #2bbe60), color-stop(1, #0f9d58));
+      background-image: -webkit-linear-gradient(top, #2bbe60, #0f9d58);
+      background-image: linear-gradient(to bottom, #2bbe60, #0f9d58);
+      border: 1px solid #0f9d58;
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08),inset 0 -1px 4px rgba(151,159,175,0.2);
+      box-sizing: border-box;
+      cursor: pointer;
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 0;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 18px;
+      position: relative;
+      color: #39424e;
+      text-align: center;
+      text-decoration: none !important;
+      vertical-align: middle;
+    }
+
+    .login-modal-div .btn-green{
+      color: #fff;
+      background-color: #0f9d58;
+      width: 100%;
+      text-shadow: none;
+    }
+
+    .login-modal-div .forgot-link, .login-modal-div .login-link{
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    @media(max-width: 768px){
+      .login-modal-div .forgot-link, .login-modal-div .login-link{
+        padding: 10px 0px;    
+      }
+    }
+
+    .login-modal-div .social-signin-div{
+      border: 1px solid #ddd;
+      border-top: none;
+      padding-bottom: 20px;
+    }
+
+    .login-modal-div .social-signin-div .social-div{
+      width: 50%;
+      display: inline-block;
+      padding: 5px 30px;
+    }
+
+    .login-modal-div .social-signin-div .tnc-div{
+      font-size: 10px;
+      padding: 0 15px;
+      color: #999;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+
+    .login-modal-div .social-signin-div .tnc-div a{
+      color: #0f9d58;
+    }
+
+    .login-modal-div .social-signin-div .social-divider{
+      width: 80%;
+      text-align: center;
+      border-bottom: 1px solid #979faf;
+      line-height: 0.1em;
+      margin: -20px 0 20px;
+      margin-left: 10%;
+    }
+
+    .login-modal-div .social-signin-div .social-divider span{
+      background: #fff;
+      padding: 0 10px;
+    }
+
+    .login-modal-div .social-signin-div .btn-social{
+      padding-left: 40px;
+      color: #fff;
+    }
+
+    .login-modal-div .social-signin-div .btn-social span.fa{
+      padding-top: 2px;
+    }
+
+    .login-modal-div .social-signin-div .btn-google{
+      background-image: -webkit-gradient(linear, top left, bottom left, color-stop(0, #dd4e41), color-stop(1, #c9453a));
+      background-image: -webkit-linear-gradient(top, #dd4e41, #c9453a);
+      background-image: linear-gradient(to bottom, #dd4e41, #c9453a);
+      color: #fff;
+      border: 1px solid #c9453a;
+      padding-left: 60px;
+    }
+
+    .login-modal-div .social-signin-div .btn-facebook{
+      background-image: -webkit-gradient(linear, top left, bottom left, color-stop(0, #4b66a0), color-stop(1, #3b5998));
+      background-image: -webkit-linear-gradient(top, #4b66a0, #eb5998);
+      background-image: linear-gradient(to bottom, #4b66a0, #3b5998);
+      color: #fff;
+      border: 1px solid #3b5998;
+    }
+
+    .login-modal-div .social-signin-div .btn-linkedin{
+      background-image: -webkit-gradient(linear, top left, bottom left, color-stop(0, #0073b1), color-stop(1, #075b8c));
+      background-image: -webkit-linear-gradient(top, #0073b1, #075b8c);
+      background-image: linear-gradient(to bottom, #0073b1, #075b8c);
+      color: #fff;
+      border: 1px solid #075b8c;
+      padding-left: 60px;
+    }
+
+    .login-modal-div .social-signin-div .btn-github{
+      background-image: -webkit-gradient(linear, top left, bottom left, color-stop(0, #4a4646), color-stop(1, #191717));
+      background-image: -webkit-linear-gradient(top, #4a4646, #191717);
+      background-image: linear-gradient(to bottom, #4a4646, #191717);
+      color: #fff;
+      border: 1px solid #191717;
+      padding-left: 60px;
+    }
+
+    .login-modal-div .forgot-div{
+      padding: 20px 30px 30px 30px;
+      border: 1px solid #ddd;
+      display: none;
+    }
+
+    .login-modal-div .forgot-div p:first-of-type{
+      font-weight: 400;
+      color: #404040;
+    }
+
+    .login-modal-div div.input-error{
+      font-size: 12px;
+      color: #b71c1c;
+      letter-spacing: 0.83;
+      text-align: left;
+      position: relative;
+      bottom: 10px;
+      font-weight: 500;
+    }
+
+    #glogin, #fblogin, #inlogin, #gitlogin{
+      display: block;
+    }
+
+    @media(max-width:468px){
+      .login-modal-div .social-signin-div .social-div{
+        padding: 0;
+      }
+
+      #glogin, #fblogin, #inlogin, #gitlogin{
+        font-size: 14px !important;
+        display: inline-block;
+      }
+
+      #glogin{
+        padding-left: 50px !important;
+      }
+
+      #inlogin{
+        padding-left: 43px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="spinner-loading-overlay"></div>
+  <div class="login-modal-div">
+    <div class="modal-content">
+      <!-- <div class="close-div"><span class="close">&times;</span></div> -->
+      <div class="center">
+        <a href="index.html">
+          <img width="350px" src="img/codersclub_logo.jpeg">
+        </a>
+      </div>
+      <div class="white-bg center modal-header">
+        <div class="login-register-div">
+          <input id="tab1" type="radio" name="tabs" checked>
+          <label class="tab-label" for="tab1">Sign In</label>
+        
+          <input id="tab2" type="radio" name="tabs" >
+          <label class="tab-label" for="tab2">Sign Up</label>
+
+          <section id="content1">
+            <form method="POST" class="login-form" id="Login">
+              <input type="hidden" name="reqType" value="Login">
+              <div class="modal-form-group">
+                <div class="extra"></div>
+              </div>
+              <div class="modal-form-group">
+                <i class="input-icon material-icons">account_circle</i>
+                <input name="user" id="luser" required="required" type="text" class="modal-form-input" placeholder="Username or email">
+              </div>
+              <div class="modal-form-group">
+                <i class="input-icon material-icons">lock</i>
+                <input name="pass" id="password" type="password" required="required" class="modal-form-input" placeholder="Password">
+              </div>
+              <div class="modal-form-group left">
+                <input name="rem" type="hidden" value="false">
+                <input name="to" type="hidden" value="https://www.geeksforgeeks.org/">
+                <input name="rem" type="checkbox" checked>
+                <label class="modal-form-label" for="remember">Remember me</label>
+                <a class="pull-right forgot-link">Forgot Password</a>
+              </div>
+              <div class="modal-form-group left">
+                <center><div id="loginCaptcha"></div></center>
+              </div>
+              <button class="btn btn-green signin-button" type="submit">Sign In</button>
+            </form>
+          </section>
+          <section id="content2">
+                          <form method="POST" class="login-form" id="Register">
+              <input type="hidden" name="reqType" value="Register">
+              <div class="modal-form-group">
+                <div class="extra"></div>
+              </div>
+              <div class="modal-form-group">
+                <i class="input-icon material-icons">email</i>
+                <input name="email" id="email" type="email" value="" required="required" class="modal-form-input" placeholder="E-mail">
+              </div>
+              <div class="modal-form-group">
+                <i class="input-icon material-icons">lock</i>
+                <input name="pass" id="reg-password" type="password" required="required" class="modal-form-input" placeholder="Password">
+              </div>
+              <div class="modal-form-group">
+                <i class="input-icon material-icons">business</i>
+                <select name="institute" id="organization" autocomplete="on" required="required" type="option" class="modal-form-input typeahead">
+                <option disabled selected value>
+                    Select your college </option>
+                  <option value="Adarsh Secondary School , Lamahi, Dang">Adarsh Secondary School , Lamahi, Dang</option>
+                <option value="Advance Academy , Kumaripati, Lalitpur">Advance Academy , Kumaripati, Lalitpur</option>
+                <option value="Aims Academy , Dharan">Aims Academy , Dharan</option><option value="AIMS Academy , Kusunti, Lalitpur">AIMS Academy , Kusunti, Lalitpur</option><option value="Amarsingh Higher Secondary School , Pokhara, Kaski">Amarsingh Higher Secondary School , Pokhara, Kaski</option><option value="Ambition Academy , Midbaneshwor, Kathmandu">Ambition Academy , Midbaneshwor, Kathmandu</option><option value="Annapurna Model College , Butwal, Rupandehi">Annapurna Model College , Butwal, Rupandehi</option><option value="Araniko Higher Secondary School , Biratnagar, Morang">Araniko Higher Secondary School , Biratnagar, Morang</option><option value="Araniko International School , Talchhikhel, lalitpur">Araniko International School , Talchhikhel, lalitpur</option><option value="Arniko Higher Secondary School , Biratnagar, Morang">Arniko Higher Secondary School , Biratnagar, Morang</option><option value="Arniko International College , Satdobato, Lalitpur">Arniko International College , Satdobato, Lalitpur</option><option value="Aroma Collage , Bharatpur, Chitwan">Aroma Collage , Bharatpur, Chitwan</option><option value="Asian Institute of Technology and Management , Dhapakhel Lalitupr">Asian Institute of Technology and Management , Dhapakhel Lalitupr</option><option value="Bagmati Modern College , Sukedhara, kathmandu">Bagmati Modern College , Sukedhara, kathmandu</option><option value="Bhutan Devi Higher Seconday School , Hetauda, Makawanpur">Bhutan Devi Higher Seconday School , Hetauda, Makawanpur</option><option value="Bishnu Memorial Higher Secondary School , Dharan, Sunsari">Bishnu Memorial Higher Secondary School , Dharan, Sunsari</option><option value="Bluebird College , Kumaripati, Lalitpur">Bluebird College , Kumaripati, Lalitpur</option><option value="Bridge water international college , Sinamangal">Bridge water international college , Sinamangal</option><option value="Brihaspati College , Bhairahawa, Rupandehi">Brihaspati College , Bhairahawa, Rupandehi</option><option value="Budanilkantha School , Budanilkantha, Kathmandu">Budanilkantha School , Budanilkantha, Kathmandu</option><option value="Buddha Deep English Boarding School , Rudrapur, Rupandehi">Buddha Deep English Boarding School , Rudrapur, Rupandehi</option><option value="Butwal Multiple Campus , Butwal, Rupandehi">Butwal Multiple Campus , Butwal, Rupandehi</option><option value="Butwal Multiple Campus , Butwal, Rupandehi">Butwal Multiple Campus , Butwal, Rupandehi</option><option value="Canon College , Butwal, Rupandehi">Canon College , Butwal, Rupandehi</option><option value="Canvas International College , Basundhara, Kathmandu">Canvas International College , Basundhara, Kathmandu</option><option value="Capital College and Research Center , Balkumari, Kathmandu">Capital College and Research Center , Balkumari, Kathmandu</option><option value="Caribbean College , Mahalaxmisthan, Lalitpur">Caribbean College , Mahalaxmisthan, Lalitpur</option><option value="Caspian Valley College , Kumaripati, Lalitpur">Caspian Valley College , Kumaripati, Lalitpur</option><option value="Chhorepatan Higher Secondary School , Pokhara, Kaski">Chhorepatan Higher Secondary School , Pokhara, Kaski</option><option value="College for Higher Education , Birtamod, Jhapa">College for Higher Education , Birtamod, Jhapa</option><option value="Crimson College of Technology , Butwal, Rupandehi">Crimson College of Technology , Butwal, Rupandehi</option><option value="Damak Multiple Campus , Damak, Jhapa">Damak Multiple Campus , Damak, Jhapa</option><option value="Dang Valley Secondary School , Tulsipur, Dang">Dang Valley Secondary School , Tulsipur, Dang</option><option value="DAV High School , Dhobighat, Lalitpur">DAV High School , Dhobighat, Lalitpur</option><option value="Deep Boarding High School , Butwal, Rupandehi">Deep Boarding High School , Butwal, Rupandehi</option><option value="Deepshikha College , Ghorahi, Dang">Deepshikha College , Ghorahi, Dang</option><option value="Delhi Public School , Biratnagar">Delhi Public School , Biratnagar</option><option value="Dhanusha science , janakpur">Dhanusha science , janakpur</option><option value="Dhanusha Science Campus , Janakpur, Dhanusha">Dhanusha Science Campus , Janakpur, Dhanusha</option><option value="Dhulabari HIgh School , Dhulabari, Jhapa">Dhulabari HIgh School , Dhulabari, Jhapa</option><option value="Everest College , Butwal, Rupandehi">Everest College , Butwal, Rupandehi</option><option value="Everest Innovative College , Kalimati, Kathmandu">Everest Innovative College , Kalimati, Kathmandu</option><option value="Everest Secondary School , Biratnagar, Morang">Everest Secondary School , Biratnagar, Morang</option><option value="Gandaki Boarding School , Pokhara, Kaski">Gandaki Boarding School , Pokhara, Kaski</option><option value="Glacier International College , Shantinagar kathmandu">Glacier International College , Shantinagar kathmandu</option><option value="Glorious College, Butwal, Rupandehi">Glorious College, Butwal, Rupandehi</option><option value="Golden Gate International College, Old Baneshwor, Kathmandu">Golden Gate International College, Old Baneshwor, Kathmandu</option><option value="Golden Park College , Biratnagar, Morang">Golden Park College , Biratnagar, Morang</option><option value="Gorkha International Public Secondary School , Ghorahi, Dang">Gorkha International Public Secondary School , Ghorahi, Dang</option><option value="Gorkha International Public Secondary School,Ghorahi">Gorkha International Public Secondary School,Ghorahi</option><option value="Gorkha Secondary School , Tulsipur, Dang">Gorkha Secondary School , Tulsipur, Dang</option><option value="Greenland International College , Biratnagar, Morang">Greenland International College , Biratnagar, Morang</option><option value="Guru Jajur Secondary School, Tulsipur, Dang">Guru Jajur Secondary School, Tulsipur, Dang</option><option value="GVN, Nepalgunj">GVN, Nepalgunj</option><option value="Happyland Secondary School , Rajbiraj, Saptari">Happyland Secondary School , Rajbiraj, Saptari</option><option value="Herald international college , Bashundhara Kathmandu">Herald international college , Bashundhara Kathmandu</option><option value="Himal Academy Dang , Tulsipur 6 Dang">Himal Academy Dang , Tulsipur 6 Dang</option><option value="Himalayan White House College , Baneshwor, Kathmandu">Himalayan White House College , Baneshwor, Kathmandu</option><option value="Holy Vision International school and college , Tahachal">Holy Vision International school and college , Tahachal</option><option value="Holyland Higher Secondary School , Nepalgung, Banke">Holyland Higher Secondary School , Nepalgung, Banke</option><option value="Horizon Gautam Buddha Secondary School , tilottama-1,rupandehi,nepal">Horizon Gautam Buddha Secondary School , tilottama-1,rupandehi,nepal</option><option value="Janapriya Secondary School , Pokhara 8 simalchaur">Janapriya Secondary School , Pokhara 8 simalchaur</option><option value="Janjyoti secondary boarding school , Bardiya">Janjyoti secondary boarding school , Bardiya</option><option value="Jyoti Secondary School , Itahari, Sunsari">Jyoti Secondary School , Itahari, Sunsari</option><option value="Kailali Model College , Dhangadhi, Kailali">Kailali Model College , Dhangadhi, Kailali</option><option value="Kailali Multiple Campus , Dhangadi, Kailali">Kailali Multiple Campus , Dhangadi, Kailali</option><option value="Kalika Manavgyan Secondary School , Butwal, Rupandehi">Kalika Manavgyan Secondary School , Butwal, Rupandehi</option><option value="kanjirowa national collage , balkumari">kanjirowa national collage , balkumari</option><option value="Kanjirowa national school , Kalinchok-9, Dolakha">Kanjirowa national school , Kalinchok-9, Dolakha</option><option value="Kanti Secondary School , Butwal, Rupandehi">Kanti Secondary School , Butwal, Rupandehi</option><option value="Kathmandu Bernhardt College , Balkhu, Kathmandu">Kathmandu Bernhardt College , Balkhu, Kathmandu</option><option value="Kathmandu Model College , Bagbazar, Kathmandu">Kathmandu Model College , Bagbazar, Kathmandu</option><option value="Korea Nepal Institute of Technology , Butwal, Rupandehi">Korea Nepal Institute of Technology , Butwal, Rupandehi</option><option value="Koshi St. James College">Koshi St. James College</option><option value="Little Angel's Higher Secondary School , Hattiban, Lalitpur">Little Angel's Higher Secondary School , Hattiban, Lalitpur</option><option value="Liverpool International College , Baneshwor, Kathmandu">Liverpool International College , Baneshwor, Kathmandu</option><option value="Lord Buddha College , Biratnagar, Morang">Lord Buddha College , Biratnagar, Morang</option><option value="Lumbini Academic College , Chabahil, Kathmandu">Lumbini Academic College , Chabahil, Kathmandu</option><option value="Mahakabi Devkota Secondary School , Sunwal, Nawalparasi">Mahakabi Devkota Secondary School , Sunwal, Nawalparasi</option><option value="Makawanpur Multiple Campus , Hetauda, Makawanpur">Makawanpur Multiple Campus , Hetauda, Makawanpur</option><option value="Mangal Prasad Higher Secondary School , Nepalgung, Banke">Mangal Prasad Higher Secondary School , Nepalgung, Banke</option>
+                <option value="Manimukunda College , Butwal, Rupandehi">Manimukunda College , Butwal, Rupandehi</option><option value="Mega Higher Secondary school , Kumaripati, Lalitpur">Mega Higher Secondary school , Kumaripati, Lalitpur</option><option value="Milestone international college , Balkumari , lalitpur">Milestone international college , Balkumari , lalitpur</option><option value="Moonlight Secondary School , Kumaripati, Lalitpur">Moonlight Secondary School , Kumaripati, Lalitpur</option><option value="Morgan international college , Dhumbarahi">Morgan international college , Dhumbarahi</option><option value="Morgan International College , Basundhara, Kathmandu">Morgan International College , Basundhara, Kathmandu</option>
+                <option value="Motherland Higher Secondary School , Pokhara, Kaski">Motherland Higher Secondary School , Pokhara, Kaski</option><option value="Mount View Secondary Boarding School , Ghorahi, Dang">Mount View Secondary Boarding School , Ghorahi, Dang</option><option value="Nabin Audhyogic Kadar Bahadur Rita High. Sec. School , Butwal, Rupandehi">Nabin Audhyogic Kadar Bahadur Rita High. Sec. School , Butwal, Rupandehi</option><option value="Narayani Public School , Bharatpur, Chitawan">Narayani Public School , Bharatpur, Chitawan</option><option value="nasa international collage , kathmandu">nasa international collage , kathmandu</option><option value="Nasa International College , Tinkune, Kathmandu">Nasa International College , Tinkune, Kathmandu</option><option value="National Academy of Science and Technology , Dhangadi, Kailali">National Academy of Science and Technology , Dhangadi, Kailali</option><option value="National Infotech Secondary School , Birgunj, Parsa">National Infotech Secondary School , Birgunj, Parsa</option><option value="National School of Sciences , Lainchour, Kathmandu">National School of Sciences , Lainchour, Kathmandu</option><option value="Nepal Mega College , Babarmahal, Kathmandu">Nepal Mega College , Babarmahal, Kathmandu</option><option value="Nepal Polytechnic Institute , Bharatpur, Chitwan">Nepal Polytechnic Institute , Bharatpur, Chitwan</option><option value="New Horizon , Tansen palpa">New Horizon , Tansen palpa</option><option value="New Horizon College , Butwal, Rupandehi">New Horizon College , Butwal, Rupandehi</option><option value="Nobel Academy Secondary School , New Baneshwor, Kathmandu">Nobel Academy Secondary School , New Baneshwor, Kathmandu</option><option value="Olympia World College , Babarmahal, Kathmandu">Olympia World College , Babarmahal, Kathmandu</option><option value="Om National Academy , Birgunj, Parsa">Om National Academy , Birgunj, Parsa</option><option value="Omega International College , Kumaripati, Lalitpur">Omega International College , Kumaripati, Lalitpur</option><option value="Orchid College , Biratnagar, Morang">Orchid College , Biratnagar, Morang</option><option value="Orchid Science College , Bharatpur, Chitwan">Orchid Science College , Bharatpur, Chitwan</option><option value="Oxbridge International College , Sanepa">Oxbridge International College , Sanepa</option><option value="Oxford College , Butwal, Rupandehi">Oxford College , Butwal, Rupandehi</option><option value="Padmodaya Public Secondary School , Ghorahi, Dang">Padmodaya Public Secondary School , Ghorahi, Dang</option><option value="Padmodaya Secondary School , Putalisadak, Kathmandu">Padmodaya Secondary School , Putalisadak, Kathmandu</option><option value="Paramount College , Shankarnagar, Butwal">Paramount College , Shankarnagar, Butwal</option><option value="Pentagon International College , Tinkune, Kathmandu">Pentagon International College , Tinkune, Kathmandu</option><option value="Pokhara Multimodal Secondary School , Pokhara, Kaski">Pokhara Multimodal Secondary School , Pokhara, Kaski</option><option value="Prasadi Academy , Lalitpur">Prasadi Academy , Lalitpur</option><option value="Prativa Higher Secondary School , Pokhara, Kaski">Prativa Higher Secondary School , Pokhara, Kaski</option><option value="Prativa Secondary School , Pokhara, Kaski">Prativa Secondary School , Pokhara, Kaski</option><option value="Premier International College , Baneshowr">Premier International College , Baneshowr</option><option value="Prime international school , Khusibun">Prime international school , Khusibun</option><option value="Public Gyan Jyoti Secondary School , Tulsipur, Dang">Public Gyan Jyoti Secondary School , Tulsipur, Dang</option><option value="Pulchowk campus , Rampur palpa">Pulchowk campus , Rampur palpa</option><option value="Radiant Secondary School , Mahendranagar, Kanchanpur">Radiant Secondary School , Mahendranagar, Kanchanpur</option><option value="Rammani Multiple Campus , Manigram, Rupandehi">Rammani Multiple Campus , Manigram, Rupandehi</option><option value="Reliance international academy , Kathmandu">Reliance international academy , Kathmandu</option><option value="sagarmatha , syangja">sagarmatha , syangja</option><option value="Sagarmatha Higher Secondary School , Pokhara, Kaski">Sagarmatha Higher Secondary School , Pokhara, Kaski</option><option value="Sagarmatha higher secondary school , Biratnagar">Sagarmatha higher secondary school , Biratnagar</option><option value="Sagarmatha Multiple College , Dillibazar, Kathmandu">Sagarmatha Multiple College , Dillibazar, Kathmandu</option><option value="Sagarmatha Sec. School , Mirchiya -06, siraha">Sagarmatha Sec. School , Mirchiya -06, siraha</option><option value="Sai Global College , Bhairahawa, Rupandehi">Sai Global College , Bhairahawa, Rupandehi</option><option value="Sainik Aawashiya Mahavidyalaya Bhaktapur , Sallaghari, Bhaktapur">Sainik Aawashiya Mahavidyalaya Bhaktapur , Sallaghari, Bhaktapur</option><option value="Sainik Awasiya Mahavidyalaya , Pokhara, Kaski">Sainik Awasiya Mahavidyalaya , Pokhara, Kaski</option><option value="Scholars Home , Butwal, Rupandehi">Scholars Home , Butwal, Rupandehi</option><option value="Shanti Sudha Secondary English Boarding School , Ghorahi, Dang">Shanti Sudha Secondary English Boarding School , Ghorahi, Dang</option><option value="Siddhartha College , Shankarnagar, Butwal">Siddhartha College , Shankarnagar, Butwal</option><option value="Sikshyadeep Higher Secondary School , Biratnagar, Morang">Sikshyadeep Higher Secondary School , Biratnagar, Morang</option><option value="SOS Bharatpur , Bharatpur, Chitawan">SOS Bharatpur , Bharatpur, Chitawan</option><option value="SOS College Bhaktapur , Sanothimi, Bhaktapur">SOS College Bhaktapur , Sanothimi, Bhaktapur</option><option value="SOS Pokhara , Pokhara, Kaski">SOS Pokhara , Pokhara, Kaski</option><option value="Southwestern State College , Basundhara, Kathmandu">Southwestern State College , Basundhara, Kathmandu</option><option value="St Joseph English Secondary School , Bhalwari, Rupandehi">St Joseph English Secondary School , Bhalwari, Rupandehi</option><option value="St. Marys Higher Secondary School , Jawalakhel, Lalitpur">St. Marys Higher Secondary School , Jawalakhel, Lalitpur</option><option value="St. Xavier's College , Maitighar, Kathmandu">St. Xavier's College , Maitighar, Kathmandu</option><option value="St. Xavier's College Godawari , Lalitpur">St. Xavier's College Godawari , Lalitpur</option><option value="St. Xavier's College Jawalakhel , Lalitpur">St. Xavier's College Jawalakhel , Lalitpur</option><option value="St.Xavier Secondary School , Ranighat, Birgunj">St.Xavier Secondary School , Ranighat, Birgunj</option><option value="Sukuna Higher Secondary School , Itahari, Sunsari">Sukuna Higher Secondary School , Itahari, Sunsari</option><option value="Sungava College , Khairahani, Chitwan">Sungava College , Khairahani, Chitwan</option><option value="Sunlight Modern Secondary English School , Lamahi, Dang">Sunlight Modern Secondary English School , Lamahi, Dang</option><option value="Sunrise English Secondary School , Bharatpur-6,Chitwan">Sunrise English Secondary School , Bharatpur-6,Chitwan</option><option value="Texas International College , Chabahil, Kathmandu">Texas International College , Chabahil, Kathmandu</option><option value="The New Summit College , Maitidevi, Kathmandu">The New Summit College , Maitidevi, Kathmandu</option><option value="Tilottama Campus , Tilottama, Rupandehi">Tilottama Campus , Tilottama, Rupandehi</option><option value="Times International College , Charkhal, Kathmandu">Times International College , Charkhal, Kathmandu</option><option value="Tiny Tots Secondary school , Lamahi, Dang">Tiny Tots Secondary school , Lamahi, Dang</option><option value="Trinity International College , Dillibazar, Kathmandu">Trinity International College , Dillibazar, Kathmandu</option><option value="Triton International College , Tinkune, Kathmandu">Triton International College , Tinkune, Kathmandu</option><option value="Tulsi Boarding Secondary School , Tulsipur, Dang">Tulsi Boarding Secondary School , Tulsipur, Dang</option><option value="Tulsi Boarding Secondary School , Tulsipur, Dang">Tulsi Boarding Secondary School , Tulsipur, Dang</option><option value="Uniglobe College , Kamaladi, Kathmandu">Uniglobe College , Kamaladi, Kathmandu</option><option value="United Academy , Kumaripati, Lalitpur">United Academy , Kumaripati, Lalitpur</option><option value="Vidhya Sanskar Secondary School , New Baneshwor, Kathmandu">Vidhya Sanskar Secondary School , New Baneshwor, Kathmandu</option><option value="Vishwa Niketan School , Naikap, Kathmandu">Vishwa Niketan School , Naikap, Kathmandu</option><option value="Viswa Adarsa College , Itahari">Viswa Adarsa College , Itahari</option><option value="Vs Niketan college , Tinkune, Kathmandu">Vs Niketan college , Tinkune, Kathmandu</option><option value="Xavier Academy , Lazimpat, Kathmandu">Xavier Academy , Lazimpat, Kathmandu</option><option value="Xavier International College , Kalopul, Kathmandu">Xavier International College , Kalopul, Kathmandu</option>
+              </select>
+              <button type="button" class="bp3-button bp3-minimal notInList-0-2-112"><span class="modal-form-group"><small class="notInList-0-2-112">Not in the list?</small></span></button>
+              <div class="modal-form-group">
+                <i class="input-icon material-icons">business</i>
+                <input name="pass" id="reg-password" type="password" required="required" class="modal-form-input" placeholder="organization">
+              </div>
+                 </div>
+            
+              <input name="to" type="hidden" value="index.html">
+              <button class="btn btn-green signup-button" type="submit">Sign Up</button>
+            </form>
+          </section>
+          <div class="social-signin-div">
+            <div class="social-divider">
+              <span>or</span>
+            </div>
+            <div class="google-div social-div pull-left">
+              <a id="glogin" href="https://accounts.google.com/signin"target="_blank" class="btn btn-social btn-google">
+                <span class="fa fa-google"></span>Google
+              </a>
+            </div>
+            <div class="facebook-div social-div">
+              <a id="fblogin" href= "https://www.facebook.com/login.php"target="_blank" class="btn btn-social btn-facebook">
+                <span class="fa fa-facebook"></span>Facebook
+              </a>  
+            </div>
+            <p></p>
+            <div class="linkedin-div social-div pull-left">
+              <a id="inlogin" href="https://www.linkedin.com/login"target="_blank" class="btn btn-social btn-linkedin">
+                <span class="fa fa-linkedin"></span>LinkedIn
+              </a>
+            </div>
+            <div class="github-div social-div pull-left">
+              <a id="gitlogin"  href="https://www.github.com/login"target="_blank" class="btn btn-social btn-github">
+                <span class="fa fa-github"></span>GitHub
+              </a>
+            </div>
+            <div style="padding: 10px 0px;font-size: 14px;font-weight: 500;padding-top: 50px;"><a href="creating.html" style="color: #120a81;" target="_blank">Why Create an Account?</a></div>
+            <div class="tnc-div">
+                By creating this account, you agree to our <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+            </div>
+          </div>
+        </div>
+        <div class="forgot-div">
+          <form class="login-form" id="Forgot">
+            <input type="hidden" name="reqType" value="Forgot">
+            <div class="modal-form-group">
+              <div class="extra"></div>
+            </div>
+            <div class="modal-form-group">
+              <p class="left">Please enter your email address or userHandle.</p>
+            </div>
+            <div class="modal-form-group">
+              <i class="input-icon material-icons">account_circle</i>
+              <input name="user" id="fuser" type="text" class="modal-form-input" placeholder="Username/Email">
+            </div>
+            <div class="modal-form-group">
+              <center><div id="forgotCaptcha"></div></center>
+            </div>
+            <div class="modal-form-group left">
+              <a class="login-link">Back to Login</a>
+            </div>
+            <button class="btn btn-green center reset-button" type="submit">Reset Password</button>
+          </form> 
+        </div>
+      </div>
+    </div>
+  </div>
+  </script>
+</body>
+</html>

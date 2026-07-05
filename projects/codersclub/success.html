@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful | Java Mastery</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; border-top: 6px solid #28a745; }
+        .icon { font-size: 60px; color: #28a745; margin-bottom: 20px; }
+        .txid { font-family: monospace; background: #eee; padding: 8px; border-radius: 4px; display: block; margin: 15px 0; word-break: break-all; font-size: 14px; }
+        .btn { display: inline-block; background-color: #5662FF; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">✅</div>
+        <h2>Enrollment Successful!</h2>
+        <p>Your payment of <strong>Rs. 4500.55</strong> has been verified.</p>
+        <p>Transaction ID:</p>
+        <span class="txid" id="displayTxid"></span>
+        <a href="https://sandeepkumarjha.com.np" class="btn">Start Learning Java</a>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('verified') !== 'true') {
+            window.location.href = "/getpay.html";
+        } else {
+            document.getElementById('displayTxid').innerText = params.get('txid');
+        }
+    </script>
+</body>
+</html>
