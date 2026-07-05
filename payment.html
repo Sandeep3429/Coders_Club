@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Secure FinTech Checkout | getPay</title>
+  <title>Secure Checkout | getPay</title>
 
   <!-- Prevent clickjacking -->
   <script>
@@ -14,303 +14,134 @@
 
   <!-- GetPay bundle -->
   <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
-  
-  <!-- FontAwesome & Google Fonts -->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --bg-main: #090d16;
-      --bg-card: rgba(17, 24, 39, 0.7);
-      --border-color: rgba(255, 255, 255, 0.08);
-      --accent-emerald: #10b981;
-      --accent-gold: #f59e0b;
-      --text-primary: #ffffff;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --primary-blue: #5662ff;
-      --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    }
-
     * {
       box-sizing: border-box;
+    }
+
+    html,
+    body {
       margin: 0;
       padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #eef2ff;
+      min-height: 100vh;
     }
 
-    html, body {
-      font-family: var(--font-family);
-      background-color: var(--bg-main);
-      color: var(--text-primary);
-      min-height: 100vh;
+    body {
       display: flex;
       justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle at top, #141b2d 0%, #060913 100%);
     }
 
-    .checkout-container {
+    /* Single centered column, no extra wrapper card */
+    .payment-page {
       width: 100%;
-      max-width: 1100px;
-      padding: 40px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
+      max-width: 960px;
+      padding: 24px 16px 40px;
     }
 
-    .checkout-header {
+    .page-header {
       text-align: center;
+      margin-bottom: 16px;
     }
 
-    .checkout-header h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 8px;
-      background: linear-gradient(to right, #ffffff, #94a3b8);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .page-header h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      color: #111827;
     }
 
-    .checkout-header p {
-      font-size: 1rem;
-      color: var(--text-secondary);
+    .page-header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
     }
 
-    .checkout-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 32px;
-      align-items: start;
-    }
-
-    /* Left Panel: Order Details */
-    .order-details-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 32px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    /* Thin top bar only, rest is native GetPay layout */
+    .payment-header-bar {
       display: flex;
-      flex-direction: column;
-      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
     }
 
-    .card-section-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .brand-left {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .card-section-title i {
-      color: var(--primary-blue);
+    .brand-logo {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
     }
 
-    .order-meta-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .order-id-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+    .brand-text {
       font-weight: 600;
-      text-transform: uppercase;
+      font-size: 1rem;
+      color: #111827;
     }
 
-    .order-id-val {
-      font-family: monospace;
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      font-weight: 700;
-    }
-
-    .currency-selector-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 8px 16px;
-    }
-
-    .currency-selector-label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .currency-toggle {
-      display: flex;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 4px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-    }
-
-    .toggle-btn {
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      padding: 6px 16px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .toggle-btn.active {
-      background: var(--primary-blue);
-      color: var(--text-primary);
-      box-shadow: 0 4px 12px rgba(86, 98, 255, 0.35);
-    }
-
-    /* Itemized Breakdown Grid */
-    .item-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .item-main {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .item-title {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: var(--text-primary);
-    }
-
-    .item-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-    }
-
-    .item-price {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--text-primary);
-    }
-
-    .breakdown-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .breakdown-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    .breakdown-row.grand-total {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--accent-gold);
-      padding-top: 16px;
-      border-top: 1px dashed var(--border-color);
-    }
-
-    .conversion-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .gateway-badge {
       font-size: 0.8rem;
-      color: var(--accent-emerald);
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.15);
-      padding: 4px 10px;
-      border-radius: 6px;
-      align-self: flex-start;
-      margin-top: 4px;
+      color: #6b7280;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
     }
 
-    /* Right Panel: Gateway Container */
-    .gateway-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 8px;
-      backdrop-filter: blur(20px);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
-      min-height: 520px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
+    /* Main GetPay mount point – let it define its own card width */
     #checkout {
       width: 100%;
-      min-height: 520px;
-      border-radius: 18px;
-      overflow: hidden;
+      min-height: 820px;
+      display: block;
     }
 
-    .info-footer {
+    /* Information / logo strip below (maps to your information-section path) */
+    .information-section {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid #d1d5db;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: #4b5563;
+    }
+
+    .information-section .info-text {
+      flex: 1 1 auto;
+    }
+
+    .information-section .nchl-logo {
+      height: 26px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .error-message {
+      margin-top: 16px;
       padding: 16px;
-      border-top: 1px solid var(--border-color);
-      margin-top: auto;
-    }
-
-    .info-footer img {
-      height: 20px;
-      filter: grayscale(1) brightness(0.8);
-    }
-
-    /* Message Panels */
-    .error-container {
-      background: rgba(239, 68, 68, 0.07);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-      padding: 20px;
-      border-radius: 16px;
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 10px;
       text-align: center;
+      border: 1px solid #fecaca;
       display: none;
+      font-size: 0.9rem;
     }
 
-    .error-container h3 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-      color: #ef4444;
-    }
-
-    #status-overlay {
+    /* Full‑page processing overlay */
+    #status-message {
       position: fixed;
       inset: 0;
-      z-index: 1000;
-      background: rgba(6, 9, 19, 0.96);
-      backdrop-filter: blur(15px);
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.92);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -318,121 +149,77 @@
       gap: 20px;
     }
 
-    .spin-loader {
-      border: 4px solid rgba(255, 255, 255, 0.05);
-      border-top: 4px solid var(--primary-blue);
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #5662ff;
       border-radius: 50%;
-      width: 64px;
-      height: 64px;
-      animation: spinner 0.8s linear infinite;
+      width: 56px;
+      height: 56px;
+      animation: spin 1.1s linear infinite;
     }
 
-    @keyframes spinner {
-      to { transform: rotate(360deg); }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
-    #status-overlay h2 {
-      font-size: 1.6rem;
-      font-weight: 800;
+    /* Responsive tweaks */
+    @media (min-width: 1200px) {
+      .payment-page {
+        max-width: 1100px;
+        padding-top: 32px;
+      }
     }
 
-    #status-overlay p {
-      color: var(--text-secondary);
-      font-size: 1rem;
-    }
+    @media (max-width: 640px) {
+      .payment-page {
+        padding: 16px 10px 28px;
+      }
 
-    @media (max-width: 900px) {
-      .checkout-grid {
-        grid-template-columns: 1fr;
+      .payment-header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      #checkout {
+        min-height: 860px;
       }
     }
   </style>
 </head>
 <body>
-
-  <div class="checkout-container">
-    <header class="checkout-header">
-      <h1>Payment Checkout</h1>
-      <p>Secure orchestrator powered by getpay.global</p>
+  <main class="payment-page">
+    <header class="page-header">
+      <p>Complete your payment safely via getPay</p>
     </header>
 
-    <div class="checkout-grid">
-      <!-- Left Panel: Order Details -->
-      <div class="order-details-card">
-        <div class="card-section-title">
-          <i class="fa-solid fa-receipt"></i> Order Summary
-        </div>
-
-        <div class="order-meta-info">
-          <span class="order-id-label">Order Reference</span>
-          <span class="order-id-val" id="order-ref-val">ORD-12345678</span>
-        </div>
-
-        <!-- Currency Selector -->
-        <div class="currency-selector-wrap">
-          <span class="currency-selector-label">Payment Currency</span>
-          <div class="currency-toggle">
-            <button class="toggle-btn" id="toggle-usd" onclick="setCurrency('USD')">USD ($)</button>
-            <button class="toggle-btn active" id="toggle-npr" onclick="setCurrency('NPR')">NPR (रू)</button>
-          </div>
-        </div>
-
-        <!-- Itemized breakdown -->
-        <div class="item-grid">
-          <div class="item-row">
-            <div class="item-main">
-              <span class="item-title" id="course-name-title">Course Loading...</span>
-              <span class="item-subtitle" id="course-email-sub">customer@example.com</span>
-            </div>
-            <span class="item-price" id="course-base-price">रू 0.00</span>
-          </div>
-        </div>
-
-        <div class="breakdown-list">
-          <div class="breakdown-row">
-            <span>Subtotal</span>
-            <span id="breakdown-subtotal">रू 0.00</span>
-          </div>
-          <div class="breakdown-row">
-            <span>Tax (0.00%)</span>
-            <span>रू 0.00</span>
-          </div>
-          <div class="breakdown-row" id="conversion-row" style="display: none;">
-            <span>Exchange Rate</span>
-            <span>1 USD = 133.00 NPR</span>
-          </div>
-          <div class="conversion-badge" id="conversion-badge" style="display: none;">
-            <i class="fa-solid fa-circle-info"></i> Converted for local gateway processing
-          </div>
-          <div class="breakdown-row grand-total">
-            <span>Grand Total</span>
-            <span id="breakdown-grand-total">रू 0.00</span>
-          </div>
-        </div>
+    <div class="payment-header-bar">
+      <div class="brand-left">
+        <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
       </div>
-
-      <!-- Right Panel: Gateway Container -->
-      <div class="gateway-card">
-        <div id="checkout"></div>
-
-        <div class="error-container" id="error-container-box">
-          <h3>Payment Gateway Error</h3>
-          <p id="error-msg-text">Failed to initialize session. Please check details or try again later.</p>
-        </div>
-
-        <div class="info-footer">
-          <span>Protected by 256-bit encryption</span>
-          <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" />
-        </div>
-      </div>
+      <span class="gateway-badge">Powered by getPay</span>
     </div>
-  </div>
 
-  <!-- Verification Overlay -->
-  <div id="status-overlay">
-    <div class="spin-loader"></div>
-    <h2 id="status-title">Verifying Payment</h2>
-    <p id="status-text">Confirming secure payment status with getPay...</p>
+    <!-- Main checkout container (xpath: /html/body/div/div[2]/main/div/div[4]) -->
+    <div id="checkout"></div>
+
+    <!-- Information section with NCHL logo (xpath: /html/body/div/div[2]/main/div/div[3]) -->
+    <div class="information-section">
+      <div class="info-text">
+        Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
+      </div>
+      <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL" class="nchl-logo" />
+    </div>
+
+    <div id="error-display" class="error-message"></div>
+  </main>
+
+  <!-- Full‑page processing overlay -->
+  <div id="status-message">
+    <div class="loader"></div>
+    <h2>Processing payment</h2>
+    <p>Please wait while we verify your transaction…</p>
   </div>
 
   <script>
@@ -440,80 +227,18 @@
     const OPR_KEY = "4fa4c6b9-3f91-43e5-9b4f-319f68187ba5";
     const VERIFY_URL = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
     const WEBSITE_DOMAIN = "https://sandeepkumarjha.com.np";
-    const EX_RATE = 133.00; // Exchange rate USD -> NPR
 
-    const courseCatalog = {
-      "oracle-plsql": {
-        name: "Mastering Oracle PL/SQL for Financial Systems",
-        usdPrice: 49.00,
-        nprPrice: 6500.00
-      },
-      "banking-etl": {
-        name: "Banking Data Reconciliation Pipelines",
-        usdPrice: 79.00,
-        nprPrice: 10500.00
-      },
-      "java-mastery": {
-        name: "Java Mastery Course",
-        usdPrice: 34.00,
-        nprPrice: 4500.55
-      }
-    };
-
-    let activeCourse = "oracle-plsql";
-    let activeCurrency = "NPR";
-    let activeEmail = "customer@example.com";
-    let activeOrderRef = "ORD-" + Date.now();
-
-    function getExpectedAmount(courseId, currency) {
-      const course = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
-      if (currency === "NPR") {
-        return course.nprPrice;
-      }
-      return course.usdPrice;
-    }
-
-    function updateDOM() {
-      const course = courseCatalog[activeCourse] || courseCatalog["oracle-plsql"];
-      document.getElementById("order-ref-val").textContent = activeOrderRef;
-      document.getElementById("course-name-title").textContent = course.name;
-      document.getElementById("course-email-sub").textContent = activeEmail;
-
-      const usdPriceStr = "$" + course.usdPrice.toFixed(2);
-      const nprPriceStr = "रू " + course.nprPrice.toLocaleString('en-US', { minimumFractionDigits: 2 });
-
-      if (activeCurrency === "USD") {
-        document.getElementById("course-base-price").textContent = usdPriceStr;
-        document.getElementById("breakdown-subtotal").textContent = usdPriceStr;
-        document.getElementById("breakdown-grand-total").textContent = usdPriceStr;
-        document.getElementById("conversion-row").style.display = "none";
-        document.getElementById("conversion-badge").style.display = "none";
-
-        document.getElementById("toggle-usd").classList.add("active");
-        document.getElementById("toggle-npr").classList.remove("active");
-      } else {
-        document.getElementById("course-base-price").textContent = nprPriceStr;
-        document.getElementById("breakdown-subtotal").textContent = nprPriceStr;
-        document.getElementById("breakdown-grand-total").textContent = nprPriceStr;
-        document.getElementById("conversion-row").style.display = "flex";
-        document.getElementById("conversion-badge").style.display = "inline-flex";
-
-        document.getElementById("toggle-usd").classList.remove("active");
-        document.getElementById("toggle-npr").classList.add("active");
-      }
-    }
-
-    function setCurrency(curr) {
-      if (activeCurrency === curr) return;
-      activeCurrency = curr;
-      updateDOM();
-      initGateway();
+    function showError(msg) {
+      const el = document.getElementById("error-display");
+      el.textContent = msg;
+      el.style.display = "block";
+      document.getElementById("checkout").style.display = "none";
+      document.getElementById("status-message").style.display = "none";
     }
 
     async function verifyAndRedirect(txnId, expectedAmount) {
       document.getElementById("checkout").style.display = "none";
-      document.getElementById("error-container-box").style.display = "none";
-      document.getElementById("status-overlay").style.display = "flex";
+      document.getElementById("status-message").style.display = "flex";
 
       try {
         const res = await fetch(VERIFY_URL, {
@@ -522,143 +247,124 @@
           body: JSON.stringify({ id: txnId }),
         });
 
-        if (!res.ok) throw new Error("HTTP Status " + res.status);
+        if (!res.ok) throw new Error("HTTP " + res.status);
 
         const result = await res.json();
         const data = result.data || result;
 
         if (!data || data.status !== "SUCCESS") {
           const reason = data?.remarks || "Transaction failed";
-          window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=${encodeURIComponent(reason)}`;
+          window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=${encodeURIComponent(
+            reason
+          )}`;
           return;
         }
 
         const received = Number(data.amount);
         if (Math.abs(received - expectedAmount) > 0.05) {
-          window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=amount_mismatch`;
+          window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=amount`;
           return;
         }
 
         window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/success.html?verified=true&txid=${txnId}`;
       } catch (err) {
         console.error(err);
-        window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=verification_error`;
+        window.location.href = `${WEBSITE_DOMAIN}/projects/codersclub/fail.html?reason=verification`;
       }
-    }
-
-    function initGateway() {
-      // Clear previous iframe if any
-      const mount = document.getElementById("checkout");
-      mount.innerHTML = "";
-      mount.style.display = "block";
-      document.getElementById("error-container-box").style.display = "none";
-
-      if (typeof GetPay === "undefined" && typeof getpay === "undefined") {
-        setTimeout(initGateway, 400);
-        return;
-      }
-
-      const amount = getExpectedAmount(activeCourse, activeCurrency);
-
-      // Save expected details in localStorage
-      localStorage.setItem("getpay_expected_amount", amount);
-      localStorage.setItem("getpay_expected_currency", activeCurrency);
-      localStorage.setItem("getpay_expected_course", activeCourse);
-
-      // Construct payment session options
-      const options = {
-        userInfo: {
-          name: "Sandeep Kumar Jha",
-          email: activeEmail,
-          state: "Bagmati",
-          country: "Nepal",
-          zipcode: "44600",
-          city: "Kathmandu",
-          address: "Maitidevi"
-        },
-        clientRequestId: activeOrderRef,
-        papInfo: PAP_INFO,
-        oprKey: OPR_KEY,
-        insKey: "",
-        websiteDomain: WEBSITE_DOMAIN,
-        price: amount,
-        businessName: "Sandeep Store",
-        imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/java.png",
-        currency: activeCurrency,
-        prefill: { name: true, email: true, state: true, city: true, address: true },
-        themeColor: "#5662FF",
-        baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
-        callbackUrl: {
-          successUrl: `${WEBSITE_DOMAIN}/payment.html`,
-          failUrl: `${WEBSITE_DOMAIN}/projects/codersclub/fail.html`
-        },
-        onSuccess: function (response) {
-          console.log('Success:', response);
-          const tid = response.transactionId || response.id || response.txnId;
-          if (tid) {
-            verifyAndRedirect(tid, amount);
-          }
-        },
-        onError: function (error) {
-          console.error('Error:', error);
-          showErrorGateway("Payment failed. Please try again.");
-        },
-      };
-
-      try {
-        // Initialize using the global window.getpay if defined, or via constructor.
-        // We pass options directly to initialize() to prevent the options-undefined crash.
-        if (window.getpay && typeof window.getpay.initialize === 'function') {
-          window.getpay.initialize(options);
-        } else {
-          const gp = new GetPay(options);
-          if (typeof gp.initialize === 'function') {
-            gp.initialize(options);
-          } else if (typeof gp.init === 'function') {
-            gp.init(options);
-          }
-        }
-      } catch (e) {
-        showErrorGateway("Initialization of getpay.global checkout failed.");
-        console.error(e);
-      }
-    }
-
-    function showErrorGateway(msg) {
-      document.getElementById("checkout").style.display = "none";
-      const box = document.getElementById("error-container-box");
-      document.getElementById("error-msg-text").textContent = msg;
-      box.style.display = "block";
     }
 
     window.addEventListener("load", () => {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
 
-      // Parse parameters or load from URL/Storage
-      activeCourse = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
-      activeCurrency = params.get("currency") || localStorage.getItem("getpay_expected_currency") || "NPR";
-      activeEmail = params.get("email") || "customer@example.com";
-      activeOrderRef = params.get("orderRef") || "ORD-" + Date.now();
+      // Load course configuration details dynamically
+      const courseCatalog = {
+        "oracle-plsql": 6500.00,
+        "banking-etl": 10500.00,
+        "java-mastery": 4500.55
+      };
 
-      updateDOM();
+      const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
+      const expectedAmount = courseCatalog[courseId] || 6500.00;
+      const userEmail = params.get("email") || "customer@example.com";
 
       if (token) {
         try {
           const payload = JSON.parse(atob(token));
           const txnId = payload.id || payload.transactionId || payload.txnId;
-          const expected = Number(localStorage.getItem("getpay_expected_amount")) || getExpectedAmount(activeCourse, activeCurrency);
           if (txnId) {
-            verifyAndRedirect(txnId, expected);
+            verifyAndRedirect(txnId, expectedAmount);
             return;
           }
         } catch (e) {
-          showErrorGateway("Verification parsing failure on token redirect.");
+          showError("Invalid response from bank");
           return;
         }
       }
 
-      initGateway();
+      function init() {
+        if (typeof GetPay === "undefined" && typeof getpay === "undefined") {
+          setTimeout(init, 400);
+          return;
+        }
+
+        localStorage.setItem("getpay_expected_amount", expectedAmount);
+        localStorage.setItem("getpay_expected_course", courseId);
+
+        const options = {
+          userInfo: {
+            name: "Sandeep Kumar Jha",
+            email: userEmail,
+            state: "Bagmati",
+            country: "Nepal",
+            zipcode: "44600",
+            city: "Kathmandu",
+            address: "Maitidevi"
+          },
+          clientRequestId: "ORD-" + Date.now(),
+          papInfo: PAP_INFO,
+          oprKey: OPR_KEY,
+          insKey: "",
+          websiteDomain: WEBSITE_DOMAIN,
+          price: expectedAmount,
+          businessName: "Sandeep Store",
+          imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/java.png",
+          currency: "NPR",
+          prefill: { name: true, email: true, state: true, city: true, address: true },
+          themeColor: "#5662FF",
+          baseUrl: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
+          callbackUrl: {
+            successUrl: `${WEBSITE_DOMAIN}/payment.html`,
+            failUrl: `${WEBSITE_DOMAIN}/projects/codersclub/fail.html`
+          },
+          onSuccess: (res) => {
+            const tid = res.transactionId || res.id || res.txnId;
+            if (tid) verifyAndRedirect(tid, expectedAmount);
+          },
+          onError: (err) => {
+            console.warn(err);
+            showError("Payment failed. Please try again.");
+          },
+        };
+
+        try {
+          if (window.getpay && typeof window.getpay.initialize === 'function') {
+            window.getpay.initialize(options);
+          } else {
+            const gp = new GetPay(options);
+            if (typeof gp.initialize === 'function') {
+              gp.initialize(options);
+            } else if (typeof gp.init === 'function') {
+              gp.init(options);
+            }
+          }
+        } catch (e) {
+          showError("Payment initialization failed");
+          console.error(e);
+        }
+      }
+
+      init();
     });
   </script>
 </body>
