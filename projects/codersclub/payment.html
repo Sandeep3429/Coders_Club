@@ -83,6 +83,18 @@
       position: relative;
     }
 
+    /* Target ONLY the main checkout or OTP iframe which is a direct child of #checkout */
+    #checkout > iframe {
+      width: 100% !important;
+      min-width: 100% !important;
+      height: 600px !important;
+      min-height: 600px !important;
+      border: none !important;
+      outline: none !important;
+      display: block !important;
+    }
+
+    /* Target nested secure microform iframes to ensure they don't inherit height/width */
     #checkout iframe {
       border: none !important;
       outline: none !important;
