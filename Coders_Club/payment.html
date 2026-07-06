@@ -112,6 +112,21 @@
       font-weight: 700;
       font-family: monospace;
     }
+
+    #status-message {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      background: rgba(255, 255, 255, 0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
   </style>
 </head>
 <body>
@@ -176,8 +191,8 @@
   </main>
 
   <!-- Full‑page processing overlay -->
-  <div id="status-message" class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white bg-opacity-95" style="display: none; z-index: 9999; left: 0; top: 0; background: rgba(255,255,255,0.95);">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem; border: .25em solid rgba(0,0,0,.1); border-top: .25em solid #2563eb; border-radius: 50%; animation: spin 1s linear infinite;" role="status"></div>
+  <div id="status-message">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
     <h4 class="mt-4 fw-bold text-dark">Processing payment</h4>
     <p class="text-muted">Please wait while we verify your transaction…</p>
   </div>
