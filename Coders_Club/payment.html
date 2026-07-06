@@ -18,195 +18,67 @@
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
 
+  <!-- Local Bootstrap CSS (for offline safety) -->
+  <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
+
   <style>
     * {
       box-sizing: border-box;
     }
 
-    html,
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
       min-height: 100vh;
-      color: #1f2937;
-    }
-
-    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      padding: 40px 0;
+      color: #334155;
     }
 
-    .payment-page {
-      width: 100%;
-      max-width: 1150px;
-      margin: 0 auto;
-    }
-
-    .payment-container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 32px;
-      margin-top: 10px;
-      justify-content: center;
-    }
-
-    @media (min-width: 992px) {
-      .payment-container {
-        grid-template-columns: 360px 720px;
-        justify-content: center;
-        align-items: start;
-      }
-      .info-column {
-        position: sticky;
-        top: 20px;
-      }
-    }
-
-    .brand-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    .brand-logo {
-      height: 38px;
-      width: auto;
-    }
-
-    .gateway-badge {
-      font-size: 0.8rem;
-      color: #4b5563;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.8);
-      font-weight: 500;
-      border: 1px solid #e5e7eb;
-    }
-
-    /* Left Column Info Card */
-    .info-card {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
+    .checkout-card {
+      border: 1px solid #e2e8f0;
       border-radius: 16px;
-      padding: 28px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-      margin-bottom: 20px;
+      background: #ffffff;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 
-    .info-card h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #111827;
-      border-bottom: 2px solid #f3f4f6;
-      padding-bottom: 12px;
+    /* Left side summary column styling */
+    .summary-card {
+      background: #f8fafc;
+      border-right: 1px solid #e2e8f0;
+      border-radius: 16px 0 0 16px;
     }
 
-    .summary-details-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    @media (max-width: 991.98px) {
+      .summary-card {
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        border-radius: 16px 16px 0 0;
+      }
     }
 
-    .summary-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .summary-item .label {
+    .summary-item-label {
       font-size: 0.75rem;
-      color: #6b7280;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      color: #64748b;
     }
 
-    .summary-item .value {
+    .summary-item-value {
       font-size: 1rem;
-      color: #111827;
-      font-weight: 600;
-    }
-
-    .summary-divider {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 8px 0;
-    }
-
-    .summary-item.total .value {
-      color: #2563eb;
-      font-size: 1.4rem;
-      font-weight: 800;
-    }
-
-    /* Sandbox OTP Tip Box */
-    .sandbox-otp-tip {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e40af;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
-    .sandbox-otp-tip i {
-      color: #3b82f6;
-      font-size: 1.3rem;
-    }
-
-    .sandbox-otp-tip span {
-      background: #3b82f6;
-      color: #ffffff;
-      padding: 2px 8px;
-      border-radius: 6px;
       font-weight: 700;
-      font-family: monospace;
-      font-size: 0.95rem;
+      color: #0f172a;
     }
 
-    /* Security note */
-    .security-info {
-      display: flex;
-      align-items: start;
-      gap: 10px;
-      padding: 12px;
-      font-size: 0.85rem;
-      color: #4b5563;
-      line-height: 1.4;
+    .summary-total {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #2563eb;
     }
 
-    .security-info i {
-      color: #10b981;
-      font-size: 1.1rem;
-      margin-top: 2px;
-    }
-
-    /* Right Column Checkout Form */
-    .checkout-column {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-      min-height: 820px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
-    }
-
+    /* Right side payment form container */
     #checkout {
       width: 100%;
       min-height: 780px;
@@ -220,107 +92,94 @@
       min-height: 780px !important;
       border: none !important;
       outline: none !important;
-      margin: 0 auto !important;
       display: block !important;
     }
 
-    .error-message {
-      margin-top: 16px;
-      padding: 16px;
-      background: #fee2e2;
-      color: #dc2626;
-      border-radius: 10px;
-      text-align: center;
-      border: 1px solid #fecaca;
-      display: none;
-      font-size: 0.9rem;
+    /* Sandbox OTP tip */
+    .sandbox-otp-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      border-radius: 12px;
+      font-size: 0.88rem;
     }
 
-    /* Full‑page processing overlay */
-    #status-message {
-      position: fixed;
-      inset: 0;
-      z-index: 999;
-      background: rgba(255, 255, 255, 0.95);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-    }
-
-    .loader {
-      border: 6px solid #e5e7eb;
-      border-top: 6px solid #2563eb;
-      border-radius: 50%;
-      width: 56px;
-      height: 56px;
-      animation: spin 1.1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .sandbox-otp-badge {
+      background: #3b82f6;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-family: monospace;
     }
   </style>
 </head>
 <body>
-  <main class="payment-page">
-    <div class="payment-container">
-      
-      <!-- Left Column: Information & Details -->
-      <div class="info-column">
-        <div class="brand-header">
-          <img src="img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
-          <span class="gateway-badge">Powered by getPay</span>
-        </div>
-        
-        <div class="info-card">
-          <h2>Order Summary</h2>
-          <div class="summary-details-vertical">
-            <div class="summary-item">
-              <span class="label">Course Name</span>
-              <span class="value" id="summary-course-name">Loading...</span>
+  <main class="container my-auto">
+    <div class="row justify-content-center">
+      <div class="col-xl-11 col-12">
+        <div class="card checkout-card overflow-hidden">
+          <div class="row no-gutters">
+            
+            <!-- Left Column: Order Summary -->
+            <div class="col-lg-5 col-12 summary-card p-4 p-md-5 d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex align-items-center justify-content-between mb-4 pb-2">
+                  <img src="img/NCHL-Logo.png" alt="NCHL Logo" height="36" class="img-fluid" />
+                  <span class="badge badge-light border rounded-pill px-3 py-2 text-muted" style="font-size: 0.75rem; font-weight: 600;">getPay Secure</span>
+                </div>
+                
+                <h4 class="fw-bold mb-4 text-dark" style="font-weight: 700; font-size: 1.35rem;">Order Summary</h4>
+                
+                <div class="mb-4">
+                  <div class="summary-item-label mb-1">Course Name</div>
+                  <div class="summary-item-value" id="summary-course-name">Loading...</div>
+                </div>
+                
+                <div class="mb-4">
+                  <div class="summary-item-label mb-1">Customer Email</div>
+                  <div class="summary-item-value" id="summary-email">Loading...</div>
+                </div>
+                
+                <hr class="my-4" style="border-top: 1px solid #e2e8f0;">
+                
+                <div class="mb-4">
+                  <div class="summary-item-label mb-1">Amount to Pay</div>
+                  <div class="summary-total" id="summary-amount">Rs 0.00</div>
+                </div>
+
+                <div class="sandbox-otp-box p-3 mb-4 d-flex align-items-start gap-2" id="sandbox-otp-helper">
+                  <i class="fa-solid fa-circle-info mt-1 text-primary me-2"></i>
+                  <div>
+                    <strong>Sandbox Testing:</strong> Use the OTP code <span class="sandbox-otp-badge">1234</span> when prompted to complete verification.
+                  </div>
+                </div>
+              </div>
+              
+              <div class="text-muted small d-flex align-items-start gap-2 mt-4" style="font-size: 0.8rem; line-height: 1.45;">
+                <i class="fa-solid fa-shield-halved text-success fs-5 me-2 mt-1"></i>
+                <span>Your card details are processed securely by NCHL getPay. We do not store your card details on this site.</span>
+              </div>
             </div>
-            <div class="summary-item">
-              <span class="label">Customer Email</span>
-              <span class="value" id="summary-email">Loading...</span>
+            
+            <!-- Right Column: Card Details Form -->
+            <div class="col-lg-7 col-12 p-4 p-md-5 d-flex flex-column justify-content-center bg-white">
+              <div id="checkout"></div>
             </div>
-            <div class="summary-divider"></div>
-            <div class="summary-item total">
-              <span class="label">Amount to Pay</span>
-              <span class="value" id="summary-amount">Rs 0.00</span>
-            </div>
+            
           </div>
         </div>
-
-        <div class="sandbox-otp-tip" id="sandbox-otp-helper">
-          <i class="fa-solid fa-circle-info"></i>
-          <div>
-            <strong>Sandbox Testing:</strong> Use the OTP code <span>1234</span> when prompted to complete verification.
-          </div>
-        </div>
-
-        <div class="security-info">
-          <i class="fa-solid fa-shield-halved"></i>
-          <p>Your card details are processed securely by NCHL getPay. We do not store your card information on this site.</p>
-        </div>
       </div>
-
-      <!-- Right Column: Checkout Form -->
-      <div class="checkout-column">
-        <div id="checkout"></div>
-      </div>
-      
     </div>
-
-    <div id="error-display" class="error-message"></div>
+    
+    <div id="error-display" class="alert alert-danger mt-4 text-center" style="display: none;" role="alert"></div>
   </main>
 
   <!-- Full‑page processing overlay -->
-  <div id="status-message">
-    <div class="loader"></div>
-    <h2>Processing payment</h2>
-    <p>Please wait while we verify your transaction…</p>
+  <div id="status-message" class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white bg-opacity-95" style="display: none; z-index: 9999; left: 0; top: 0; background: rgba(255,255,255,0.95);">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem; border: .25em solid rgba(0,0,0,.1); border-top: .25em solid #2563eb; border-radius: 50%; animation: spin 1s linear infinite;" role="status"></div>
+    <h4 class="mt-4 fw-bold text-dark">Processing payment</h4>
+    <p class="text-muted">Please wait while we verify your transaction…</p>
   </div>
 
   <script>
