@@ -11,9 +11,6 @@
       window.top.location = window.self.location.href;
     }
   </script>
-
-  <!-- GetPay bundle -->
-  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
   
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
@@ -140,7 +137,7 @@
             <div class="col-lg-5 col-12 summary-card p-4 p-md-5 d-flex flex-column justify-content-between">
               <div>
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-2">
-                  <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" height="36" class="img-fluid" />
+                  <img src="projects/codersclub/img/NCHL-Logo.png" alt="NCHL Logo" width="120" height="36" style="height: 36px; width: auto; max-width: 100%; display: block;" />
                   <span class="badge badge-light border rounded-pill px-3 py-2 text-muted" style="font-size: 0.75rem; font-weight: 600;">getPay Secure</span>
                 </div>
                 
@@ -179,7 +176,9 @@
             
             <!-- Right Column: Card Details Form -->
             <div class="col-lg-7 col-12 p-4 p-md-5 d-flex flex-column justify-content-center bg-white">
-              <div id="checkout"></div>
+              <div id="getpay-form-container" class="w-100">
+                <div id="checkout" class="w-100"></div>
+              </div>
             </div>
             
           </div>
@@ -196,6 +195,9 @@
     <h4 class="mt-4 fw-bold text-dark">Processing payment</h4>
     <p class="text-muted">Please wait while we verify your transaction…</p>
   </div>
+
+  <!-- GetPay bundle (deferred load) -->
+  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
 
   <script>
     const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
