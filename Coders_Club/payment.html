@@ -84,8 +84,9 @@
       position: relative;
     }
 
-    /* Target ONLY the main checkout or OTP iframe which is a direct child of #checkout */
-    #checkout > iframe {
+    /* Target ONLY the main checkout or OTP iframe which is a direct child (or wrapped child) of #checkout */
+    #checkout > iframe,
+    #checkout > div > iframe {
       width: 100% !important;
       min-width: 100% !important;
       height: 600px !important;
@@ -273,15 +274,18 @@
       const courseCatalog = {
         "oracle-plsql": {
           name: "Mastering Oracle PL/SQL for Financial Systems",
-          price: 6500.00
+          price: 6500.00,
+          imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/python.jpg"
         },
         "banking-etl": {
           name: "Banking Data Reconciliation Pipelines",
-          price: 10500.00
+          price: 10500.00,
+          imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/feature.jpg"
         },
         "java-mastery": {
           name: "Java Mastery Course",
-          price: 4500.55
+          price: 4500.55,
+          imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/java.png"
         }
       };
 
@@ -334,8 +338,8 @@
           insKey: "",
           websiteDomain: WEBSITE_DOMAIN,
           price: expectedAmount,
-          businessName: "Sandeep Store",
-          imageUrl: "https://sandeepkumarjha.com.np/projects/codersclub/img/java.png",
+          businessName: courseData.name,
+          imageUrl: courseData.imageUrl,
           currency: "NPR",
           prefill: { name: true, email: true, state: true, city: true, address: true },
           themeColor: "#5662FF",
