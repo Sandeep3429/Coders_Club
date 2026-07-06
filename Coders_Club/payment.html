@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +12,7 @@
       window.top.location = window.self.location.href;
     }
   </script>
-  
+
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
 
@@ -79,7 +80,7 @@
     #checkout {
       width: 100%;
       min-height: 780px;
-      position: relative;
+      position: absolute;
     }
 
     #checkout iframe {
@@ -126,35 +127,38 @@
     }
   </style>
 </head>
+
 <body>
   <main class="container my-auto">
     <div class="row justify-content-center">
       <div class="col-xl-11 col-12">
         <div class="card checkout-card overflow-hidden">
           <div class="row no-gutters">
-            
+
             <!-- Left Column: Order Summary -->
             <div class="col-lg-5 col-12 summary-card p-4 p-md-5 d-flex flex-column justify-content-between">
               <div>
                 <div class="d-flex align-items-center justify-content-between mb-4 pb-2">
-                  <img src="img/NCHL-Logo.png" alt="NCHL Logo" width="120" height="36" style="height: 36px; width: auto; max-width: 100%; display: block;" />
-                  <span class="badge badge-light border rounded-pill px-3 py-2 text-muted" style="font-size: 0.75rem; font-weight: 600;">getPay Secure</span>
+                  <img src="img/NCHL-Logo.png" alt="NCHL Logo" width="120" height="36"
+                    style="height: 36px; width: auto; max-width: 100%; display: block;" />
+                  <span class="badge badge-light border rounded-pill px-3 py-2 text-muted"
+                    style="font-size: 0.75rem; font-weight: 600;">getPay Secure</span>
                 </div>
-                
+
                 <h4 class="fw-bold mb-4 text-dark" style="font-weight: 700; font-size: 1.35rem;">Order Summary</h4>
-                
+
                 <div class="mb-4">
                   <div class="summary-item-label mb-1">Course Name</div>
                   <div class="summary-item-value" id="summary-course-name">Loading...</div>
                 </div>
-                
+
                 <div class="mb-4">
                   <div class="summary-item-label mb-1">Customer Email</div>
                   <div class="summary-item-value" id="summary-email">Loading...</div>
                 </div>
-                
+
                 <hr class="my-4" style="border-top: 1px solid #e2e8f0;">
-                
+
                 <div class="mb-4">
                   <div class="summary-item-label mb-1">Amount to Pay</div>
                   <div class="summary-total" id="summary-amount">Rs 0.00</div>
@@ -163,29 +167,32 @@
                 <div class="sandbox-otp-box p-3 mb-4 d-flex align-items-start gap-2" id="sandbox-otp-helper">
                   <i class="fa-solid fa-circle-info mt-1 text-primary me-2"></i>
                   <div>
-                    <strong>Sandbox Testing:</strong> Use the OTP code <span class="sandbox-otp-badge">1234</span> when prompted to complete verification.
+                    <strong>Sandbox Testing:</strong> Use the OTP code <span class="sandbox-otp-badge">1234</span> when
+                    prompted to complete verification.
                   </div>
                 </div>
               </div>
-              
-              <div class="text-muted small d-flex align-items-start gap-2 mt-4" style="font-size: 0.8rem; line-height: 1.45;">
+
+              <div class="text-muted small d-flex align-items-start gap-2 mt-4"
+                style="font-size: 0.8rem; line-height: 1.45;">
                 <i class="fa-solid fa-shield-halved text-success fs-5 me-2 mt-1"></i>
-                <span>Your card details are processed securely by NCHL getPay. We do not store your card details on this site.</span>
+                <span>Your card details are processed securely by NCHL getPay. We do not store your card details on this
+                  site.</span>
               </div>
             </div>
-            
+
             <!-- Right Column: Card Details Form -->
             <div class="col-lg-7 col-12 p-4 p-md-5 d-flex flex-column justify-content-center bg-white">
               <div id="getpay-form-container" class="w-100">
                 <div id="checkout" class="w-100"></div>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
     </div>
-    
+
     <div id="error-display" class="alert alert-danger mt-4 text-center" style="display: none;" role="alert"></div>
   </main>
 
@@ -197,7 +204,7 @@
   </div>
 
   <!-- GetPay bundle (deferred load) -->
-  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <script defer src=" https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
 
   <script>
     const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
@@ -360,4 +367,5 @@
     });
   </script>
 </body>
+
 </html>
