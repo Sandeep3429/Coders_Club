@@ -27,90 +27,89 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #eef2ff;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
       min-height: 100vh;
+      color: #1f2937;
     }
 
     body {
       display: flex;
       justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
-    /* Single centered column, no extra wrapper card */
     .payment-page {
       width: 100%;
-      max-width: 960px;
-      padding: 24px 16px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
 
-    .page-header {
-      text-align: center;
-      margin-bottom: 16px;
+    .payment-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-top: 10px;
     }
 
-    .page-header h1 {
-      margin: 0 0 4px;
-      font-size: 1.4rem;
-      color: #111827;
+    @media (min-width: 868px) {
+      .payment-container {
+        grid-template-columns: 1fr 1.2fr;
+        align-items: start;
+      }
+      .info-column {
+        position: sticky;
+        top: 20px;
+      }
     }
 
-    .page-header p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #6b7280;
-    }
-
-    /* Thin top bar only, rest is native GetPay layout */
-    .payment-header-bar {
+    .brand-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
-      gap: 12px;
-    }
-
-    .brand-left {
-      display: flex;
       align-items: center;
-      gap: 10px;
+      margin-bottom: 24px;
     }
 
     .brand-logo {
-      height: 32px;
+      height: 38px;
       width: auto;
-      object-fit: contain;
-    }
-
-    .brand-text {
-      font-weight: 600;
-      font-size: 1rem;
-      color: #111827;
     }
 
     .gateway-badge {
       font-size: 0.8rem;
-      color: #6b7280;
-      padding: 4px 8px;
+      color: #4b5563;
+      padding: 6px 12px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      border: 1px solid #e5e7eb;
     }
 
-    /* Modern Order Summary Banner styling */
-    .order-summary-banner {
+    /* Left Column Info Card */
+    .info-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
       margin-bottom: 20px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
 
-    .summary-details {
+    .info-card h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #111827;
+      border-bottom: 2px solid #f3f4f6;
+      padding-bottom: 12px;
+    }
+
+    .summary-details-vertical {
       display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 16px;
     }
 
     .summary-item {
@@ -121,82 +120,90 @@
 
     .summary-item .label {
       font-size: 0.75rem;
-      color: #64748b;
+      color: #6b7280;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
     .summary-item .value {
-      font-size: 0.95rem;
-      color: #0f172a;
-      font-weight: 700;
+      font-size: 1rem;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .summary-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 8px 0;
     }
 
     .summary-item.total .value {
-      color: #5662ff;
-      font-size: 1.15rem;
+      color: #2563eb;
+      font-size: 1.4rem;
+      font-weight: 800;
     }
 
-    /* Beautiful Sandbox OTP Tip Box */
+    /* Sandbox OTP Tip Box */
     .sandbox-otp-tip {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
       color: #1e40af;
       border-radius: 12px;
-      padding: 14px 18px;
-      margin-bottom: 24px;
+      padding: 16px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       gap: 12px;
       font-size: 0.9rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      line-height: 1.4;
     }
 
     .sandbox-otp-tip i {
       color: #3b82f6;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
     }
 
     .sandbox-otp-tip span {
       background: #3b82f6;
       color: #ffffff;
-      padding: 3px 8px;
+      padding: 2px 8px;
       border-radius: 6px;
-      font-weight: 800;
+      font-weight: 700;
       font-family: monospace;
       font-size: 0.95rem;
     }
 
-    /* Main GetPay mount point */
-    #checkout {
-      width: 100%;
-      min-height: 820px;
-      display: block;
-    }
-
-    /* Information / logo strip below (maps to your information-section path) */
-    .information-section {
-      margin-top: 20px;
-      padding-top: 12px;
-      border-top: 1px solid #d1d5db;
+    /* Security note */
+    .security-info {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      align-items: start;
       gap: 10px;
-      flex-wrap: wrap;
+      padding: 12px;
       font-size: 0.85rem;
       color: #4b5563;
+      line-height: 1.4;
     }
 
-    .information-section .info-text {
-      flex: 1 1 auto;
+    .security-info i {
+      color: #10b981;
+      font-size: 1.1rem;
+      margin-top: 2px;
     }
 
-    .information-section .nchl-logo {
-      height: 26px;
-      width: auto;
-      object-fit: contain;
+    /* Right Column Checkout Form */
+    .checkout-column {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      min-height: 820px;
+    }
+
+    #checkout {
+      width: 100%;
+      min-height: 780px;
     }
 
     .error-message {
@@ -215,8 +222,8 @@
     #status-message {
       position: fixed;
       inset: 0;
-      z-index: 20;
-      background: rgba(255, 255, 255, 0.92);
+      z-index: 999;
+      background: rgba(255, 255, 255, 0.95);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -225,8 +232,8 @@
     }
 
     .loader {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #5662ff;
+      border: 6px solid #e5e7eb;
+      border-top: 6px solid #2563eb;
       border-radius: 50%;
       width: 56px;
       height: 56px;
@@ -234,88 +241,58 @@
     }
 
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* Responsive tweaks */
-    @media (min-width: 1200px) {
-      .payment-page {
-        max-width: 1100px;
-        padding-top: 32px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .payment-page {
-        padding: 16px 10px 28px;
-      }
-
-      .payment-header-bar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .summary-details {
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      #checkout {
-        min-height: 860px;
-      }
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <main class="payment-page">
-    <header class="page-header">
-      <p>Complete your payment safely via getPay</p>
-    </header>
-
-    <div class="payment-header-bar">
-      <div class="brand-left">
-        <img src="img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
-      </div>
-      <span class="gateway-badge">Powered by getPay</span>
-    </div>
-
-    <!-- Order Summary Banner -->
-    <div class="order-summary-banner" id="order-summary-box">
-      <div class="summary-details">
-        <div class="summary-item">
-          <span class="label">Course Name</span>
-          <span class="value" id="summary-course-name">Loading...</span>
+    <div class="payment-container">
+      
+      <!-- Left Column: Information & Details -->
+      <div class="info-column">
+        <div class="brand-header">
+          <img src="img/NCHL-Logo.png" alt="NCHL Logo" class="brand-logo" />
+          <span class="gateway-badge">Powered by getPay</span>
         </div>
-        <div class="summary-item">
-          <span class="label">Customer Email</span>
-          <span class="value" id="summary-email">Loading...</span>
+        
+        <div class="info-card">
+          <h2>Order Summary</h2>
+          <div class="summary-details-vertical">
+            <div class="summary-item">
+              <span class="label">Course Name</span>
+              <span class="value" id="summary-course-name">Loading...</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Customer Email</span>
+              <span class="value" id="summary-email">Loading...</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item total">
+              <span class="label">Amount to Pay</span>
+              <span class="value" id="summary-amount">Rs 0.00</span>
+            </div>
+          </div>
         </div>
-        <div class="summary-item total">
-          <span class="label">Amount to Pay</span>
-          <span class="value" id="summary-amount">Rs 0.00</span>
+
+        <div class="sandbox-otp-tip" id="sandbox-otp-helper">
+          <i class="fa-solid fa-circle-info"></i>
+          <div>
+            <strong>Sandbox Testing:</strong> Use the OTP code <span>1234</span> when prompted to complete verification.
+          </div>
+        </div>
+
+        <div class="security-info">
+          <i class="fa-solid fa-shield-halved"></i>
+          <p>Your card details are processed securely by NCHL getPay. We do not store your card information on this site.</p>
         </div>
       </div>
-    </div>
 
-    <!-- Beautiful Sandbox OTP helper tip -->
-    <div class="sandbox-otp-tip" id="sandbox-otp-helper">
-      <i class="fa-solid fa-circle-info"></i>
-      <div>
-        <strong>Sandbox Testing:</strong> Use the OTP code <span>1234</span> when prompted to complete verification.
+      <!-- Right Column: Checkout Form -->
+      <div class="checkout-column">
+        <div id="checkout"></div>
       </div>
-    </div>
-
-    <!-- Main checkout container -->
-    <div id="checkout"></div>
-
-    <!-- Information section with NCHL logo -->
-    <div class="information-section">
-      <div class="info-text">
-        Your card details are processed securely by NCHL getPay. We do not store your card information on this site.
-      </div>
-      <img src="img/NCHL-Logo.png" alt="NCHL" class="nchl-logo" />
+      
     </div>
 
     <div id="error-display" class="error-message"></div>
