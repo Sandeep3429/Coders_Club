@@ -83,8 +83,9 @@
       position: relative;
     }
 
-    /* Target all checkout and nested/redirect/OTP iframes inside #checkout to ensure full dimensions */
-    #checkout iframe {
+    /* Target ONLY the main checkout or OTP iframe which is a direct child (or wrapped child) of #checkout */
+    #checkout > iframe,
+    #checkout > div > iframe {
       width: 100% !important;
       min-width: 100% !important;
       height: 600px !important;
@@ -92,7 +93,12 @@
       border: none !important;
       outline: none !important;
       display: block !important;
-      background: #ffffff !important;
+    }
+
+    /* Target nested secure microform iframes to ensure they don't inherit height/width */
+    #checkout iframe {
+      border: none !important;
+      outline: none !important;
     }
 
     /* Style for the Cardinal Cruise 3DS Challenge IFrame to ensure it displays properly */
