@@ -83,9 +83,8 @@
       position: relative;
     }
 
-    /* Target ONLY the main checkout or OTP iframe which is a direct child (or wrapped child) of #checkout */
-    #checkout > iframe,
-    #checkout > div > iframe {
+    /* Target all checkout and nested/redirect/OTP iframes inside #checkout to ensure full dimensions */
+    #checkout iframe {
       width: 100% !important;
       min-width: 100% !important;
       height: 600px !important;
@@ -93,12 +92,28 @@
       border: none !important;
       outline: none !important;
       display: block !important;
+      background: #ffffff !important;
     }
 
-    /* Target nested secure microform iframes to ensure they don't inherit height/width */
-    #checkout iframe {
+    /* Style for the Cardinal Cruise 3DS Challenge IFrame to ensure it displays properly */
+    #Cardinal-CCA-IFrame,
+    iframe[id*="Cardinal"],
+    iframe[name*="Cardinal"] {
+      width: 100% !important;
+      min-width: 100% !important;
+      height: 600px !important;
+      min-height: 600px !important;
       border: none !important;
       outline: none !important;
+      display: block !important;
+      background: #ffffff !important;
+      position: relative !important;
+      z-index: 9999 !important;
+    }
+
+    #Cardinal-Modal,
+    .cardinal-modal {
+      z-index: 99999 !important;
     }
 
     /* Sandbox OTP tip */
@@ -206,7 +221,7 @@
   </div>
 
   <!-- GetPay bundle (deferred load) -->
-  <script defer src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <script defer src="https://minio.finpos.global/getpay-cdn/webcheckout/v5/bundle.js"></script>
 
   <script>
     const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
