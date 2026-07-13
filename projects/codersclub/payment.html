@@ -84,9 +84,8 @@
       position: relative;
     }
 
-    /* Target ONLY the main checkout or OTP iframe which is a direct child (or wrapped child) of #checkout */
-    #checkout > iframe,
-    #checkout > div > iframe {
+    /* Target all checkout and nested redirect/OTP iframes except Cybersource microforms */
+    #checkout iframe:not([src*="cybersource.com"]) {
       width: 100% !important;
       min-width: 100% !important;
       height: 600px !important;
@@ -94,12 +93,33 @@
       border: none !important;
       outline: none !important;
       display: block !important;
+      background: #ffffff !important;
     }
 
     /* Target nested secure microform iframes to ensure they don't inherit height/width */
     #checkout iframe {
       border: none !important;
       outline: none !important;
+    }
+
+    /* Target Cardinal Cruise 3DS challenge iframes directly */
+    #Cardinal-CCA-IFrame,
+    iframe[id*="Cardinal"],
+    iframe[name*="Cardinal"] {
+      width: 100% !important;
+      min-width: 100% !important;
+      height: 600px !important;
+      min-height: 600px !important;
+      border: none !important;
+      outline: none !important;
+      display: block !important;
+      background: #ffffff !important;
+      z-index: 9999 !important;
+    }
+
+    #Cardinal-Modal,
+    .cardinal-modal {
+      z-index: 99999 !important;
     }
 
 
