@@ -215,6 +215,9 @@
         </div>
       `;
 
+      // Save Order UI in localStorage for payment.html
+      localStorage.setItem("getpay_order_ui", orderInformationUI);
+
       // Redirect cleanly to payment.html with courseId, amount, and email in payload
       const targetUrl = `payment.html?courseId=${encodeURIComponent(courseId)}&amount=${encodeURIComponent(selectedCourse.price)}&email=${encodeURIComponent(userEmail)}`;
       window.location.href = targetUrl;

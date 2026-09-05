@@ -1,148 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <title>Secure Checkout | getPay</title>
 
-  <!-- Prevent clickjacking -->
+  <!-- Prevent clickjacking & keep clean URL -->
   <script>
     if (window.top !== window.self) {
       window.top.location = window.self.location.href;
     }
+    if (window.location.pathname.endsWith('.html')) {
+      var cleanPath = window.location.pathname.replace(/\.html$/, '');
+      window.history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+    }
   </script>
 
-  <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-
-  <!-- Local Bootstrap CSS (for offline safety) -->
-  <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
+  <!-- GetPay bundle (deferred load) -->
+  <script defer src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
 
   <style>
     * {
       box-sizing: border-box;
     }
-
     body {
+      margin: 0;
+      padding: 30px 16px;
       background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       display: flex;
       align-items: center;
-      padding: 40px 0;
+      justify-content: center;
       color: #334155;
     }
-
-    .checkout-card {
+    .checkout-wrapper {
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 16px;
-      background: #ffffff;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+      padding: 24px;
     }
-
-    /* Left side summary column styling */
-    .summary-card {
-      background: #f8fafc;
-      border-right: 1px solid #e2e8f0;
-      border-radius: 16px 0 0 16px;
-    }
-
-    @media (max-width: 991.98px) {
-      .summary-card {
-        border-right: none;
-        border-bottom: 1px solid #e2e8f0;
-        border-radius: 16px 16px 0 0;
-      }
-    }
-
-    .summary-item-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #64748b;
-    }
-
-    .summary-item-value {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    .summary-total {
-      font-size: 1.55rem;
-      font-weight: 800;
-      color: #2563eb;
-    }
-
-    /* Right side payment form container */
     #checkout {
       width: 100% !important;
-      max-width: 500px !important;
-      margin: 0 auto !important;
       position: relative;
     }
-
-    /* Target all checkout and nested redirect/OTP iframes except Cybersource microforms */
     #checkout iframe:not([src*="cybersource.com"]) {
       width: 100% !important;
       min-width: 100% !important;
-      height: 600px !important;
-      min-height: 600px !important;
+      min-height: 520px !important;
       border: none !important;
-      outline: none !important;
       display: block !important;
       background: #ffffff !important;
     }
-
-    /* Target nested secure microform iframes to ensure they don't inherit height/width */
     #checkout iframe {
       border: none !important;
-      outline: none !important;
     }
-
-    /* Target Cardinal Cruise 3DS challenge iframes directly */
     #Cardinal-CCA-IFrame,
     iframe[id*="Cardinal"],
     iframe[name*="Cardinal"] {
       width: 100% !important;
-      min-width: 100% !important;
-      height: 600px !important;
       min-height: 600px !important;
       border: none !important;
-      outline: none !important;
-      display: block !important;
-      background: #ffffff !important;
       z-index: 9999 !important;
     }
-
-    #Cardinal-Modal,
-    .cardinal-modal {
-      z-index: 99999 !important;
-    }
-
-
-
-    /* Sandbox OTP tip */
-    .sandbox-otp-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e40af;
-      border-radius: 12px;
-      font-size: 0.88rem;
-    }
-
-    .sandbox-otp-badge {
-      background: #3b82f6;
-      color: #ffffff;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-family: monospace;
-    }
-
     #status-message {
       position: fixed;
       top: 0;
@@ -155,88 +78,45 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 16px;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
     }
   </style>
 </head>
-
 <body>
-  <main class="container my-auto">
-    <div class="row justify-content-center">
-      <div class="col-xl-11 col-12">
-        <div class="card checkout-card overflow-hidden">
-          <div class="row no-gutters">
 
-            <!-- Left Column: Order Summary -->
-            <div class="col-lg-5 col-12 summary-card p-4 p-md-5 d-flex flex-column justify-content-between">
-              <div>
-                <div class="d-flex align-items-center justify-content-between mb-4 pb-2">
-                  <img src="img/NCHL-Logo.png" alt="NCHL Logo" width="120" height="36"
-                    style="height: 36px; width: auto; max-width: 100%; display: block;" />
-                  <span class="badge badge-light border rounded-pill px-3 py-2 text-muted"
-                    style="font-size: 0.75rem; font-weight: 600;">getPay Secure</span>
-                </div>
-
-                <h4 class="fw-bold mb-4 text-dark" style="font-weight: 700; font-size: 1.35rem;">Order Summary</h4>
-
-                <div class="mb-4">
-                  <div class="summary-item-label mb-1">Course Name</div>
-                  <div class="summary-item-value" id="summary-course-name">Loading...</div>
-                </div>
-
-                <div class="mb-4">
-                  <div class="summary-item-label mb-1">Customer Email</div>
-                  <div class="summary-item-value" id="summary-email">Loading...</div>
-                </div>
-
-                <hr class="my-4" style="border-top: 1px solid #e2e8f0;">
-
-                <div class="mb-4">
-                  <div class="summary-item-label mb-1">Amount to Pay</div>
-                  <div class="summary-total" id="summary-amount">Rs 0.00</div>
-                </div>
-
-                <div class="sandbox-otp-box p-3 mb-4 d-flex align-items-start gap-2" id="sandbox-otp-helper">
-                  <i class="fa-solid fa-circle-info mt-1 text-primary me-2"></i>
-                  <div>
-                    <strong>Sandbox Testing:</strong> Use the OTP code <span class="sandbox-otp-badge">1234</span> when
-                    prompted to complete verification.
-                  </div>
-                </div>
-              </div>
-
-              <div class="text-muted small d-flex align-items-start gap-2 mt-4"
-                style="font-size: 0.8rem; line-height: 1.45;">
-                <i class="fa-solid fa-shield-halved text-success fs-5 me-2 mt-1"></i>
-                <span>Your card details are processed securely by NCHL getPay. We do not store your card details on this
-                  site.</span>
-              </div>
-            </div>
-
-            <!-- Right Column: Card Details Form -->
-            <div class="col-lg-7 col-12 p-4 p-md-5 d-flex flex-column justify-content-start bg-white">
-              <div id="getpay-form-container" class="w-100">
-                <div id="checkout" class="w-100"></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="error-display" class="alert alert-danger mt-4 text-center" style="display: none;" role="alert"></div>
-  </main>
-
-  <!-- Full‑page processing overlay -->
-  <div id="status-message">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-    <h4 class="mt-4 fw-bold text-dark">Processing payment</h4>
-    <p class="text-muted">Please wait while we verify your transaction…</p>
+  <div class="checkout-wrapper">
+    <div id="error-display" class="error-box"></div>
+    <div id="checkout"></div>
   </div>
 
-  <!-- GetPay bundle (deferred load) -->
-  <script defer src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <!-- Processing overlay -->
+  <div id="status-message">
+    <div class="spinner"></div>
+    <h3 style="margin: 0; color: #0f172a; font-weight: 700;">Processing Payment</h3>
+    <p style="margin: 0; color: #64748b; font-size: 14px;">Please wait while we verify your transaction…</p>
+  </div>
 
   <script>
     const PAP_INFO = "eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiMTIzMTIzNDUxNzcwOTg2IiwidGlkIjoiMTIzNTg3NjIifQ==";
@@ -250,13 +130,11 @@
       el.style.display = "block";
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "none";
-      document.getElementById("sandbox-otp-helper").style.display = "none";
     }
 
     async function verifyAndRedirect(txnId, expectedAmount) {
       document.getElementById("checkout").style.display = "none";
       document.getElementById("status-message").style.display = "flex";
-      document.getElementById("sandbox-otp-helper").style.display = "none";
 
       try {
         const res = await fetch(VERIFY_URL, {
@@ -293,7 +171,6 @@
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
 
-      // Load course configuration details dynamically
       const courseCatalog = {
         "oracle-plsql": {
           name: "Mastering Oracle PL/SQL for Financial Systems",
@@ -314,13 +191,8 @@
 
       const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
       const courseData = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
-      const expectedAmount = parseFloat(params.get("amount")) || courseData.price;
+      const expectedAmount = parseFloat(params.get("amount")) || parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
       const userEmail = params.get("email") || "customer@example.com";
-
-      // Render Order Details inside the summary banner
-      document.getElementById("summary-course-name").textContent = courseData.name;
-      document.getElementById("summary-email").textContent = userEmail;
-      document.getElementById("summary-amount").textContent = "Rs " + expectedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
 
       if (token) {
         try {
@@ -345,15 +217,17 @@
         localStorage.setItem("getpay_expected_amount", expectedAmount);
         localStorage.setItem("getpay_expected_course", courseId);
 
-        // Order UI
-        const orderInformationUI = `
-          <div style="font-family: Arial, sans-serif; padding: 4px 0 12px 0;">
-            <h3 style="margin-bottom: 12px; font-weight: 700; color: #0f172a; font-size: 1.15rem;">Order Information</h3>
-            <div class="item" style="display: flex; align-items: center; margin-bottom: 20px;">
-              <img style="max-width: 50px; max-height: 50px; width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 12px;" src="${courseData.imageUrl}" alt="${courseData.name}">
-              <div>
-                <div style="font-weight: 600; font-size: 14px; color: #1e293b; line-height: 1.3;">${courseData.name}</div>
-                <div style="color: #2563eb; font-weight: 700; font-size: 15px; margin-top: 4px;">NPR ${expectedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+        // Order UI block
+        const orderInformationUI = localStorage.getItem("getpay_order_ui") || `
+          <div style="font-family:Arial;">
+            <h3>Order Information</h3>
+            <div class="item" style="margin-bottom: 20px;">
+              <div class="item" style="display: flex; align-items: center;">
+                <img style="max-width: 50px; max-height: 50px; width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 10px;" src="${courseData.imageUrl}" alt="image">
+                <div>
+                  <div style="font-weight: 600; color: #0f172a;">${courseData.name}</div>
+                  <div style="color: #2563eb; font-weight: 700; margin-top: 4px;">NPR ${expectedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -417,5 +291,4 @@
     });
   </script>
 </body>
-
 </html>
