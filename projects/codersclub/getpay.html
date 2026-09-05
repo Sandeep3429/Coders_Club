@@ -194,8 +194,13 @@
     btn.onclick = function (e) {
       e.preventDefault();
 
+      if (typeof window.GetPay === 'undefined' && typeof window.getpay === 'undefined') {
+        alert('GetPay SDK not loaded. Check internet or AdBlock.');
+        return;
+      }
+
       btn.disabled = true;
-      btnText.innerText = 'Redirecting to Checkout…';
+      btnText.innerText = 'Initializing Payment…';
 
       // Save expected details in localStorage
       localStorage.setItem("getpay_expected_amount", selectedCourse.price);
@@ -205,22 +210,86 @@
       const orderInformationUI = `
         <div style="font-family:Arial;">
           <h3>Order Information</h3>
-          <div class="item" style="display: flex; align-items: center; margin-bottom: 20px;">
-            <img style="max-width: 50px; max-height: 50px; width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 10px;" src="${WEBSITE_DOMAIN}${selectedCourse.imageUrl}" alt="image">
-            <div>
-              <div style="font-weight: 600; color: #0f172a;">${selectedCourse.name}</div>
-              <div style="color: #2563eb; font-weight: 700; margin-top: 4px;">NPR ${selectedCourse.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+          <div class="item" style="margin-bottom: 20px;">
+            <div class="item" style="display: flex; align-items: center;">
+              <img style="max-width: 50px; max-height: 50px; width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 10px;" src="${WEBSITE_DOMAIN}${selectedCourse.imageUrl}" alt="image">
+              <div>
+                <div style="font-weight: 600; color: #0f172a;">${selectedCourse.name}</div>
+                <div style="color: #2563eb; font-weight: 700; margin-top: 4px;">NPR ${selectedCourse.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+              </div>
             </div>
           </div>
         </div>
       `;
 
-      // Save Order UI in localStorage for payment.html
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
-      // Redirect cleanly to payment.html with courseId, amount, and email in payload
-      const targetUrl = `payment.html?courseId=${encodeURIComponent(courseId)}&amount=${encodeURIComponent(selectedCourse.price)}&email=${encodeURIComponent(userEmail)}`;
-      window.location.href = targetUrl;
+      const checkoutEl = document.getElementById("checkout");
+      if (checkoutEl) {
+        checkoutEl.removeAttribute("hidden");
+        checkoutEl.style.display = "block";
+      }
+
+      const options = {
+        userInfo: {
+          name: "Sandeep Kumar Jha",
+          email: userEmail,
+          state: "Bagmati",
+          country: "Nepal",
+          zipcode: "44600",
+          city: "Kathmandu",
+          address: "Maitidevi"
+        },
+        clientRequestId: "ORD-" + Date.now(),
+        papInfo: PAP_INFO,
+        oprKey: OPR_KEY,
+        insKey: INS_KEY,
+        websiteDomain: "https://sandeepkumarjha.com.np",
+        price: selectedCourse.price,
+        businessName: selectedCourse.name,
+        imageUrl: WEBSITE_DOMAIN + selectedCourse.imageUrl,
+        orderInformationUI: orderInformationUI,
+        currency: "NPR",
+        prefill: { name: true, email: true, state: true, city: true, address: true },
+        themeColor: "#5662FF",
+        baseUrl: BASE_URL,
+        // callback URLs
+        callbackUrl: {
+          successUrl: 'https://sandeepkumarjha.com.np/projects/codersclub/success.html',
+          failUrl: 'https://sandeepkumarjha.com.np/projects/codersclub/fail.html',
+        },
+        onSuccess: function (response) {
+          console.log('Success:', response);
+          window.location.href = 'https://sandeepkumarjha.com.np/projects/codersclub/success.html';
+        },
+        onError: function (error) {
+          console.error('Error:', error);
+          btn.disabled = false;
+          btnText.innerText = 'Proceed to Pay Securely';
+          alert('Payment Failed or Cancelled.');
+        }
+      };
+
+      try {
+        if (window.getpay && typeof window.getpay.initialize === 'function') {
+          window.getpay.initialize(options);
+        } else {
+          const gp = new GetPay(options);
+          if (typeof gp.initialize === 'function') {
+            gp.initialize(options);
+          } else if (typeof gp.init === 'function') {
+            gp.init(options);
+          }
+        }
+        setStatus('Checkout opened.');
+        if (checkoutEl) {
+          checkoutEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch (err) {
+        console.error('Init Error:', err);
+        btn.disabled = false;
+        btnText.innerText = 'Proceed to Pay Securely';
+      }
     };
   </script>
 </body>

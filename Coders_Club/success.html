@@ -24,10 +24,26 @@
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        if (params.get('verified') !== 'true') {
+        const token = params.get('token');
+        let txid = params.get('txid') || params.get('transactionId') || params.get('id');
+        let receivedAmount = null;
+
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token));
+                txid = payload.id || payload.transactionId || payload.txnId || txid;
+                if (payload.amount) {
+                    receivedAmount = Number(payload.amount);
+                }
+            } catch (e) {
+                console.warn("Could not decode token parameter:", e);
+            }
+        }
+
+        if (!txid && !token && params.get('verified') !== 'true') {
             window.location.href = "getpay.html";
         } else {
-            document.getElementById('displayTxid').innerText = params.get('txid') || 'N/A';
+            document.getElementById('displayTxid').innerText = txid || 'Verified by Bank';
 
             // Dynamic course catalog mapping
             const courseCatalog = {
@@ -47,8 +63,9 @@
 
             const courseId = localStorage.getItem("getpay_expected_course") || "oracle-plsql";
             const courseData = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
+            const finalAmount = receivedAmount || parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
 
-            document.getElementById('displayAmount').innerText = "Rs. " + courseData.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
+            document.getElementById('displayAmount').innerText = "Rs. " + finalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
             document.getElementById('learningBtn').innerText = courseData.btnText;
         }
     </script>
