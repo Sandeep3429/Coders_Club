@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NCHL Payment Verify Test</title>
+<script>
+if (window.location.pathname.endsWith('.html')) {
+    var cleanPath = window.location.pathname.replace(/\.html$/, '');
+    window.history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+}
+</script>
 <style>
 body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: auto; }
 .form-group { margin-bottom: 15px; }
