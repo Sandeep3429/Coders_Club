@@ -193,70 +193,31 @@
 
     btn.onclick = function (e) {
       e.preventDefault();
-      
-      if (typeof window.GetPay === 'undefined') {
-        alert('GetPay SDK not loaded.');
-        return;
-      }
 
       btn.disabled = true;
-      btnText.innerText = 'Initializing…';
+      btnText.innerText = 'Redirecting to Checkout…';
 
       // Save expected details in localStorage
       localStorage.setItem("getpay_expected_amount", selectedCourse.price);
       localStorage.setItem("getpay_expected_course", courseId);
 
-      const options = {
-        userInfo: {
-          name: "Sandeep Kumar Jha",
-          email: userEmail,
-          state: "Bagmati",
-          country: "Nepal",
-          zipcode: "44600",
-          city: "Kathmandu",
-          address: "Maitidevi"
-        },
-        clientRequestId: "ORDER-" + Date.now(),
-        papInfo: PAP_INFO,
-        oprKey: OPR_KEY,
-        insKey: INS_KEY,
-        websiteDomain: window.location.origin,
-        price: selectedCourse.price,
-        businessName: selectedCourse.name,
-        imageUrl: WEBSITE_DOMAIN + selectedCourse.imageUrl,
-        currency: "NPR",
-        prefill: { name: true, email: true, state: true, city: true, address: true },
-        themeColor: "#5662FF",
-        baseUrl: BASE_URL,
-        callbackUrl: {
-          successUrl: `${WEBSITE_DOMAIN}payment.html`,
-          failUrl: `${WEBSITE_DOMAIN}fail.html`
-        },
-        onSuccess: function (response) {
-          console.log('Success:', response);
-          window.location.href = `${WEBSITE_DOMAIN}payment.html`;
-        },
-        onError: function (error) {
-          console.error('Error:', error);
-          alert('Payment Failed.');
-          btn.disabled = false;
-          btnText.innerText = 'Proceed to Pay Securely';
-        }
-      };
+      // Order UI template matching GetPay specification
+      const orderInformationUI = `
+        <div style="font-family:Arial;">
+          <h3>Order Information</h3>
+          <div class="item" style="display: flex; align-items: center; margin-bottom: 20px;">
+            <img style="max-width: 50px; max-height: 50px; width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 10px;" src="${WEBSITE_DOMAIN}${selectedCourse.imageUrl}" alt="image">
+            <div>
+              <div style="font-weight: 600; color: #0f172a;">${selectedCourse.name}</div>
+              <div style="color: #2563eb; font-weight: 700; margin-top: 4px;">NPR ${selectedCourse.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+            </div>
+          </div>
+        </div>
+      `;
 
-      try {
-        const getpay = new GetPay(options);
-        if (typeof getpay.initialize === 'function') {
-          getpay.initialize();
-        } else if (typeof getpay.init === 'function') {
-          getpay.init();
-        }
-        setStatus('Checkout opened.');
-      } catch (err) {
-        console.error('Init Error:', err);
-        btn.disabled = false;
-        btnText.innerText = 'Proceed to Pay Securely';
-      }
+      // Redirect cleanly to payment.html with courseId, amount, and email in payload
+      const targetUrl = `payment.html?courseId=${encodeURIComponent(courseId)}&amount=${encodeURIComponent(selectedCourse.price)}&email=${encodeURIComponent(userEmail)}`;
+      window.location.href = targetUrl;
     };
   </script>
 </body>
