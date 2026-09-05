@@ -16,12 +16,17 @@ button { background: #007bff; color: white; padding: 10px 15px; border: none; cu
 <body>
 
 <h2>Verify Payment Status</h2>
-<p><small>Note: This may fail in the browser due to CORS or IP restrictions.</small></p>
+<p><small>Note: Enter either <b>Transaction ID</b> or <b>Client Request ID</b> (at least one is mandatory).<br>Direct browser requests may fail if CORS/IP restrictions are enabled by NCHL.</small></p>
 
 
 <div class="form-group">
-<label>Transaction ID (from tokenInfo):</label>
-<input type="text" id="txnId" placeholder="Enter ID">
+<label>Transaction ID:</label>
+<input type="text" id="txnId" placeholder="e.g. 0cc5b1a39f3c4cad864bc1c6a524534f">
+</div>
+
+<div class="form-group">
+<label>Client Request ID (Optional):</label>
+<input type="text" id="clientRequestId" placeholder="e.g. 20260903034003328677">
 </div>
 
 <button onclick="verifyPayment()">Verify Payment</button>
@@ -31,15 +36,25 @@ button { background: #007bff; color: white; padding: 10px 15px; border: none; cu
 
 <script>
 async function verifyPayment() {
-            const baseURL = "https://ecom-getpay.nchl.com.np/ecom-web-checkout";
-const txnId = document.getElementById('txnId').value;          
-const responseDiv = document.getElementById('response');
+    const baseURL = "https://ecom-getpay.nchl.com.np/ecom-web-checkout";
+    const txnId = document.getElementById('txnId').value.trim();
+    const clientRequestId = document.getElementById('clientRequestId').value.trim();
+    const responseDiv = document.getElementById('response');
 
-responseDiv.innerText = "Sending request...";
+    responseDiv.innerText = "Sending request...";
 
-const payload = {
-id: txnId
-};
+    const payload = {};
+    if (txnId) {
+        payload.transactionId = txnId;
+    }
+    if (clientRequestId) {
+        payload.clientRequestId = clientRequestId;
+    }
+
+    if (!txnId && !clientRequestId) {
+        responseDiv.innerText = "Please enter either a Transaction ID or a Client Request ID.";
+        return;
+    }
 
 try {
 const response = await fetch(`${baseURL}/v1/secure-merchant/transactions/transaction-statement`, {
