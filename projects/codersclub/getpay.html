@@ -224,12 +224,6 @@
 
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
-      const checkoutEl = document.getElementById("checkout");
-      if (checkoutEl) {
-        checkoutEl.removeAttribute("hidden");
-        checkoutEl.style.display = "block";
-      }
-
       const options = {
         userInfo: {
           name: "Sandeep Kumar Jha",
@@ -245,50 +239,69 @@
         oprKey: OPR_KEY,
         insKey: INS_KEY,
         websiteDomain: "https://sandeepkumarjha.com.np",
-        price: selectedCourse.price,
+        allowBillingAddressFields: true,
+        price: Number(selectedCourse.price),
         businessName: selectedCourse.name,
         imageUrl: WEBSITE_DOMAIN + selectedCourse.imageUrl,
         orderInformationUI: orderInformationUI,
         currency: "NPR",
-        prefill: { name: true, email: true, state: true, city: true, address: true },
+        prefill: {
+          name: true,
+          email: true,
+          state: true,
+          city: true,
+          address: true,
+          zipcode: true,
+          country: true
+        },
+        disableFields: {
+          address: true,
+          state: true
+        },
         themeColor: "#5662FF",
         baseUrl: BASE_URL,
-        // callback URLs
+        // callback URLs as per GetPay doc
         callbackUrl: {
           successUrl: 'https://sandeepkumarjha.com.np/projects/codersclub/success.html',
           failUrl: 'https://sandeepkumarjha.com.np/projects/codersclub/fail.html',
         },
+        // Per GetPay doc: onSuccess fires when internal validation succeeds -> navigate to payment page
         onSuccess: function (response) {
-          console.log('Success:', response);
-          window.location.href = 'https://sandeepkumarjha.com.np/projects/codersclub/success.html';
+          console.log('GetPay initialization success:', response);
+          setStatus('GetPay validated. Redirecting to payment checkout…');
+          const targetUrl = 'payment.html?courseId=' + encodeURIComponent(courseId) + '&amount=' + encodeURIComponent(selectedCourse.price);
+          window.location.href = targetUrl;
         },
         onError: function (error) {
-          console.error('Error:', error);
+          console.error('GetPay Error:', error);
           btn.disabled = false;
           btnText.innerText = 'Proceed to Pay Securely';
-          alert('Payment Failed or Cancelled.');
+          setStatus('Initialization failed. Check network or credentials.', 'err');
+          alert('Payment initialization failed. Please check network/credentials.');
         }
       };
 
       try {
-        if (window.getpay && typeof window.getpay.initialize === 'function') {
+        options.baseUrl = BASE_URL;
+        if (typeof window.GetPay === 'function') {
+          const gp = new window.GetPay(options);
+          if (typeof gp.initialize === 'function') {
+            gp.initialize();
+          } else if (typeof gp.init === 'function') {
+            gp.init();
+          }
+        } else if (window.getpay && typeof window.getpay.initialize === 'function') {
           window.getpay.initialize(options);
         } else {
-          const gp = new GetPay(options);
-          if (typeof gp.initialize === 'function') {
-            gp.initialize(options);
-          } else if (typeof gp.init === 'function') {
-            gp.init(options);
-          }
+          throw new Error('GetPay SDK not loaded.');
         }
-        setStatus('Checkout opened.');
-        if (checkoutEl) {
-          checkoutEl.scrollIntoView({ behavior: 'smooth' });
-        }
+        setStatus('Connecting to payment gateway…');
       } catch (err) {
         console.error('Init Error:', err);
         btn.disabled = false;
         btnText.innerText = 'Proceed to Pay Securely';
+        setStatus('GetPay initialization failed: ' + err.message, 'err');
+        alert('Payment initialization failed: ' + err.message);
       }
     };
   </script>

@@ -5,6 +5,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
   <title>Payment Checkout | getPay</title>
+  <!-- Anti-clickjacking per GetPay doc -->
+  <script>
+    if (window.top !== window.self) {
+      window.top.location = window.self.location.href;
+    }
+  </script>
   <script defer src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
   <style>
     body {
@@ -58,15 +64,30 @@
     };
 
     window.addEventListener("load", () => {
+      // Check if redirected with token info
+      const urlParams = new URLSearchParams(window.location.search || window.location.hash.replace(/^#/, '?'));
+      const token = urlParams.get("token") || urlParams.get("tokenInfo");
+      if (token) {
+        window.location.href = "success.html" + window.location.search + (window.location.hash || "");
+        return;
+      }
+
       const params = new URLSearchParams(window.location.search);
       const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
       const courseData = courses[courseId] || courses["oracle-plsql"];
       const amount = parseFloat(params.get("amount")) || parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
-      const userEmail = params.get("email") || "zhasandeep7@gmail.com";
+      const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "zhasandeep7@gmail.com";
 
       function initGetPay() {
         if (typeof window.GetPay === 'undefined' && typeof window.getpay === 'undefined') {
           setTimeout(initGetPay, 300);
+          return;
+        }
+
+        const checkoutDiv = document.getElementById("checkout");
+        // If checkout container already has elements rendered by bundle, do not reinitialize
+        if (checkoutDiv && checkoutDiv.children.length > 0) {
+          console.log("GetPay checkout already rendered in #checkout container.");
           return;
         }
 
@@ -100,12 +121,25 @@
           oprKey: OPR_KEY,
           insKey: "",
           websiteDomain: "https://sandeepkumarjha.com.np",
-          price: amount,
+          allowBillingAddressFields: true,
+          price: Number(amount),
           businessName: courseData.name,
           imageUrl: WEBSITE_DOMAIN + courseData.imageUrl,
           orderInformationUI: orderInformationUI,
           currency: "NPR",
-          prefill: { name: true, email: true, state: true, city: true, address: true },
+          prefill: {
+            name: true,
+            email: true,
+            state: true,
+            city: true,
+            address: true,
+            zipcode: true,
+            country: true
+          },
+          disableFields: {
+            address: true,
+            state: true
+          },
           themeColor: "#5662FF",
           baseUrl: BASE_URL,
           callbackUrl: {
@@ -113,24 +147,27 @@
             failUrl: 'https://sandeepkumarjha.com.np/projects/codersclub/fail.html'
           },
           onSuccess: function (res) {
-            window.location.href = 'https://sandeepkumarjha.com.np/projects/codersclub/success.html';
+            // Per GetPay architecture, onSuccess is validation callback for rendering checkout form.
+            // Do NOT redirect here; let customer complete card entry and 3DS in #checkout.
+            console.log("GetPay checkout ready in payment.html:", res);
           },
           onError: function (err) {
-            console.error("Payment error:", err);
-            alert("Payment initialization error. Check credentials or domain.");
+            console.error("GetPay checkout initialization error:", err);
+            alert("Payment initialization error. Please check credentials or domain.");
           }
         };
 
         try {
-          if (window.getpay && typeof window.getpay.initialize === 'function') {
-            window.getpay.initialize(options);
-          } else {
-            const gp = new GetPay(options);
+          options.baseUrl = BASE_URL;
+          if (typeof window.GetPay === 'function') {
+            const gp = new window.GetPay(options);
             if (typeof gp.initialize === 'function') {
-              gp.initialize(options);
+              gp.initialize();
             } else if (typeof gp.init === 'function') {
-              gp.init(options);
+              gp.init();
             }
+          } else if (window.getpay && typeof window.getpay.initialize === 'function') {
+            window.getpay.initialize(options);
           }
         } catch (e) {
           console.error("Initialization exception:", e);
