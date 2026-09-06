@@ -14,10 +14,29 @@
     // Gateways & API Endpoints
     BASE_URL: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions",
     STATUS_API: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status",
+    STATEMENT_API: "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/transaction-statement",
     BUNDLE_URL: "https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js",
 
     // Website Domain - must match callbackUrl host per GetPay documentation
     WEBSITE_DOMAIN: isProduction ? "https://sandeepkumarjha.com.np" : (typeof window !== 'undefined' ? window.location.origin : "https://sandeepkumarjha.com.np"),
+
+    // Resolves accurate absolute image URL for GetPay header and order summary
+    getImageUrl: function (relativeImgPath) {
+      if (!relativeImgPath) return "";
+      if (relativeImgPath.startsWith("http://") || relativeImgPath.startsWith("https://")) {
+        return relativeImgPath;
+      }
+      const clean = relativeImgPath.replace(/^\//, "");
+      if (typeof window !== "undefined") {
+        const origin = window.location.origin.includes("sandeepkumarjha.com.np")
+          ? "https://sandeepkumarjha.com.np"
+          : window.location.origin;
+        const pathname = window.location.pathname;
+        const dir = pathname.substring(0, pathname.lastIndexOf('/') + 1);
+        return origin + dir + clean;
+      }
+      return this.WEBSITE_DOMAIN + "/projects/codersclub/" + clean;
+    },
 
     // Dynamically generate callback URLs matching current directory context
     getCallbackUrls: function () {
@@ -74,22 +93,7 @@
     createOrderInformationUI: function (course, amount) {
       const priceVal = amount || course.price;
       const formattedPrice = Number(priceVal).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      
-      // Calculate image URL
-      let imgPath = course.imageUrl;
-      if (!imgPath.startsWith('http')) {
-        let baseFolder = '';
-        if (typeof window !== 'undefined') {
-          if (window.location.pathname.includes('/projects/codersclub/')) {
-            baseFolder = '/projects/codersclub/';
-          } else if (window.location.pathname.includes('/Coders_Club/')) {
-            baseFolder = '/Coders_Club/';
-          } else {
-            baseFolder = '/';
-          }
-        }
-        imgPath = this.WEBSITE_DOMAIN + baseFolder + imgPath.replace(/^\//, '');
-      }
+      const imgPath = this.getImageUrl(course.imageUrl);
 
       return `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 12px 14px; box-sizing: border-box; width: 100%; max-width: 100%;">

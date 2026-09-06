@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Successful</title>
+  <title>Payment Successful – Coders Club</title>
 
   <!-- Anti-clickjacking per GetPay doc Page 4 -->
   <script>
@@ -12,22 +12,96 @@
     }
   </script>
 
-  <!-- Segregated Stylesheet -->
+  <!-- FontAwesome & Segregated Stylesheet -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/status.css">
+
+  <!-- html2pdf Library for Instant Client-Side PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-  <div class="status-card">
-    <div class="status-icon">✅</div>
-    <div class="status-badge" id="statusBadge">Payment Confirmed</div>
-    <h2 class="status-title">Enrollment Successful!</h2>
-    <p class="status-desc">Your payment of <strong id="displayAmount">Rs. 0.00</strong> has been verified.</p>
-    <div class="txid-label">Transaction ID:</div>
-    <span class="txid" id="displayTxid">Verifying with bank…</span>
-    <a href="https://sandeepkumarjha.com.np" class="btn-action" id="learningBtn">Start Learning</a>
+  <div class="page-wrapper">
+    <div class="status-card">
+      <div class="status-icon">✅</div>
+      <div class="status-badge" id="statusBadge">Payment Confirmed</div>
+      <h2 class="status-title">Enrollment Successful!</h2>
+      <p class="status-desc">Your payment of <strong id="displayAmount">Rs. 0.00</strong> has been confirmed.</p>
+
+      <!-- Printable / Downloadable Receipt Card generated on the fly -->
+      <div class="receipt-container" id="receipt-printable">
+        <div class="receipt-header">
+          <div>
+            <div class="receipt-org-title">CODERS CLUB</div>
+            <div class="receipt-org-sub">Official Enrollment & Payment Receipt</div>
+          </div>
+          <div class="receipt-badge-paid">PAID</div>
+        </div>
+
+        <div class="receipt-grid">
+          <div>
+            <div class="receipt-field-label">Transaction ID</div>
+            <div class="receipt-field-value mono" id="receipt-txid">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Client Request ID</div>
+            <div class="receipt-field-value mono" id="receipt-reqid">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Transaction Date</div>
+            <div class="receipt-field-value" id="receipt-date">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Payment Mode</div>
+            <div class="receipt-field-value" id="receipt-method">Debit / Credit Card</div>
+          </div>
+          <div style="grid-column: span 2;">
+            <div class="receipt-field-label">Customer Email</div>
+            <div class="receipt-field-value" id="receipt-email">--</div>
+          </div>
+        </div>
+
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="col-right">Qty</th>
+              <th class="col-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="receipt-course">Mastering Oracle PL/SQL for Financial Systems</td>
+              <td class="col-right">1</td>
+              <td class="col-right" id="receipt-item-price">Rs. 0.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="receipt-total-box">
+          <span class="receipt-total-label">Grand Total Paid</span>
+          <span class="receipt-total-amount" id="receipt-total">Rs. 0.00</span>
+        </div>
+
+        <div class="receipt-footer-note">
+          <i class="fas fa-shield-alt"></i> Verified via Nepal Clearing House Ltd. (NCHL) GetPay Gateway.<br>
+          This is an official digital receipt. For queries, contact support@nchl.com.np
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="receipt-actions" id="receipt-actions">
+        <button type="button" class="btn-action" onclick="downloadReceiptPDF()">
+          <i class="fas fa-file-pdf"></i> Download Receipt (PDF)
+        </button>
+        <a href="https://sandeepkumarjha.com.np" class="btn-action btn-secondary" id="learningBtn">
+          <i class="fas fa-graduation-cap"></i> Start Learning
+        </a>
+      </div>
+    </div>
   </div>
 
-  <!-- Segregated Configuration & Verification Logic -->
+  <!-- Segregated Configuration & Receipt Generation Logic -->
   <script src="js/getpay-config.js"></script>
   <script src="js/success.js"></script>
 </body>

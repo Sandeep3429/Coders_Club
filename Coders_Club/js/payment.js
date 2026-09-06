@@ -27,7 +27,7 @@
   const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
   const courseData = config.getCourseData(courseId);
   const amount = parseFloat(params.get("amount")) || parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
-  const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "zhasandeep7@gmail.com";
+  const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "";
 
   window.addEventListener("load", () => {
     function initGetPay() {
@@ -47,15 +47,18 @@
       const orderInformationUI = localStorage.getItem("getpay_order_ui") || config.createOrderInformationUI(courseData, amount);
       const callbacks = config.getCallbackUrls();
 
+      // Resolved absolute image URL for the GetPay header
+      const verifiedImageUrl = config.getImageUrl(courseData.imageUrl);
+
       const options = {
         userInfo: {
-          name: "Sandeep Kumar Jha",
+          name: "",
           email: userEmail,
-          state: "Bagmati",
-          country: "Nepal",
-          zipcode: "44600",
-          city: "Kathmandu",
-          address: "Maitidevi"
+          state: "",
+          country: "",
+          zipcode: "",
+          city: "",
+          address: ""
         },
         clientRequestId: "ORD-" + Date.now(),
         papInfo: config.PAP_INFO,
@@ -65,9 +68,7 @@
         allowBillingAddressFields: true,
         price: Number(amount),
         businessName: courseData.name,
-        imageUrl: courseData.imageUrl.startsWith("http")
-          ? courseData.imageUrl
-          : config.WEBSITE_DOMAIN + (config.WEBSITE_DOMAIN.endsWith("/") ? "" : "/") + courseData.imageUrl.replace(/^\//, ""),
+        imageUrl: verifiedImageUrl,
         orderInformationUI: orderInformationUI,
         currency: "NPR",
         prefill: {
@@ -80,8 +81,8 @@
           country: true
         },
         disableFields: {
-          address: true,
-          state: true
+          address: false,
+          state: false
         },
         themeColor: "#5662FF",
         baseUrl: config.BASE_URL,

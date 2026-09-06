@@ -11,7 +11,7 @@
 
   const params = new URLSearchParams(window.location.search);
   const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "java-mastery";
-  const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "zhasandeep7@gmail.com";
+  const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "";
   const selectedCourse = config.getCourseData(courseId);
 
   const statusEl = document.getElementById("integration-status");
@@ -71,23 +71,24 @@
       // Persist user selection
       localStorage.setItem("getpay_expected_amount", selectedCourse.price);
       localStorage.setItem("getpay_expected_course", courseId);
-      localStorage.setItem("getpay_user_email", userEmail);
+      if (userEmail) localStorage.setItem("getpay_user_email", userEmail);
 
       const orderInformationUI = config.createOrderInformationUI(selectedCourse, selectedCourse.price);
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();
+      const verifiedImageUrl = config.getImageUrl(selectedCourse.imageUrl);
 
       // Full GetPay Options per official specification
       const options = {
         userInfo: {
-          name: "Sandeep Kumar Jha",
+          name: "",
           email: userEmail,
-          state: "Bagmati",
-          country: "Nepal",
-          zipcode: "44600",
-          city: "Kathmandu",
-          address: "Maitidevi"
+          state: "",
+          country: "",
+          zipcode: "",
+          city: "",
+          address: ""
         },
         clientRequestId: "ORD-" + Date.now(),
         papInfo: config.PAP_INFO,
@@ -97,9 +98,7 @@
         allowBillingAddressFields: true,
         price: Number(selectedCourse.price),
         businessName: selectedCourse.name,
-        imageUrl: selectedCourse.imageUrl.startsWith("http")
-          ? selectedCourse.imageUrl
-          : config.WEBSITE_DOMAIN + (config.WEBSITE_DOMAIN.endsWith("/") ? "" : "/") + selectedCourse.imageUrl.replace(/^\//, ""),
+        imageUrl: verifiedImageUrl,
         orderInformationUI: orderInformationUI,
         currency: "NPR",
         prefill: {
@@ -112,8 +111,8 @@
           country: true
         },
         disableFields: {
-          address: true,
-          state: true
+          address: false,
+          state: false
         },
         themeColor: "#5662FF",
         baseUrl: config.BASE_URL,
