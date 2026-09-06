@@ -1,129 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful</title>
-    <!-- Anti-clickjacking per GetPay doc Page 4 -->
-    <script>
-        if (window.top !== window.self) {
-            window.top.location = window.self.location.href;
-        }
-    </script>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; border-top: 6px solid #28a745; }
-        .icon { font-size: 60px; color: #28a745; margin-bottom: 20px; }
-        .txid { font-family: monospace; background: #eee; padding: 8px; border-radius: 4px; display: block; margin: 15px 0; word-break: break-all; font-size: 14px; }
-        .btn { display: inline-block; background-color: #5662FF; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
-        .status-badge { font-size: 12px; font-weight: 600; color: #16a34a; background: #dcfce7; padding: 4px 12px; border-radius: 12px; display: inline-block; margin-bottom: 12px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful</title>
+
+  <!-- Anti-clickjacking per GetPay doc Page 4 -->
+  <script>
+    if (window.top !== window.self) {
+      window.top.location = window.self.location.href;
+    }
+  </script>
+
+  <!-- Segregated Stylesheet -->
+  <link rel="stylesheet" href="css/status.css">
 </head>
 <body>
-    <div class="card">
-        <div class="icon">✅</div>
-        <div class="status-badge" id="statusBadge">Payment Confirmed</div>
-        <h2>Enrollment Successful!</h2>
-        <p>Your payment of <strong id="displayAmount">Rs. 0.00</strong> has been verified.</p>
-        <p>Transaction ID:</p>
-        <span class="txid" id="displayTxid">Verifying with bank…</span>
-        <a href="https://sandeepkumarjha.com.np" class="btn" id="learningBtn">Start Learning</a>
-    </div>
 
-    <script>
-        const STATUS_API = "https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status";
+  <div class="status-card">
+    <div class="status-icon">✅</div>
+    <div class="status-badge" id="statusBadge">Payment Confirmed</div>
+    <h2 class="status-title">Enrollment Successful!</h2>
+    <p class="status-desc">Your payment of <strong id="displayAmount">Rs. 0.00</strong> has been verified.</p>
+    <div class="txid-label">Transaction ID:</div>
+    <span class="txid" id="displayTxid">Verifying with bank…</span>
+    <a href="https://sandeepkumarjha.com.np" class="btn-action" id="learningBtn">Start Learning</a>
+  </div>
 
-        const params = new URLSearchParams(window.location.search || window.location.hash.replace(/^#/, '?'));
-        const token = params.get('token') || params.get('tokenInfo');
-        let txid = params.get('txid') || params.get('transactionId') || params.get('id');
-        let receivedAmount = null;
-
-        if (token) {
-            try {
-                const payload = JSON.parse(atob(token));
-                txid = payload.id || payload.transactionId || payload.txnId || txid;
-                if (payload.amount) {
-                    receivedAmount = Number(payload.amount);
-                }
-            } catch (e) {
-                console.warn("Could not decode token parameter:", e);
-            }
-        }
-
-        // Dynamic course catalog mapping
-        const courseCatalog = {
-          "oracle-plsql": {
-            price: 6500.00,
-            btnText: "Start Learning Oracle PL/SQL"
-          },
-          "banking-etl": {
-            price: 10500.00,
-            btnText: "Start Learning Banking ETL"
-          },
-          "java-mastery": {
-            price: 4500.55,
-            btnText: "Start Learning Java"
-          }
-        };
-
-        const courseId = localStorage.getItem("getpay_expected_course") || "oracle-plsql";
-        const courseData = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
-        const expectedAmount = parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
-        const finalAmount = receivedAmount || expectedAmount;
-
-        document.getElementById('displayAmount').innerText = "Rs. " + finalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
-        document.getElementById('learningBtn').innerText = courseData.btnText;
-
-        if (!txid && !token && params.get('verified') !== 'true') {
-            window.location.href = "getpay.html";
-        } else {
-            const finalTxid = txid || ('TXN-' + Date.now());
-            document.getElementById('displayTxid').innerText = finalTxid;
-
-            // Per GetPay doc Page 4: POST merchant-status API to verify transaction
-            if (txid) {
-                fetch(STATUS_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: txid })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    console.log("GetPay status response:", data);
-                    const status = (data.status || data.transactionStatus || "").toUpperCase();
-                    if (status === "FAILED" || status === "DECLINED") {
-                        window.location.href = "fail.html?reason=" + encodeURIComponent(data.remarks || "Payment declined");
-                        return;
-                    }
-                    if (data.amount) {
-                        document.getElementById('displayAmount').innerText = "Rs. " + Number(data.amount).toLocaleString('en-US', { minimumFractionDigits: 2 });
-                    }
-                    document.getElementById('statusBadge').innerText = "Bank Verified • " + (status || "SUCCESS");
-                })
-                .catch(err => {
-                    console.warn("Status API verification notice (handled gracefully):", err);
-                    document.getElementById('statusBadge').innerText = "Verified by Bank Token";
-                });
-            }
-
-            // Record transaction in history ledger
-            try {
-                const stored = localStorage.getItem('transactions');
-                const transactions = stored ? JSON.parse(stored) : [];
-                const alreadyRecorded = transactions.some(t => t.id === finalTxid);
-                if (!alreadyRecorded) {
-                    transactions.unshift({
-                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                        id: finalTxid,
-                        amount: finalAmount,
-                        status: 'Completed'
-                    });
-                    localStorage.setItem('transactions', JSON.stringify(transactions));
-                }
-            } catch (e) {
-                console.warn("Failed saving transaction ledger:", e);
-            }
-        }
-    </script>
+  <!-- Segregated Configuration & Verification Logic -->
+  <script src="js/getpay-config.js"></script>
+  <script src="js/success.js"></script>
 </body>
 </html>
