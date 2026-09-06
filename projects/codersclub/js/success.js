@@ -3,8 +3,9 @@
  * Handles:
  * 1. Token decoding (atob)
  * 2. POST to transaction-statement API (${baseURL}/v1/secure-merchant/transactions/transaction-statement)
- * 3. On-the-fly Receipt creation for successful transactions
- * 4. Direct PDF Receipt Download using html2pdf
+ * 3. Extracts Cardholder Name, Customer Email, Masked Card securely from API / Token / localStorage
+ * 4. On-the-fly Receipt creation for successful transactions
+ * 5. Direct PDF Receipt Download using html2pdf
  */
 (function () {
   // Break out of iframe if embedded
@@ -22,14 +23,17 @@
   let clientRequestId = urlParams.get("clientRequestId") || "";
   let receivedAmount = null;
 
+  // Decoded payload holder
+  let tokenPayload = null;
+
   // 1. Decode Bank Token
   if (token) {
     try {
-      const payload = JSON.parse(atob(token));
-      txid = payload.id || payload.transactionId || payload.txnId || txid;
-      clientRequestId = payload.clientRequestId || clientRequestId;
-      if (payload.amount) {
-        receivedAmount = Number(payload.amount);
+      tokenPayload = JSON.parse(atob(token));
+      txid = tokenPayload.id || tokenPayload.transactionId || tokenPayload.txnId || txid;
+      clientRequestId = tokenPayload.clientRequestId || clientRequestId;
+      if (tokenPayload.amount) {
+        receivedAmount = Number(tokenPayload.amount);
       }
     } catch (e) {
       console.warn("Could not parse token parameter:", e);
@@ -46,7 +50,6 @@
 
   const expectedAmount = parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
   let finalAmount = receivedAmount || expectedAmount;
-  const userEmail = localStorage.getItem("getpay_user_email") || "Student / Customer";
 
   // Redirect if arrived on success page with no credentials and not verified
   if (!txid && !token && urlParams.get("verified") !== "true") {
@@ -57,7 +60,46 @@
   const finalTxid = txid || ("TXN-" + Date.now());
   const finalClientReqId = clientRequestId || ("ORD-" + Date.now().toString().slice(-8));
 
-  // Render initial receipt fields
+  // Resolve Cardholder Name, Email, and Card Details hierarchically
+  function resolvePayerDetails(apiData = {}) {
+    // 1. Check API Data
+    const apiName = apiData.cardHolderName || apiData.cardholderName || apiData.name || apiData.customerName || apiData.payerName || apiData.cardHolder || (apiData.customer && apiData.customer.name);
+    const apiEmail = apiData.customerEmail || apiData.email || apiData.userEmail || apiData.payerEmail || (apiData.customer && apiData.customer.email);
+    const apiCard = apiData.maskedCard || apiData.maskedCardNo || apiData.cardNumber || apiData.cardNo || apiData.accountNo;
+    const apiCardType = apiData.cardType || apiData.cardBrand || apiData.paymentMode || apiData.channel;
+
+    // 2. Check Token Data
+    const tokenName = tokenPayload && (tokenPayload.cardHolderName || tokenPayload.cardholderName || tokenPayload.name || tokenPayload.customerName || tokenPayload.payerName);
+    const tokenEmail = tokenPayload && (tokenPayload.customerEmail || tokenPayload.email || tokenPayload.userEmail || tokenPayload.payerEmail);
+    const tokenCard = tokenPayload && (tokenPayload.maskedCard || tokenPayload.cardNumber || tokenPayload.cardNo);
+
+    // 3. Check URL Parameters
+    const urlName = urlParams.get("name") || urlParams.get("cardHolderName") || urlParams.get("cardholder");
+    const urlEmail = urlParams.get("email") || urlParams.get("customerEmail");
+
+    // 4. Check Secure LocalStorage
+    const localName = localStorage.getItem("getpay_card_holder") || localStorage.getItem("getpay_user_name");
+    const localEmail = localStorage.getItem("getpay_user_email");
+
+    // Final Fallbacks
+    const resolvedName = apiName || tokenName || urlName || localName || "Cardholder";
+    const resolvedEmail = apiEmail || tokenEmail || urlEmail || localEmail || (localName ? localName.toLowerCase().replace(/\s+/g, '') + "@example.com" : "customer@codersclub.com");
+    
+    let resolvedMethod = "Debit / Credit Card (GetPay)";
+    if (apiCard) {
+      resolvedMethod = (apiCardType ? apiCardType + " • " : "Card • ") + apiCard;
+    } else if (tokenCard) {
+      resolvedMethod = "Card • " + tokenCard;
+    }
+
+    return {
+      name: resolvedName,
+      email: resolvedEmail,
+      method: resolvedMethod
+    };
+  }
+
+  // Render receipt fields
   function renderReceipt(statementData = {}) {
     const amountVal = statementData.amount || finalAmount;
     finalAmount = Number(amountVal);
@@ -67,6 +109,8 @@
       timeStyle: "short"
     });
     const statusText = (statementData.status || statementData.transactionStatus || "SUCCESS").toUpperCase();
+
+    const payer = resolvePayerDetails(statementData);
 
     // Fill DOM elements
     const displayAmountEl = document.getElementById("displayAmount");
@@ -81,6 +125,15 @@
     const receiptDateEl = document.getElementById("receipt-date");
     if (receiptDateEl) receiptDateEl.innerText = formattedDate;
 
+    const receiptHolderEl = document.getElementById("receipt-holder");
+    if (receiptHolderEl) receiptHolderEl.innerText = payer.name;
+
+    const receiptMethodEl = document.getElementById("receipt-method");
+    if (receiptMethodEl) receiptMethodEl.innerText = payer.method;
+
+    const receiptEmailEl = document.getElementById("receipt-email");
+    if (receiptEmailEl) receiptEmailEl.innerText = payer.email;
+
     const receiptCourseEl = document.getElementById("receipt-course");
     if (receiptCourseEl) receiptCourseEl.innerText = statementData.particulars || courseData.name;
 
@@ -89,12 +142,6 @@
 
     const receiptItemPriceEl = document.getElementById("receipt-item-price");
     if (receiptItemPriceEl) receiptItemPriceEl.innerText = formattedAmount;
-
-    const receiptMethodEl = document.getElementById("receipt-method");
-    if (receiptMethodEl) receiptMethodEl.innerText = statementData.paymentMode || statementData.channel || "Debit / Credit Card (GetPay)";
-
-    const receiptEmailEl = document.getElementById("receipt-email");
-    if (receiptEmailEl) receiptEmailEl.innerText = statementData.customerEmail || userEmail;
 
     const statusBadgeEl = document.getElementById("statusBadge");
     if (statusBadgeEl) statusBadgeEl.innerText = "Bank Verified • " + statusText;

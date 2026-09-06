@@ -27,16 +27,39 @@
   const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
   const courseData = config.getCourseData(courseId);
   const amount = parseFloat(params.get("amount")) || parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
+  
+  // Persist email & cardholder if present in URL
   const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "";
+  const userName = params.get("name") || params.get("cardHolderName") || localStorage.getItem("getpay_card_holder") || "";
+  if (userEmail) localStorage.setItem("getpay_user_email", userEmail);
+  if (userName) localStorage.setItem("getpay_card_holder", userName);
 
   window.addEventListener("load", () => {
+    // Listen for inputs inside #checkout to capture cardholder name and email on the fly
+    const checkoutContainer = document.getElementById("checkout");
+    if (checkoutContainer) {
+      checkoutContainer.addEventListener("input", (e) => {
+        const target = e.target;
+        if (!target) return;
+        const attr = (target.name || target.id || target.placeholder || "").toLowerCase();
+        if (attr.includes("name") || attr.includes("holder")) {
+          if (target.value && target.value.trim().length > 1) {
+            localStorage.setItem("getpay_card_holder", target.value.trim());
+          }
+        } else if (attr.includes("email") || target.type === "email") {
+          if (target.value && target.value.includes("@")) {
+            localStorage.setItem("getpay_user_email", target.value.trim());
+          }
+        }
+      });
+    }
+
     function initGetPay() {
       if (typeof window.GetPay === "undefined" && typeof window.getpay === "undefined") {
         setTimeout(initGetPay, 300);
         return;
       }
 
-      const checkoutContainer = document.getElementById("checkout");
       // Check if GetPay bundle already mounted into container automatically
       if (checkoutContainer && checkoutContainer.querySelectorAll("iframe, form, div.checkout-root").length > 0) {
         console.log("GetPay checkout already rendered automatically by bundle.");
@@ -52,7 +75,7 @@
 
       const options = {
         userInfo: {
-          name: "",
+          name: userName,
           email: userEmail,
           state: "",
           country: "",
