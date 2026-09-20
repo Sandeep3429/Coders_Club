@@ -173,14 +173,35 @@
       transactions.forEach(txn => {
         const tr = document.createElement('tr');
         
-        const statusClass = txn.status.toLowerCase() === 'completed' ? 'completed' : 'failed';
-        
-        tr.innerHTML = `
-          <td>${txn.date}</td>
-          <td style="font-family: monospace; color: #475569;">${txn.id}</td>
-          <td style="font-weight: 600;">Rs. ${parseFloat(txn.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-          <td><span class="status ${statusClass}">${txn.status}</span></td>
-        `;
+        const statusValue = String(txn.status || '');
+        const statusClass = statusValue.toLowerCase() === 'completed' ? 'completed' : 'failed';
+
+        const dateTd = document.createElement('td');
+        dateTd.textContent = String(txn.date || '');
+
+        const idTd = document.createElement('td');
+        idTd.style.fontFamily = 'monospace';
+        idTd.style.color = '#475569';
+        idTd.textContent = String(txn.id || '');
+
+        const amountTd = document.createElement('td');
+        amountTd.style.fontWeight = '600';
+        const parsedAmount = parseFloat(txn.amount);
+        const displayAmount = Number.isFinite(parsedAmount)
+          ? parsedAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })
+          : '0.00';
+        amountTd.textContent = `Rs. ${displayAmount}`;
+
+        const statusTd = document.createElement('td');
+        const statusSpan = document.createElement('span');
+        statusSpan.className = `status ${statusClass}`;
+        statusSpan.textContent = statusValue;
+        statusTd.appendChild(statusSpan);
+
+        tr.appendChild(dateTd);
+        tr.appendChild(idTd);
+        tr.appendChild(amountTd);
+        tr.appendChild(statusTd);
         tbody.appendChild(tr);
       });
     }
