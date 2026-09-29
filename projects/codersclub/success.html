@@ -3,315 +3,208 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transaction Successful | GetPay</title>
-  <meta name="robots" content="noindex, nofollow">
+  <title id="page-title">Payment Successful – Coders Club</title>
 
-  <!-- Anti-clickjacking -->
-  <script>if (window.top !== window.self) window.top.location = window.self.location.href;</script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #f0f2f5;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      -webkit-font-smoothing: antialiased;
+  <!-- Anti-clickjacking per GetPay doc Page 4 -->
+  <script>
+    if (window.top !== window.self) {
+      window.top.location = window.self.location.href;
     }
+  </script>
 
-    .card {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 12px 40px rgba(15,23,42,0.1), 0 2px 8px rgba(15,23,42,0.06);
-      max-width: 480px;
-      width: 100%;
-      overflow: hidden;
-    }
+  <!-- FontAwesome & Segregated Stylesheet -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/status.css">
 
-    /* ── Success stripe ── */
-    .top-stripe {
-      height: 5px;
-      background: linear-gradient(90deg, #059669, #34d399);
-    }
-
-    .card-body { padding: 40px 36px 36px; text-align: center; }
-
-    /* ── Icon ── */
-    .icon-wrap {
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: #ecfdf5;
-      border: 2px solid #a7f3d0;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 30px;
-      color: #059669;
-    }
-
-    h1 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: #0f172a;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 0.875rem;
-      color: #6b7280;
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
-
-    /* ── Detail rows ── */
-    .details {
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 24px;
-      text-align: left;
-    }
-
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 12px 16px;
-      border-bottom: 1px solid #e5e7eb;
-      gap: 12px;
-    }
-
-    .detail-row:last-child { border-bottom: none; }
-
-    .detail-row .lbl {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: #9ca3af;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .detail-row .val {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #0f172a;
-      text-align: right;
-      word-break: break-all;
-    }
-
-    .detail-row.total-row .val {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #1a56db;
-    }
-
-    /* Txn ID pill */
-    .txn-pill {
-      display: inline-block;
-      background: #eff4ff;
-      border: 1px solid #c7d7fd;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-family: monospace;
-      font-size: 0.78rem;
-      color: #1a56db;
-      word-break: break-all;
-    }
-
-    /* ── CTA button ── */
-    .btn-cta {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 13px 20px;
-      font-size: 0.9375rem;
-      font-weight: 700;
-      font-family: 'Inter', sans-serif;
-      background: #1a56db;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.18s ease, transform 0.18s ease;
-      letter-spacing: -0.01em;
-      margin-bottom: 12px;
-    }
-
-    .btn-cta:hover { background: #1344b4; transform: translateY(-1px); }
-
-    .btn-secondary {
-      display: inline-block;
-      font-size: 0.825rem;
-      color: #6b7280;
-      text-decoration: none;
-      margin-top: 4px;
-    }
-
-    .btn-secondary:hover { color: #374151; }
-
-    /* ── Secure note ── */
-    .secure-note {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 0.73rem;
-      color: #9ca3af;
-      margin-top: 20px;
-    }
-
-    .secure-note i { color: #059669; }
-
-    /* ── AFT route summary ── */
-    .route-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .route-icon {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-      flex-shrink: 0;
-    }
-
-    .route-icon.sender    { background: #dbeafe; color: #1a56db; }
-    .route-icon.recipient { background: #dcfce7; color: #059669; }
-  </style>
+  <!-- html2pdf Library for Instant Client-Side PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
-  <div class="card">
-    <div class="top-stripe"></div>
-    <div class="card-body">
+  <!-- ── AFT Transfer Confirmation (shown only when ?flow=aft) ── -->
+  <div id="aft-success-block" style="display:none;" class="page-wrapper">
+    <div class="status-card">
+      <div class="status-icon">✅</div>
+      <div class="status-badge" id="aft-status-badge">Transfer Confirmed</div>
+      <h2 class="status-title">Transfer Successful!</h2>
+      <p class="status-desc">Your account fund transfer has been completed and verified.</p>
 
-      <div class="icon-wrap">
-        <i class="fas fa-check"></i>
+      <div class="receipt-container" id="aft-receipt-printable">
+        <div class="receipt-header">
+          <div>
+            <div class="receipt-org-title">GETPAY AFT</div>
+            <div class="receipt-org-sub">Account Fund Transfer Receipt</div>
+          </div>
+          <div class="receipt-badge-paid">SENT</div>
+        </div>
+
+        <div class="receipt-grid">
+          <div>
+            <div class="receipt-field-label">Transaction ID</div>
+            <div class="receipt-field-value mono" id="aft-receipt-txid">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Date</div>
+            <div class="receipt-field-value" id="aft-receipt-date">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">From (Sender)</div>
+            <div class="receipt-field-value" id="aft-receipt-sender">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Sender Account</div>
+            <div class="receipt-field-value mono" id="aft-receipt-sender-acct">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">To (Recipient)</div>
+            <div class="receipt-field-value" id="aft-receipt-recipient">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Recipient Account</div>
+            <div class="receipt-field-value mono" id="aft-receipt-recipient-acct">--</div>
+          </div>
+        </div>
+
+        <div class="receipt-total-box">
+          <span class="receipt-total-label">Amount Transferred</span>
+          <span class="receipt-total-amount" id="aft-receipt-total">--</span>
+        </div>
+
+        <div class="receipt-footer-note">
+          <i class="fas fa-shield-alt"></i> Verified via NCHL GetPay Gateway &middot; 256-bit SSL<br>
+          This is an official AFT transfer receipt.
+        </div>
       </div>
 
-      <h1 id="main-title">Transaction Successful</h1>
-      <p class="subtitle" id="main-subtitle">Your transaction has been verified and completed.</p>
-
-      <div class="details" id="detail-block">
-        <!-- populated by JS -->
-      </div>
-
-      <a href="#" class="btn-cta" id="cta-btn">
-        <i class="fas fa-arrow-right"></i>
-        <span id="cta-text">Continue</span>
-      </a>
-
-      <div>
-        <a href="aft.html" class="btn-secondary" id="new-transfer-link" style="display:none;">
-          <i class="fas fa-plus"></i> New Transfer
+      <div class="receipt-actions">
+        <button type="button" class="btn-action" onclick="downloadAftReceiptPDF()">
+          <i class="fas fa-file-pdf"></i> Download Receipt (PDF)
+        </button>
+        <a href="aft.html" class="btn-action btn-secondary">
+          <i class="fas fa-arrow-left"></i> New Transfer
         </a>
-      </div>
-
-      <div class="secure-note">
-        <i class="fas fa-shield-halved"></i>
-        Secured by NCHL GetPay &middot; 256-bit SSL
       </div>
     </div>
   </div>
 
+  <!-- ── ECOM Enrollment Receipt (shown by default) ── -->
+  <div id="ecom-success-block" class="page-wrapper">
+    <div class="status-card">
+      <div class="status-icon">✅</div>
+      <div class="status-badge" id="statusBadge">Payment Confirmed</div>
+      <h2 class="status-title">Enrollment Successful!</h2>
+      <p class="status-desc">Your payment of <strong id="displayAmount">Rs. 0.00</strong> has been confirmed.</p>
+
+      <!-- Printable / Downloadable Receipt Card generated on the fly -->
+      <div class="receipt-container" id="receipt-printable">
+        <div class="receipt-header">
+          <div>
+            <div class="receipt-org-title">CODERS CLUB</div>
+            <div class="receipt-org-sub">Official Enrollment &amp; Payment Receipt</div>
+          </div>
+          <div class="receipt-badge-paid">PAID</div>
+        </div>
+
+        <div class="receipt-grid">
+          <div>
+            <div class="receipt-field-label">Transaction ID</div>
+            <div class="receipt-field-value mono" id="receipt-txid">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Client Request ID</div>
+            <div class="receipt-field-value mono" id="receipt-reqid">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Transaction Date</div>
+            <div class="receipt-field-value" id="receipt-date">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Cardholder Name</div>
+            <div class="receipt-field-value" id="receipt-holder">--</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Payment Mode</div>
+            <div class="receipt-field-value" id="receipt-method">Debit / Credit Card</div>
+          </div>
+          <div>
+            <div class="receipt-field-label">Customer Email</div>
+            <div class="receipt-field-value" id="receipt-email">--</div>
+          </div>
+        </div>
+
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="col-right">Qty</th>
+              <th class="col-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="receipt-course">Mastering Oracle PL/SQL for Financial Systems</td>
+              <td class="col-right">1</td>
+              <td class="col-right" id="receipt-item-price">Rs. 0.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="receipt-total-box">
+          <span class="receipt-total-label">Grand Total Paid</span>
+          <span class="receipt-total-amount" id="receipt-total">Rs. 0.00</span>
+        </div>
+
+        <div class="receipt-footer-note">
+          <i class="fas fa-shield-alt"></i> Verified via Nepal Clearing House Ltd. (NCHL) GetPay Gateway.<br>
+          This is an official digital receipt. For queries, contact support@nchl.com.np
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="receipt-actions" id="receipt-actions">
+        <button type="button" class="btn-action" onclick="downloadReceiptPDF()">
+          <i class="fas fa-file-pdf"></i> Download Receipt (PDF)
+        </button>
+        <a href="https://sandeepkumarjha.com.np" class="btn-action btn-secondary" id="learningBtn">
+          <i class="fas fa-graduation-cap"></i> Start Learning
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Centralized config + flow-branched controller -->
+  <script src="js/getpay-config.js"></script>
   <script>
-    const params  = new URLSearchParams(window.location.search);
-    const isAft   = params.get('flow') === 'aft';
-    const verified = params.get('verified') === 'true';
+    // Branch: AFT vs ECOM
+    (function () {
+      const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
+      if (isAft) {
+        document.getElementById('ecom-success-block').style.display = 'none';
+        document.getElementById('aft-success-block').style.display  = 'block';
+        var s = document.createElement('script');
+        s.src = 'js/aft-success.js';
+        document.body.appendChild(s);
+      } else {
+        var s = document.createElement('script');
+        s.src = 'js/success.js';
+        document.body.appendChild(s);
+      }
+    })();
 
-    // Guard: only show this page when arrived correctly
-    if (!verified) {
-      window.location.href = isAft ? 'aft.html' : 'getpay.html';
-    }
-
-    const txid = params.get('txid') || 'N/A';
-
-    function row(label, value, isTotalRow = false) {
-      return '<div class="detail-row' + (isTotalRow ? ' total-row' : '') + '">'
-        + '<span class="lbl">' + label + '</span>'
-        + '<span class="val">' + value + '</span>'
-        + '</div>';
-    }
-
-    function txnPill(id) {
-      return '<span class="txn-pill">' + id + '</span>';
-    }
-
-    if (isAft) {
-      // ── AFT success ──────────────────────────────────────────
-      document.getElementById('main-title').textContent    = 'Transfer Successful!';
-      document.getElementById('main-subtitle').textContent = 'Your account fund transfer has been completed and verified.';
-
-      // Recover display context from sessionStorage
-      let ctx = {};
-      try { ctx = JSON.parse(sessionStorage.getItem('aft_ctx') || '{}'); } catch(e) {}
-
-      const amt = params.get('amt') || ctx.displayAmount || '—';
-      const cur = params.get('cur') || ctx.currency || '';
-
-      const sName = ctx.senderName    || params.get('sname') || '—';
-      const rName = ctx.recipientName || params.get('rname') || '—';
-      const sAcct = ctx.senderAcct    ? ('•••• ' + String(ctx.senderAcct).slice(-4))    : '—';
-      const rAcct = ctx.recipientAcct ? ('•••• ' + String(ctx.recipientAcct).slice(-4)) : '—';
-
-      const displayAmt = (cur && !isNaN(parseFloat(amt)))
-        ? cur + '\u00a0' + parseFloat(amt).toLocaleString('en-US', { minimumFractionDigits: 2 })
-        : amt;
-
-      document.getElementById('detail-block').innerHTML =
-        row('From',           '<span class="route-row"><span class="route-icon sender"><i class="fas fa-arrow-up" style="font-size:10px"></i></span><span>' + sName + ' &nbsp;<span style="color:#9ca3af;font-weight:400;font-size:0.75rem">' + sAcct + '</span></span></span>')
-        + row('To',           '<span class="route-row"><span class="route-icon recipient"><i class="fas fa-arrow-down" style="font-size:10px"></i></span><span>' + rName + ' &nbsp;<span style="color:#9ca3af;font-weight:400;font-size:0.75rem">' + rAcct + '</span></span></span>')
-        + row('Transaction ID', txnPill(txid))
-        + row('Status',       '<span style="color:#059669;font-weight:700"><i class="fas fa-circle-check"></i> Verified</span>')
-        + row('Amount',       displayAmt, true);
-
-      document.getElementById('cta-btn').href         = 'aft.html';
-      document.getElementById('cta-text').textContent = 'Back to AFT';
-      document.getElementById('new-transfer-link').style.display = 'inline';
-
-      // Clear sensitive session data after displaying
-      sessionStorage.removeItem('aft_ctx');
-
-    } else {
-      // ── ECOM success ─────────────────────────────────────────
-      document.getElementById('main-title').textContent    = 'Enrollment Successful!';
-      document.getElementById('main-subtitle').textContent = 'Your payment has been verified. You\'re all set to start learning.';
-
-      const COURSE_CATALOG = {
-        'oracle-plsql': { name: 'Mastering Oracle PL/SQL',          price: 6500.00,  btnText: 'Start Learning PL/SQL' },
-        'banking-etl':  { name: 'Banking Data Pipelines',            price: 10500.00, btnText: 'Start Learning ETL' },
-        'java-mastery': { name: 'Java Mastery Course',               price: 4500.55,  btnText: 'Start Learning Java' }
-      };
-
-      const courseId   = localStorage.getItem('getpay_expected_course') || 'oracle-plsql';
-      const courseData = COURSE_CATALOG[courseId] || COURSE_CATALOG['oracle-plsql'];
-      const dispAmt    = 'Rs\u00a0' + courseData.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
-
-      document.getElementById('detail-block').innerHTML =
-        row('Course',         courseData.name)
-        + row('Transaction ID', txnPill(txid))
-        + row('Status',       '<span style="color:#059669;font-weight:700"><i class="fas fa-circle-check"></i> Verified</span>')
-        + row('Amount Paid',  dispAmt, true);
-
-      document.getElementById('cta-btn').href         = 'https://sandeepkumarjha.com.np';
-      document.getElementById('cta-text').textContent = courseData.btnText;
-    }
+    // AFT PDF download helper
+    window.downloadAftReceiptPDF = function () {
+      var el = document.getElementById('aft-receipt-printable');
+      if (!el) return;
+      if (window.html2pdf) {
+        window.html2pdf().set({
+          margin: [10,10,10,10],
+          filename: 'AFT_Transfer_Receipt.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(el).save();
+      } else { window.print(); }
+    };
   </script>
 </body>
 </html>

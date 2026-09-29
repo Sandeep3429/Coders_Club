@@ -1,3 +1,9 @@
+// Clean .html extension from browser address bar
+if (window.location.pathname.endsWith('.html')) {
+    const cleanPath = window.location.pathname.replace(/\.html$/, '').replace(/\/index$/, '/');
+    window.history.replaceState(null, '', cleanPath + window.location.search + window.location.hash);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     // STICKY HEADER ON SCROLL
