@@ -916,12 +916,9 @@
         /* ── Callbacks ── */
         onSuccess: (res) => {
           resetBtn();
-          console.log('[GetPay AFT] success:', res);
-          const tid = (res && (res.transactionId || res.id || res.txnId)) || '';
-          if (tid) {
-            try { sessionStorage.setItem('aft_txid', tid); } catch (e) {}
-          }
-          window.location.href = absUrl('success.html') + '?flow=aft&verified=true' + (tid ? '&txid=' + encodeURIComponent(tid) : '');
+          console.log('[GetPay AFT] payment context initialized:', res);
+          // Navigate to payment.html where GetPay SDK card checkout form is mounted into #checkout
+          window.location.href = absUrl('payment.html') + '?flow=aft';
         },
         onError: err => {
           resetBtn();

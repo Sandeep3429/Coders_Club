@@ -2,12 +2,12 @@
  * AFT Payment Controller — js/aft-payment.js
  * Handles the payment.html?flow=aft branch.
  * Reads AFT session context from sessionStorage (written by aft.html).
- * Uses GetPayAftConfig from getpay-config.js.
+ * Mounts GetPay AFT card payment form into #checkout.
  *
  * Security:
  *  - Sender/recipient data travels only via sessionStorage (tab-scoped, never in URL).
  *  - sessionStorage key 'aft_ctx' is cleared after success.html renders.
- *  - papInfo is NOT a secret — it is an opaque merchant reference.
+ *  - papInfo is an opaque merchant reference.
  */
 (function () {
   if (window.top !== window.self) {
@@ -44,17 +44,23 @@
 
   function waitForGetPay(cb, attempts) {
     attempts = attempts || 0;
-    if (typeof window.GetPay !== 'undefined') { cb(); return; }
-    if (attempts > 30) {
-      removeLoader();
-      const errBox = document.getElementById('error-box');
-      if (errBox) { errBox.textContent = 'GetPay SDK did not load. Check network / AdBlock.'; errBox.style.display = 'block'; }
+    if (typeof window.GetPay !== 'undefined' || typeof window.getpay !== 'undefined') {
+      cb();
       return;
     }
-    setTimeout(function () { waitForGetPay(cb, attempts + 1); }, 400);
+    if (attempts > 100) {
+      removeLoader();
+      const errBox = document.getElementById('error-box');
+      if (errBox) {
+        errBox.textContent = 'GetPay SDK did not load. Check network / AdBlock.';
+        errBox.style.display = 'block';
+      }
+      return;
+    }
+    setTimeout(function () { waitForGetPay(cb, attempts + 1); }, 100);
   }
 
-  window.addEventListener('load', function () {
+  function startAft() {
     waitForGetPay(function () {
       const callbacks = aftCfg.getCallbackUrls();
 
@@ -74,20 +80,20 @@
           failUrl:    callbacks.failUrl
         },
         userInfo: {
-          name:    ctx.senderName    || '',
+          name:    ctx.senderName      || '',
           email:   '',
           state:   ctx.senderAdminArea || '',
-          country: ctx.senderCountry  || 'NP',
-          zipcode: ctx.senderPostal   || '',
-          city:    ctx.senderCity     || '',
-          address: ctx.senderAddress  || ''
+          country: ctx.senderCountry   || 'NP',
+          zipcode: ctx.senderPostal    || '',
+          city:    ctx.senderCity      || '',
+          address: ctx.senderAddress   || ''
         },
         prefill: { name: false, email: false, state: false, city: false, address: false },
 
         // AFT-specific flags
         aft:         true,
         paymentType: 'ACCOUNT_FUND_TRANSFER',
-        BAI:         [ctx.bai || aftCfg.BAI],
+        BAI:         [ctx.bai || aftCfg.BAI || 'WT'],
 
         senderInformation: {
           account: {
@@ -128,10 +134,9 @@
         themeColor: '#1a56db',
 
         onSuccess: function (res) {
-          console.log('[AFT] SDK onSuccess:', res);
+          console.log('[AFT] SDK onSuccess payment complete:', res);
           removeLoader();
           const tid = (res && (res.transactionId || res.id || res.txnId)) || '';
-          // Store txid so success.html can display it
           try { sessionStorage.setItem('aft_txid', tid); } catch (e) {}
           const base = callbacks.successUrl;
           window.location.href = tid ? (base + '&txid=' + encodeURIComponent(tid)) : base;
@@ -141,7 +146,13 @@
           removeLoader();
           const errBox = document.getElementById('error-box');
           if (errBox) {
-            errBox.textContent = 'Transfer failed: ' + (err && err.message ? err.message : String(err));
+            let msg = 'Transfer failed';
+            if (typeof err === 'string') msg += ': ' + err;
+            else if (err && err.message) msg += ': ' + err.message;
+            else if (err && typeof err === 'object') {
+              try { msg += ': ' + (err.errorMsg || err.error || err.status || JSON.stringify(err)); } catch(e) { msg += ': ' + String(err); }
+            }
+            errBox.textContent = msg;
             errBox.style.display = 'block';
           }
         }
@@ -150,11 +161,15 @@
       console.log('[AFT aft-payment.js] options:', options);
 
       try {
-        const gp = new window.GetPay(options);
-        if (typeof gp.initialize === 'function') {
-          gp.initialize();
-        } else if (typeof gp.init === 'function') {
-          gp.init();
+        if (typeof window.GetPay === 'function') {
+          const gp = new window.GetPay(options);
+          if (typeof gp.initialize === 'function') {
+            gp.initialize();
+          } else if (typeof gp.init === 'function') {
+            gp.init();
+          }
+        } else if (window.getpay && typeof window.getpay.initialize === 'function') {
+          window.getpay.initialize(options);
         }
         setTimeout(removeLoader, 1500);
       } catch (e) {
@@ -164,5 +179,13 @@
         if (errBox) { errBox.textContent = 'AFT init failed: ' + e.message; errBox.style.display = 'block'; }
       }
     });
-  });
+  }
+
+  // Ensure execution on first attempt whether DOM is already loaded or loading
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startAft);
+    window.addEventListener('load', startAft);
+  } else {
+    startAft();
+  }
 })();

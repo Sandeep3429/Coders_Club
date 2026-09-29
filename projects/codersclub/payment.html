@@ -12,18 +12,22 @@
     }
   </script>
 
-  <!-- Route AFT traffic directly to dedicated AFT page if flow=aft is specified -->
-  <script>
-    if (new URLSearchParams(window.location.search).get('flow') === 'aft') {
-      window.location.replace('aft.html');
-    }
-  </script>
-
   <!-- Segregated Stylesheet -->
   <link rel="stylesheet" href="css/payment.css">
 
-  <!-- NCHL GetPay SDK Bundle (ECOM v5) loaded upfront in head -->
-  <script src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
+  <!-- Centralized Configuration -->
+  <script src="js/getpay-config.js"></script>
+
+  <!-- Synchronously load the exact SDK bundle in HEAD for instantaneous parsing -->
+  <script>
+    (function () {
+      const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
+      const bundleSrc = isAft
+        ? ((window.GetPayAftConfig && window.GetPayAftConfig.BUNDLE_URL) || 'https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js')
+        : ((window.GetPayConfig && window.GetPayConfig.BUNDLE_URL) || 'https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js');
+      document.write('<script src="' + bundleSrc + '"><\/script>');
+    })();
+  </script>
 </head>
 <body>
 
@@ -38,8 +42,13 @@
     <div id="error-box"></div>
   </main>
 
-  <!-- Centralized config & ECOM Controller -->
-  <script src="js/getpay-config.js"></script>
-  <script src="js/payment.js"></script>
+  <!-- Synchronously load the exact controller matching the current flow -->
+  <script>
+    (function () {
+      const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
+      const ctrlSrc = isAft ? 'js/aft-payment.js' : 'js/payment.js';
+      document.write('<script src="' + ctrlSrc + '"><\/script>');
+    })();
+  </script>
 </body>
 </html>
