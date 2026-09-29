@@ -592,11 +592,27 @@
         </div>
       </div>
 
-      <!-- ── Amount ── -->
+      <!-- ── Amount & Transfer Type ── -->
       <div class="card-section">
         <div class="section-header">
           <div class="section-icon amount-icon"><i class="fas fa-coins"></i></div>
-          <span class="section-title">Transfer Amount</span>
+          <span class="section-title">Transfer Details</span>
+        </div>
+
+        <div class="field" style="margin-bottom: 16px;">
+          <label for="business-application-id">Business Application ID</label>
+          <select id="business-application-id">
+            <option value="WT" selected>WT - Wallet Transfer (Default)</option>
+            <option value="PP">PP - Person to Person</option>
+            <option value="AA">AA - Account to Account</option>
+            <option value="TU">TU - Top Up (Mobile/Wallet)</option>
+            <option value="PD">PD - Payroll Disbursement</option>
+            <option value="FD">FD - Funds Disbursement</option>
+            <option value="GD">GD - Government Disbursement</option>
+            <option value="CP">CP - Cash Pickup</option>
+            <option value="GP">GP - General Bill Payment</option>
+            <option value="MD">MD - Medical Payment</option>
+          </select>
         </div>
 
         <div class="amount-row">
@@ -685,7 +701,7 @@
       oprKey: '4fa4c6b9-3f91-43e5-9b4f-319f68187ba5',
       insKey: '',
       baseUrl: 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions',
-      bai: 'PP',        // Business Application ID — Person to Person
+      bai: 'WT',        // Business Application ID — defaulted to WT (Wallet Transfer)
       fundsSource: '05',        // Sender funds source (hidden)
       accountType: '01',        // Recipient account type (hidden)
       businessName: 'GetPay AFT',
@@ -738,6 +754,7 @@
 
     REQUIRED.forEach(id => { const el = $(id); if (el) el.addEventListener('input', checkValidity); });
     $('currency').addEventListener('change', checkValidity);
+    if ($('business-application-id')) $('business-application-id').addEventListener('change', checkValidity);
 
     updateSummary();
     checkValidity();
@@ -746,12 +763,14 @@
     function buildOrderInfoHtml() {
       const cur = $('currency').value;
       const amt = parseFloat($('aft-amount').value) || 0;
+      const selectedBai = ($('business-application-id') && $('business-application-id').value) || HARDCODED.bai || 'WT';
       return '<div style="font-family:Inter,sans-serif;padding:20px 0">' +
         '<div style="font-size:18px;color:#1a56db;font-weight:700;margin-bottom:14px">Account Fund Transfer</div>' +
         '<div style="font-size:13px;color:#374151;margin-bottom:8px"><b>From:</b> ' + val('sender-first-name') + ' ' + val('sender-last-name') +
         ' &nbsp;&middot;&nbsp; Acct: ' + val('sender-account-number') + '</div>' +
         '<div style="font-size:13px;color:#374151;margin-bottom:8px"><b>To:</b> ' + val('recipient-first-name') + ' ' + val('recipient-last-name') +
         ' &nbsp;&middot;&nbsp; Acct: ' + val('recipient-account-id') + '</div>' +
+        '<div style="font-size:13px;color:#374151;margin-bottom:8px"><b>Transfer Type:</b> ' + selectedBai + '</div>' +
         '<div style="display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;margin-top:14px;padding-top:12px">' +
         '<span style="font-size:13px;font-weight:600">Total</span>' +
         '<span style="font-size:15px;font-weight:700;color:#1a56db">' + fmt(amt, cur) + '</span>' +
@@ -777,6 +796,7 @@
       const currency = $('currency').value;
       const amount = parseFloat($('aft-amount').value) || 0;
       const clientRequestId = 'AFT-' + Date.now();
+      const selectedBai = ($('business-application-id') && $('business-application-id').value) || HARDCODED.bai || 'WT';
       const orderInfoHtml = buildOrderInfoHtml();
 
       /*
@@ -808,7 +828,7 @@
         recipientPostal: val('recipient-postal-code'),
         amount,
         currency,
-        bai: HARDCODED.bai,
+        bai: selectedBai,
         displayAmount: fmt(amount, currency),
         orderInfoHtml
       };
@@ -831,7 +851,7 @@
         baseUrl: HARDCODED.baseUrl,
         websiteDomain: window.location.origin,
         callbackUrl: {
-          successUrl: absUrl('payment.html') + '?flow=aft',
+          successUrl: absUrl('success.html') + '?flow=aft&verified=true',
           failUrl: absUrl('fail.html') + '?flow=aft'
         },
 
@@ -850,7 +870,7 @@
         /* ── AFT flags ── */
         aft: true,
         paymentType: 'ACCOUNT_FUND_TRANSFER',
-        BAI: [HARDCODED.bai],
+        BAI: [selectedBai],
 
         /* ── Sender (fundsSource passed silently in background) ── */
         senderInformation: {
@@ -894,15 +914,31 @@
         themeColor: '#1a56db',
 
         /* ── Callbacks ── */
-        onSuccess: () => {
+        onSuccess: (res) => {
           resetBtn();
-          // payment.html reads aft_ctx from sessionStorage for the inline SDK mount
-          window.location.href = absUrl('payment.html') + '?flow=aft';
+          console.log('[GetPay AFT] success:', res);
+          const tid = (res && (res.transactionId || res.id || res.txnId)) || '';
+          if (tid) {
+            try { sessionStorage.setItem('aft_txid', tid); } catch (e) {}
+          }
+          window.location.href = absUrl('success.html') + '?flow=aft&verified=true' + (tid ? '&txid=' + encodeURIComponent(tid) : '');
         },
         onError: err => {
           resetBtn();
           console.error('[GetPay AFT] error:', err);
-          alert('Transfer failed: ' + (err && err.message ? err.message : String(err)));
+          let errMsg = 'Transfer failed';
+          if (typeof err === 'string') {
+            errMsg += ': ' + err;
+          } else if (err && err.message) {
+            errMsg += ': ' + err.message;
+          } else if (err && typeof err === 'object') {
+            try {
+              errMsg += ': ' + (err.errorMsg || err.error || err.status || err.description || JSON.stringify(err));
+            } catch (e) {
+              errMsg += ': ' + String(err);
+            }
+          }
+          alert(errMsg);
         },
         onLoading: loading => console.log('[GetPay AFT] loading:', loading)
       };

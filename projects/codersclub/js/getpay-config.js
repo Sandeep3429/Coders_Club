@@ -124,7 +124,7 @@
     BASE_URL: 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions',
     STATUS_API: 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status',
     BUNDLE_URL: 'https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js',
-    BAI: 'PP',          // Business Application ID — Person to Person
+    BAI: 'WT',          // Business Application ID — defaulted to WT (Wallet Transfer)
     FUNDS_SOURCE: '05',          // Sender funds source (hidden from UI)
     ACCOUNT_TYPE: '01',          // Recipient account type (hidden from UI)
 

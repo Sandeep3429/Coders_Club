@@ -11,7 +11,8 @@
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
@@ -20,271 +21,247 @@
 
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0a0f1e 0%, #111827 60%, #0d1b2a 100%);
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 50%, #f1f5f9 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px 16px;
+      padding: 32px 20px;
       -webkit-font-smoothing: antialiased;
-      color: #f1f5f9;
+      color: #0f172a;
     }
 
-    /* ── Brand header ── */
-    .brand {
+    /* ── Page Container ── */
+    .container {
+      width: 100%;
+      max-width: 680px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 36px;
-    }
-
-    .brand-logo {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, #5662ff, #7b85ff);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 17px; font-weight: 800; color: #fff;
-      box-shadow: 0 4px 16px rgba(86,98,255,0.4);
-      letter-spacing: -1px;
-    }
-
-    .brand-text {
-      line-height: 1;
-    }
-
-    .brand-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #f1f5f9;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-sub {
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #475569;
-      margin-top: 2px;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
     }
 
     /* ── Heading block ── */
     .heading {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
 
     .heading h1 {
-      font-size: 1.5rem;
+      font-size: 1.85rem;
       font-weight: 800;
-      color: #f1f5f9;
+      color: #0f172a;
       letter-spacing: -0.03em;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .heading p {
-      font-size: 0.875rem;
+      font-size: 1rem;
       color: #64748b;
+      font-weight: 500;
     }
 
     /* ── Cards grid ── */
     .cards {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: 20px;
       width: 100%;
-      max-width: 520px;
     }
 
-    @media (max-width: 460px) {
+    @media (max-width: 580px) {
       .cards { grid-template-columns: 1fr; }
     }
 
     /* ── Individual card ── */
     .txn-card {
       position: relative;
-      background: rgba(255,255,255,0.04);
-      border: 1.5px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 28px 20px 24px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 36px 26px 30px;
       cursor: pointer;
       text-decoration: none;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      gap: 14px;
-      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      gap: 16px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       outline: none;
       user-select: none;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 24px -5px rgba(0, 0, 0, 0.04);
       -webkit-tap-highlight-color: transparent;
     }
 
     /* ECOM hover & active */
     .txn-card.ecom:hover,
     .txn-card.ecom:focus-visible {
-      border-color: #5662ff;
-      background: rgba(86,98,255,0.1);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(86,98,255,0.25), 0 0 0 1px rgba(86,98,255,0.3);
+      border-color: #6366f1;
+      transform: translateY(-4px);
+      box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.2), 0 0 0 1px rgba(99, 102, 241, 0.15);
     }
 
     .txn-card.ecom:active {
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(86,98,255,0.2);
+      box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.2);
     }
 
     /* AFT hover & active */
     .txn-card.aft:hover,
     .txn-card.aft:focus-visible {
       border-color: #f59e0b;
-      background: rgba(245,158,11,0.08);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(245,158,11,0.2), 0 0 0 1px rgba(245,158,11,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 35px -10px rgba(245, 158, 11, 0.2), 0 0 0 1px rgba(245, 158, 11, 0.15);
     }
 
     .txn-card.aft:active {
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(245,158,11,0.15);
+      box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.2);
     }
 
     /* ── Icon circle ── */
     .card-icon {
-      width: 58px; height: 58px;
-      border-radius: 16px;
+      width: 68px; height: 68px;
+      border-radius: 18px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      font-size: 26px;
       flex-shrink: 0;
-      transition: transform 0.2s ease;
+      transition: transform 0.25s ease;
     }
 
-    .txn-card:hover .card-icon { transform: scale(1.07); }
+    .txn-card:hover .card-icon { transform: scale(1.08); }
 
     .ecom .card-icon {
-      background: rgba(86,98,255,0.18);
-      color: #818cf8;
+      background: #eef2ff;
+      color: #4f46e5;
     }
 
     .aft .card-icon {
-      background: rgba(245,158,11,0.15);
-      color: #f59e0b;
+      background: #fffbeb;
+      color: #d97706;
     }
 
     /* ── Card text ── */
     .card-label {
-      font-size: 0.95rem;
+      font-size: 1.15rem;
       font-weight: 700;
-      color: #e2e8f0;
+      color: #0f172a;
       letter-spacing: -0.02em;
       line-height: 1.3;
+      margin-bottom: 4px;
     }
 
     .card-desc {
-      font-size: 0.775rem;
+      font-size: 0.875rem;
       color: #64748b;
       line-height: 1.5;
     }
 
     /* ── Arrow badge ── */
     .card-arrow {
-      margin-top: auto;
-      width: 32px; height: 32px;
+      margin-top: 10px;
+      width: 38px; height: 38px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px;
-      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      font-size: 14px;
+      background: #f8fafc;
+      transition: all 0.2s ease;
     }
 
-    .ecom .card-arrow  { background: rgba(86,98,255,0.14);  color: #818cf8; }
-    .aft  .card-arrow  { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    .ecom .card-arrow  { color: #64748b; }
+    .aft  .card-arrow  { color: #64748b; }
 
-    .txn-card:hover .card-arrow { transform: translateX(3px); }
+    .txn-card.ecom:hover .card-arrow {
+      background: #eef2ff;
+      color: #4f46e5;
+      transform: translateX(4px);
+    }
+
+    .txn-card.aft:hover .card-arrow {
+      background: #fffbeb;
+      color: #d97706;
+      transform: translateX(4px);
+    }
 
     /* ── Badge ── */
     .card-badge {
       position: absolute;
-      top: 12px; right: 12px;
-      font-size: 0.6rem;
+      top: 14px; right: 14px;
+      font-size: 0.65rem;
       font-weight: 700;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 100px;
     }
 
-    .ecom .card-badge { background: rgba(86,98,255,0.18); color: #818cf8; }
-    .aft  .card-badge { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .ecom .card-badge { background: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; }
+    .aft  .card-badge { background: #fffbeb; color: #b45309; border: 1px solid #fef3c7; }
 
     /* ── Secure footer ── */
     .secure-bar {
-      margin-top: 28px;
+      margin-top: 36px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-      color: #334155;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 500;
     }
 
-    .secure-bar i { color: #10b981; }
+    .secure-bar i { color: #10b981; font-size: 14px; }
   </style>
 </head>
 <body>
 
-  <!-- Brand -->
-  <div class="brand">
-    <div class="brand-logo">GP</div>
-    <div class="brand-text">
-      <div class="brand-name">GetPay</div>
-      <div class="brand-sub">NCHL Secure Gateway</div>
+  <div class="container">
+    <!-- Heading -->
+    <div class="heading">
+      <h1>Select Transaction Type</h1>
+      <p>Choose how you'd like to proceed</p>
     </div>
-  </div>
 
-  <!-- Heading -->
-  <div class="heading">
-    <h1>Select Transaction Type</h1>
-    <p>Choose how you'd like to proceed</p>
-  </div>
+    <!-- Transaction Type Cards -->
+    <div class="cards">
 
-  <!-- Transaction Type Cards -->
-  <div class="cards">
+      <!-- ECOM Purchase -->
+      <a class="txn-card ecom" href="payment.html?courseId=oracle-plsql" id="ecom-card">
+        <span class="card-badge">ECOM</span>
+        <div class="card-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div>
+          <div class="card-label">ECOM Purchase</div>
+          <div class="card-desc">Course enrollment &amp; secure card checkout</div>
+        </div>
+        <div class="card-arrow">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
 
-    <!-- ECOM Purchase -->
-    <a class="txn-card ecom" href="payment.html?courseId=oracle-plsql" id="ecom-card">
-      <span class="card-badge">ECOM</span>
-      <div class="card-icon">
-        <i class="fas fa-shopping-cart"></i>
-      </div>
-      <div>
-        <div class="card-label">ECOM Purchase</div>
-        <div class="card-desc">Course enrollment &amp; secure card checkout</div>
-      </div>
-      <div class="card-arrow">
-        <i class="fas fa-arrow-right"></i>
-      </div>
-    </a>
+      <!-- AFT -->
+      <a class="txn-card aft" href="aft.html" id="aft-card">
+        <span class="card-badge">AFT</span>
+        <div class="card-icon">
+          <i class="fas fa-paper-plane"></i>
+        </div>
+        <div>
+          <div class="card-label">Account Fund Transfer</div>
+          <div class="card-desc">Send funds directly to a recipient account</div>
+        </div>
+        <div class="card-arrow">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </a>
 
-    <!-- AFT -->
-    <a class="txn-card aft" href="aft.html" id="aft-card">
-      <span class="card-badge">AFT</span>
-      <div class="card-icon">
-        <i class="fas fa-paper-plane"></i>
-      </div>
-      <div>
-        <div class="card-label">Account Fund Transfer</div>
-        <div class="card-desc">Send funds directly to a recipient account</div>
-      </div>
-      <div class="card-arrow">
-        <i class="fas fa-arrow-right"></i>
-      </div>
-    </a>
+    </div>
 
-  </div>
-
-  <!-- Secure note -->
-  <div class="secure-bar">
-    <i class="fas fa-shield-halved"></i>
-    Secured by NCHL GetPay &middot; 256-bit SSL Encryption
+    <!-- Secure note -->
+    <div class="secure-bar">
+      <i class="fas fa-shield-halved"></i>
+      Secured by NCHL GetPay &middot; 256-bit SSL Encryption
+    </div>
   </div>
 
 </body>
