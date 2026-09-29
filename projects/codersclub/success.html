@@ -177,7 +177,12 @@
   <script>
     // Branch: AFT vs ECOM
     (function () {
-      const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
+      var href = window.location.href;
+      var qIdx = href.indexOf('?');
+      var fullQuery = qIdx >= 0 ? href.substring(qIdx + 1).replace(/\?/g, '&') : '';
+      var params = new URLSearchParams(fullQuery);
+      var isAft = params.get('flow') === 'aft' || href.includes('flow=aft') || !!sessionStorage.getItem('aft_ctx');
+
       if (isAft) {
         document.getElementById('ecom-success-block').style.display = 'none';
         document.getElementById('aft-success-block').style.display  = 'block';
