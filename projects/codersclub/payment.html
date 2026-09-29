@@ -14,40 +14,51 @@
 
   <!-- Segregated Stylesheet -->
   <link rel="stylesheet" href="css/payment.css">
-
-  <!-- Centralized Configuration -->
-  <script src="js/getpay-config.js"></script>
-
-  <!-- Synchronously load the exact SDK bundle in HEAD for instantaneous parsing -->
-  <script>
-    (function () {
-      const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
-      const bundleSrc = isAft
-        ? ((window.GetPayAftConfig && window.GetPayAftConfig.BUNDLE_URL) || 'https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js')
-        : ((window.GetPayConfig && window.GetPayConfig.BUNDLE_URL) || 'https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js');
-      document.write('<script src="' + bundleSrc + '"><\/script>');
-    })();
-  </script>
 </head>
 <body>
 
   <main class="payment-page-container">
-    <!-- GetPay Checkout Mount Element per documentation -->
-    <div id="checkout">
-      <div id="checkout-loader">
-        <div class="checkout-spinner"></div>
-        <div class="checkout-loader-text">Loading GetPay Secure Checkout&hellip;</div>
-      </div>
-    </div>
+    <!-- GetPay Checkout Mount Element: must be clean and present in DOM before bundle executes -->
+    <div id="checkout"></div>
     <div id="error-box"></div>
   </main>
 
-  <!-- Synchronously load the exact controller matching the current flow -->
+  <script src="js/getpay-config.js"></script>
+
   <script>
     (function () {
       const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
-      const ctrlSrc = isAft ? 'js/aft-payment.js' : 'js/payment.js';
-      document.write('<script src="' + ctrlSrc + '"><\/script>');
+
+      if (isAft) {
+        // AFT Flow: Matches official reference implementation (https://getpay.finpos.global/v3/ecom-merchant/payment.html)
+        // bundle-v1.js automatically runs: new App({ target: document.getElementById("checkout") })
+        // It reads the active payment context from sessionStorage initialized by aft.html and renders the card form.
+        const bundleScript = document.createElement('script');
+        bundleScript.src = (window.GetPayAftConfig && window.GetPayAftConfig.BUNDLE_URL) || 'https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js';
+        document.body.appendChild(bundleScript);
+
+        history.pushState(null, '', window.location.href);
+        window.addEventListener('popstate', function () {
+          window.location.replace('./aft.html');
+        });
+      } else {
+        // ECOM Flow: Load NCHL v5 bundle, then initialize course checkout via js/payment.js
+        const ecomBundle = document.createElement('script');
+        ecomBundle.src = (window.GetPayConfig && window.GetPayConfig.BUNDLE_URL) || 'https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js';
+        ecomBundle.onload = function () {
+          const ctrl = document.createElement('script');
+          ctrl.src = 'js/payment.js';
+          document.body.appendChild(ctrl);
+        };
+        ecomBundle.onerror = function () {
+          const errBox = document.getElementById('error-box');
+          if (errBox) {
+            errBox.textContent = 'GetPay SDK failed to load. Check network / AdBlock.';
+            errBox.style.display = 'block';
+          }
+        };
+        document.body.appendChild(ecomBundle);
+      }
     })();
   </script>
 </body>
