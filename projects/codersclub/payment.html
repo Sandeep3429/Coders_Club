@@ -12,15 +12,18 @@
     }
   </script>
 
+  <!-- Route AFT traffic directly to dedicated AFT page if flow=aft is specified -->
+  <script>
+    if (new URLSearchParams(window.location.search).get('flow') === 'aft') {
+      window.location.replace('aft.html');
+    }
+  </script>
+
   <!-- Segregated Stylesheet -->
   <link rel="stylesheet" href="css/payment.css">
 
-  <!--
-    Bundle loading strategy:
-    - ECOM flow (?flow=ecom or no flow param): load existing NCHL v5 bundle
-    - AFT  flow (?flow=aft):                   load GetPay v3 merchant bundle
-    Both are loaded via JS below so only one ever executes per page load.
-  -->
+  <!-- NCHL GetPay SDK Bundle (ECOM v5) loaded upfront in head -->
+  <script src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
 </head>
 <body>
 
@@ -35,27 +38,8 @@
     <div id="error-box"></div>
   </main>
 
-  <!-- Centralized config — exposes both GetPayConfig (ECOM) and GetPayAftConfig (AFT) -->
+  <!-- Centralized config & ECOM Controller -->
   <script src="js/getpay-config.js"></script>
-
-  <!-- Conditionally load the correct SDK bundle, then the matching controller -->
-  <script>
-    (function () {
-      const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
-      const bundleSrc = isAft
-        ? (window.GetPayAftConfig && window.GetPayAftConfig.BUNDLE_URL)
-        : (window.GetPayConfig   && window.GetPayConfig.BUNDLE_URL);
-
-      const s = document.createElement('script');
-      s.defer = true;
-      s.src   = bundleSrc || 'https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js';
-      document.head.appendChild(s);
-
-      // Load the matching controller after the config is ready
-      const ctrl = document.createElement('script');
-      ctrl.src = isAft ? 'js/aft-payment.js' : 'js/payment.js';
-      document.body.appendChild(ctrl);
-    })();
-  </script>
+  <script src="js/payment.js"></script>
 </body>
-</html>
+</html>

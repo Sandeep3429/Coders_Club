@@ -24,20 +24,31 @@
   }
 
   const params = new URLSearchParams(window.location.search);
-  const courseId = params.get("courseId") || localStorage.getItem("getpay_expected_course") || "oracle-plsql";
+  const courseId = params.get("courseId") || "oracle-plsql";
   const courseData = config.getCourseData(courseId);
-  const amount = parseFloat(params.get("amount")) || parseFloat(localStorage.getItem("getpay_expected_amount")) || courseData.price;
-  
+  const amount = parseFloat(params.get("amount")) || courseData.price;
+
+  // Persist expected course & amount
+  localStorage.setItem("getpay_expected_course", courseId);
+  localStorage.setItem("getpay_expected_amount", amount);
+
   // Persist email & cardholder if present in URL
   const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "";
   const userName = params.get("name") || params.get("cardHolderName") || localStorage.getItem("getpay_card_holder") || "";
   if (userEmail) localStorage.setItem("getpay_user_email", userEmail);
   if (userName) localStorage.setItem("getpay_card_holder", userName);
 
-  window.addEventListener("load", () => {
-    // Listen for inputs inside #checkout to capture cardholder name and email on the fly
+  function removeLoader() {
+    const loader = document.getElementById("checkout-loader");
+    if (loader) {
+      loader.style.display = "none";
+    }
+  }
+
+  function start() {
     const checkoutContainer = document.getElementById("checkout");
     if (checkoutContainer) {
+      // Capture cardholder inputs dynamically
       checkoutContainer.addEventListener("input", (e) => {
         const target = e.target;
         if (!target) return;
@@ -54,23 +65,38 @@
       });
     }
 
+    let attempts = 0;
+    const maxAttempts = 150; // up to 15 seconds (150 x 100ms)
+
     function initGetPay() {
+      attempts++;
       if (typeof window.GetPay === "undefined" && typeof window.getpay === "undefined") {
-        setTimeout(initGetPay, 300);
+        if (attempts < maxAttempts) {
+          setTimeout(initGetPay, 100);
+        } else {
+          console.error("GetPay SDK bundle failed to load.");
+          removeLoader();
+          const errBox = document.getElementById("error-box");
+          if (errBox) {
+            errBox.textContent = "GetPay Checkout SDK could not be loaded. Please check your internet connection or disable AdBlock.";
+            errBox.style.display = "block";
+          }
+        }
         return;
       }
 
-      // Check if GetPay bundle already mounted into container automatically
+      // Check if GetPay checkout already mounted
       if (checkoutContainer && checkoutContainer.querySelectorAll("iframe, form, div.checkout-root").length > 0) {
         console.log("GetPay checkout already rendered automatically by bundle.");
         removeLoader();
         return;
       }
 
-      const orderInformationUI = localStorage.getItem("getpay_order_ui") || config.createOrderInformationUI(courseData, amount);
-      const callbacks = config.getCallbackUrls();
+      // Freshly generate orderInformationUI matching the exact course and amount
+      const orderInformationUI = config.createOrderInformationUI(courseData, amount);
+      localStorage.setItem("getpay_order_ui", orderInformationUI);
 
-      // Resolved absolute image URL for the GetPay header
+      const callbacks = config.getCallbackUrls();
       const verifiedImageUrl = config.getImageUrl(courseData.imageUrl);
 
       const options = {
@@ -113,7 +139,6 @@
           successUrl: callbacks.successUrl,
           failUrl: callbacks.failUrl
         },
-        // onSuccess in payment.html serves as the form-ready confirmation
         onSuccess: function (res) {
           console.log("GetPay checkout ready in payment.html:", res);
           removeLoader();
@@ -123,7 +148,10 @@
           removeLoader();
           const errBox = document.getElementById("error-box");
           if (errBox) {
-            errBox.textContent = "Payment checkout failed to load. Please check credentials or network.";
+            let msg = "Payment checkout failed to load. Please check credentials or network.";
+            if (typeof err === "string") msg += " (" + err + ")";
+            else if (err && err.message) msg += " (" + err.message + ")";
+            errBox.textContent = msg;
             errBox.style.display = "block";
           }
         }
@@ -141,21 +169,23 @@
         } else if (window.getpay && typeof window.getpay.initialize === "function") {
           window.getpay.initialize(options);
         }
-        // Fallback: Remove loader after 1.5s if mount succeeded
-        setTimeout(removeLoader, 1500);
+        // Fallback: Remove loader after 2s if mount succeeded
+        setTimeout(removeLoader, 2000);
       } catch (e) {
         console.error("Payment initialization exception:", e);
         removeLoader();
       }
     }
 
-    function removeLoader() {
-      const loader = document.getElementById("checkout-loader");
-      if (loader) {
-        loader.style.display = "none";
-      }
-    }
-
     initGetPay();
-  });
+  }
+
+  // Ensure execution on first attempt whether DOM is already loaded or still loading
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+    window.addEventListener("load", start);
+  } else {
+    // Already loaded or interactive: trigger immediately!
+    start();
+  }
 })();
