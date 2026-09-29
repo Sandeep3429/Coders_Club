@@ -118,13 +118,13 @@
   // Separate config block for AFT flow — distinct papInfo + v3 bundle.
   // fundsSource and accountType are passed silently; never exposed in the UI.
   const aftConfig = {
-    PAP_INFO:     'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiODc4Nzk3OTc4Nzg3ODc5IiwidGlkIjoiMTAxMDM3NDgifQ==',
-    OPR_KEY:      '4fa4c6b9-3f91-43e5-9b4f-319f68187ba5',
-    INS_KEY:      '',
-    BASE_URL:     'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions',
-    STATUS_API:   'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status',
-    BUNDLE_URL:   'https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js',
-    BAI:          'PP',          // Business Application ID — Person to Person
+    PAP_INFO: 'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiNzcxMjMyNTYzNDIzMTIzIiwidGlkIjoiMTIzNTY3MTIifQ==',
+    OPR_KEY: '4fa4c6b9-3f91-43e5-9b4f-319f68187ba5',
+    INS_KEY: '',
+    BASE_URL: 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions',
+    STATUS_API: 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions/merchant-status',
+    BUNDLE_URL: 'https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js',
+    BAI: 'PP',          // Business Application ID — Person to Person
     FUNDS_SOURCE: '05',          // Sender funds source (hidden from UI)
     ACCOUNT_TYPE: '01',          // Recipient account type (hidden from UI)
 
@@ -140,7 +140,7 @@
       }
       return {
         successUrl: origin + pathPrefix + 'success.html?flow=aft&verified=true',
-        failUrl:    origin + pathPrefix + 'fail.html?flow=aft'
+        failUrl: origin + pathPrefix + 'fail.html?flow=aft'
       };
     }
   };
@@ -148,7 +148,7 @@
   Object.freeze(aftConfig);
 
   // Attach globally
-  global.GetPayConfig    = config;
+  global.GetPayConfig = config;
   global.GetPayAftConfig = aftConfig;
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = { GetPayConfig: config, GetPayAftConfig: aftConfig };

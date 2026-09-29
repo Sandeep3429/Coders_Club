@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -25,39 +26,45 @@
        Design Tokens — Corporate Light
     ───────────────────────────────────────── */
     :root {
-      --page-bg:       #f0f2f5;
-      --white:         #ffffff;
-      --card-border:   #e2e6ec;
-      --input-bg:      #f8f9fb;
-      --input-border:  #d1d9e6;
-      --input-focus:   #1a56db;
-      --text-h:        #0f172a;
-      --text-body:     #374151;
-      --text-muted:    #6b7280;
-      --text-label:    #4b5563;
-      --accent:        #1a56db;
-      --accent-dark:   #1344b4;
-      --accent-light:  #eff4ff;
+      --page-bg: #f0f2f5;
+      --white: #ffffff;
+      --card-border: #e2e6ec;
+      --input-bg: #f8f9fb;
+      --input-border: #d1d9e6;
+      --input-focus: #1a56db;
+      --text-h: #0f172a;
+      --text-body: #374151;
+      --text-muted: #6b7280;
+      --text-label: #4b5563;
+      --accent: #1a56db;
+      --accent-dark: #1344b4;
+      --accent-light: #eff4ff;
       --accent-border: #c7d7fd;
-      --divider:       #e5e7eb;
-      --success:       #059669;
-      --success-bg:    #ecfdf5;
-      --warn:          #d97706;
-      --warn-bg:       #fffbeb;
-      --danger:        #dc2626;
-      --shadow-sm:     0 1px 3px rgba(15,23,42,0.07), 0 1px 2px rgba(15,23,42,0.04);
-      --shadow-md:     0 4px 16px rgba(15,23,42,0.09), 0 1px 4px rgba(15,23,42,0.05);
-      --shadow-lg:     0 12px 40px rgba(15,23,42,0.12), 0 4px 12px rgba(15,23,42,0.06);
-      --radius-xs:     4px;
-      --radius-sm:     6px;
-      --radius-md:     10px;
-      --radius-lg:     16px;
-      --radius-xl:     20px;
-      --transition:    0.18s cubic-bezier(0.4,0,0.2,1);
+      --divider: #e5e7eb;
+      --success: #059669;
+      --success-bg: #ecfdf5;
+      --warn: #d97706;
+      --warn-bg: #fffbeb;
+      --danger: #dc2626;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.09), 0 1px 4px rgba(15, 23, 42, 0.05);
+      --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ─── Reset ─── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -90,10 +97,13 @@
     }
 
     .header-brand .logo-mark {
-      width: 34px; height: 34px;
+      width: 34px;
+      height: 34px;
       background: var(--accent);
       border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #fff;
       font-size: 16px;
       font-weight: 700;
@@ -124,7 +134,8 @@
 
     .header-pill::before {
       content: '';
-      width: 6px; height: 6px;
+      width: 6px;
+      height: 6px;
       background: var(--success);
       border-radius: 50%;
     }
@@ -169,7 +180,9 @@
       border-bottom: 1px solid var(--divider);
     }
 
-    .card-section:last-child { border-bottom: none; }
+    .card-section:last-child {
+      border-bottom: none;
+    }
 
     .section-header {
       display: flex;
@@ -179,9 +192,12 @@
     }
 
     .section-icon {
-      width: 30px; height: 30px;
+      width: 30px;
+      height: 30px;
       border-radius: var(--radius-xs);
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 13px;
       flex-shrink: 0;
     }
@@ -215,17 +231,32 @@
       gap: 16px;
     }
 
-    .field-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+    .field-grid.three-col {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
 
     @media (max-width: 640px) {
+
       .field-grid,
-      .field-grid.three-col { grid-template-columns: 1fr; }
-      .card-section { padding: 22px 18px; }
+      .field-grid.three-col {
+        grid-template-columns: 1fr;
+      }
+
+      .card-section {
+        padding: 22px 18px;
+      }
     }
 
     /* ─── Field ─── */
-    .field { display: flex; flex-direction: column; gap: 5px; }
-    .field.span-2 { grid-column: 1 / -1; }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field.span-2 {
+      grid-column: 1 / -1;
+    }
 
     .field label {
       font-size: 0.75rem;
@@ -249,13 +280,15 @@
       appearance: none;
     }
 
-    .field input::placeholder { color: #adb5bd; }
+    .field input::placeholder {
+      color: #adb5bd;
+    }
 
     .field input:focus,
     .field select:focus {
       border-color: var(--input-focus);
       background: var(--white);
-      box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
     }
 
     .field select {
@@ -273,8 +306,13 @@
       align-items: flex-end;
     }
 
-    .amount-row .field:first-child { flex: 0 0 130px; }
-    .amount-row .field:last-child  { flex: 1; }
+    .amount-row .field:first-child {
+      flex: 0 0 130px;
+    }
+
+    .amount-row .field:last-child {
+      flex: 1;
+    }
 
     /* ─── Transfer summary strip ─── */
     .summary-strip {
@@ -351,14 +389,14 @@
       justify-content: center;
       gap: 8px;
       transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      box-shadow: 0 2px 8px rgba(26,86,219,0.25);
+      box-shadow: 0 2px 8px rgba(26, 86, 219, 0.25);
       letter-spacing: -0.01em;
     }
 
     .btn-proceed:hover:not(:disabled) {
       background: var(--accent-dark);
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(26,86,219,0.3);
+      box-shadow: 0 6px 20px rgba(26, 86, 219, 0.3);
     }
 
     .btn-proceed:active:not(:disabled) {
@@ -395,7 +433,9 @@
       margin-top: 14px;
     }
 
-    .secure-note i { color: var(--success); }
+    .secure-note i {
+      color: var(--success);
+    }
 
     /* ─── SDK status bar (top of checkout section) ─── */
     .sdk-bar {
@@ -409,18 +449,38 @@
       margin-bottom: 16px;
     }
 
-    .sdk-bar.idle    { background: #f1f5f9; color: #64748b; }
-    .sdk-bar.ready   { background: var(--success-bg); color: var(--success); }
-    .sdk-bar.warn    { background: var(--warn-bg); color: var(--warn); }
+    .sdk-bar.idle {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .sdk-bar.ready {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .sdk-bar.warn {
+      background: var(--warn-bg);
+      color: var(--warn);
+    }
 
     /* ─── Responsive ─── */
     @media (max-width: 500px) {
-      .site-header { padding: 0 16px; }
-      .page-content { padding: 20px 12px 60px; }
-      .checkout-section { padding: 20px 18px 24px; }
+      .site-header {
+        padding: 0 16px;
+      }
+
+      .page-content {
+        padding: 20px 12px 60px;
+      }
+
+      .checkout-section {
+        padding: 20px 18px 24px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <!-- Anti-Clickjacking: JS frame-buster -->
@@ -486,7 +546,8 @@
           </div>
           <div class="field">
             <label for="sender-country">Country Code</label>
-            <input type="text" id="sender-country" value="NP" maxlength="2" style="text-transform:uppercase;" autocomplete="country" />
+            <input type="text" id="sender-country" value="NP" maxlength="2" style="text-transform:uppercase;"
+              autocomplete="country" />
           </div>
           <div class="field">
             <label for="sender-postal-code">Postal Code</label>
@@ -521,7 +582,8 @@
           </div>
           <div class="field">
             <label for="recipient-country">Country</label>
-            <input type="text" id="recipient-country" value="NP" maxlength="2" style="text-transform:uppercase;" autocomplete="country" />
+            <input type="text" id="recipient-country" value="NP" maxlength="2" style="text-transform:uppercase;"
+              autocomplete="country" />
           </div>
           <div class="field">
             <label for="recipient-postal-code">Postal Code</label>
@@ -611,22 +673,22 @@
        User edits only   : Sender/Recipient names & account fields + Amount
     ================================================================ */
 
-    const $   = id => document.getElementById(id);
-    const val = id => ($( id ).value || '').trim();
+    const $ = id => document.getElementById(id);
+    const val = id => ($(id).value || '').trim();
     const fmt = (n, cur) => cur + '\u00a0' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const absUrl = path => new URL(path, window.location.href).href;
 
     /* ── Hardcoded config (never shown in UI) ───────────────────── */
     const HARDCODED = {
-      environment:   'UAT',
-      papInfo:       'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiODc4Nzk3OTc4Nzg3ODc5IiwidGlkIjoiMTAxMDM3NDgifQ==',
-      oprKey:        '4fa4c6b9-3f91-43e5-9b4f-319f68187ba5',
-      insKey:        '',
-      baseUrl:       'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions',
-      bai:           'PP',        // Business Application ID — Person to Person
-      fundsSource:   '05',        // Sender funds source (hidden)
-      accountType:   '01',        // Recipient account type (hidden)
-      businessName:  'GetPay AFT',
+      environment: 'UAT',
+      papInfo: 'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiNzcxMjMyNTYzNDIzMTIzIiwidGlkIjoiMTIzNTY3MTIifQ==',
+      oprKey: '4fa4c6b9-3f91-43e5-9b4f-319f68187ba5',
+      insKey: '',
+      baseUrl: 'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions',
+      bai: 'PP',        // Business Application ID — Person to Person
+      fundsSource: '05',        // Sender funds source (hidden)
+      accountType: '01',        // Recipient account type (hidden)
+      businessName: 'GetPay AFT',
     };
 
     /* ── SDK readiness ──────────────────────────────────────────── */
@@ -650,11 +712,11 @@
     function updateSummary() {
       const sName = ((val('sender-first-name') + ' ' + val('sender-last-name')).trim()) || '\u2014';
       const rName = ((val('recipient-first-name') + ' ' + val('recipient-last-name')).trim()) || '\u2014';
-      const cur   = $('currency').value;
-      const amt   = parseFloat($('aft-amount').value) || 0;
-      $('sum-sender').textContent    = sName;
+      const cur = $('currency').value;
+      const amt = parseFloat($('aft-amount').value) || 0;
+      $('sum-sender').textContent = sName;
       $('sum-recipient').textContent = rName;
-      $('sum-total').textContent     = fmt(amt, cur);
+      $('sum-total').textContent = fmt(amt, cur);
     }
 
     /* ── Validation ─────────────────────────────────────────────── */
@@ -668,9 +730,9 @@
 
     function checkValidity() {
       updateSummary();
-      const amount    = parseFloat($('aft-amount').value) || 0;
+      const amount = parseFloat($('aft-amount').value) || 0;
       const allFilled = REQUIRED.every(id => val(id) !== '') && amount > 0;
-      $('checkout-btn').disabled       = !allFilled;
+      $('checkout-btn').disabled = !allFilled;
       $('checkout-hint').style.display = allFilled ? 'none' : 'flex';
     }
 
@@ -687,19 +749,19 @@
       return '<div style="font-family:Inter,sans-serif;padding:20px 0">' +
         '<div style="font-size:18px;color:#1a56db;font-weight:700;margin-bottom:14px">Account Fund Transfer</div>' +
         '<div style="font-size:13px;color:#374151;margin-bottom:8px"><b>From:</b> ' + val('sender-first-name') + ' ' + val('sender-last-name') +
-          ' &nbsp;&middot;&nbsp; Acct: ' + val('sender-account-number') + '</div>' +
+        ' &nbsp;&middot;&nbsp; Acct: ' + val('sender-account-number') + '</div>' +
         '<div style="font-size:13px;color:#374151;margin-bottom:8px"><b>To:</b> ' + val('recipient-first-name') + ' ' + val('recipient-last-name') +
-          ' &nbsp;&middot;&nbsp; Acct: ' + val('recipient-account-id') + '</div>' +
+        ' &nbsp;&middot;&nbsp; Acct: ' + val('recipient-account-id') + '</div>' +
         '<div style="display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;margin-top:14px;padding-top:12px">' +
-          '<span style="font-size:13px;font-weight:600">Total</span>' +
-          '<span style="font-size:15px;font-weight:700;color:#1a56db">' + fmt(amt, cur) + '</span>' +
+        '<span style="font-size:13px;font-weight:600">Total</span>' +
+        '<span style="font-size:15px;font-weight:700;color:#1a56db">' + fmt(amt, cur) + '</span>' +
         '</div></div>';
     }
 
     /* ── Reset button ───────────────────────────────────────────── */
     function resetBtn() {
-      $('checkout-btn').disabled  = false;
-      $('btn-text').textContent   = 'Initiate Transfer';
+      $('checkout-btn').disabled = false;
+      $('btn-text').textContent = 'Initiate Transfer';
     }
 
     /* ── Checkout handler ───────────────────────────────────────── */
@@ -709,13 +771,13 @@
         return;
       }
 
-      this.disabled             = true;
+      this.disabled = true;
       $('btn-text').textContent = 'Initializing\u2026';
 
-      const currency        = $('currency').value;
-      const amount          = parseFloat($('aft-amount').value) || 0;
+      const currency = $('currency').value;
+      const amount = parseFloat($('aft-amount').value) || 0;
       const clientRequestId = 'AFT-' + Date.now();
-      const orderInfoHtml   = buildOrderInfoHtml();
+      const orderInfoHtml = buildOrderInfoHtml();
 
       /*
        * SECURITY: Store AFT display context in sessionStorage only.
@@ -727,26 +789,26 @@
        */
       const aftCtx = {
         clientRequestId,
-        senderFirst:    val('sender-first-name'),
-        senderLast:     val('sender-last-name'),
-        senderName:     (val('sender-first-name') + ' ' + val('sender-last-name')).trim(),
-        senderAcct:     val('sender-account-number'),
-        senderPhone:    val('sender-phone'),
-        senderAddress:  val('sender-address'),
-        senderCity:     val('sender-city'),
+        senderFirst: val('sender-first-name'),
+        senderLast: val('sender-last-name'),
+        senderName: (val('sender-first-name') + ' ' + val('sender-last-name')).trim(),
+        senderAcct: val('sender-account-number'),
+        senderPhone: val('sender-phone'),
+        senderAddress: val('sender-address'),
+        senderCity: val('sender-city'),
         senderAdminArea: val('sender-admin-area'),
-        senderCountry:  val('sender-country'),
-        senderPostal:   val('sender-postal-code'),
-        recipientFirst:   val('recipient-first-name'),
-        recipientLast:    val('recipient-last-name'),
-        recipientName:    (val('recipient-first-name') + ' ' + val('recipient-last-name')).trim(),
-        recipientAcct:    val('recipient-account-id'),
-        recipientCity:    val('recipient-city'),
+        senderCountry: val('sender-country'),
+        senderPostal: val('sender-postal-code'),
+        recipientFirst: val('recipient-first-name'),
+        recipientLast: val('recipient-last-name'),
+        recipientName: (val('recipient-first-name') + ' ' + val('recipient-last-name')).trim(),
+        recipientAcct: val('recipient-account-id'),
+        recipientCity: val('recipient-city'),
         recipientCountry: val('recipient-country'),
-        recipientPostal:  val('recipient-postal-code'),
+        recipientPostal: val('recipient-postal-code'),
         amount,
         currency,
-        bai:           HARDCODED.bai,
+        bai: HARDCODED.bai,
         displayAmount: fmt(amount, currency),
         orderInfoHtml
       };
@@ -755,78 +817,78 @@
       const options = {
         /* ── Identity ── */
         clientRequestId,
-        papInfo:  HARDCODED.papInfo,
-        oprKey:   HARDCODED.oprKey,
-        insKey:   HARDCODED.insKey,
+        papInfo: HARDCODED.papInfo,
+        oprKey: HARDCODED.oprKey,
+        insKey: HARDCODED.insKey,
 
         /* ── Commerce ── */
-        price:        amount,
+        price: amount,
         currency,
         businessName: HARDCODED.businessName,
-        imageUrl:     absUrl('img/java.png'),
+        imageUrl: absUrl('img/java.png'),
 
         /* ── URLs ── */
-        baseUrl:       HARDCODED.baseUrl,
+        baseUrl: HARDCODED.baseUrl,
         websiteDomain: window.location.origin,
         callbackUrl: {
           successUrl: absUrl('payment.html') + '?flow=aft',
-          failUrl:    absUrl('fail.html')    + '?flow=aft'
+          failUrl: absUrl('fail.html') + '?flow=aft'
         },
 
         /* ── User stub ── */
         userInfo: {
-          name:    aftCtx.senderName,
-          email:   '',
-          state:   aftCtx.senderAdminArea,
+          name: aftCtx.senderName,
+          email: '',
+          state: aftCtx.senderAdminArea,
           country: aftCtx.senderCountry,
           zipcode: aftCtx.senderPostal,
-          city:    aftCtx.senderCity,
+          city: aftCtx.senderCity,
           address: aftCtx.senderAddress
         },
         prefill: { name: false, email: false, state: false, city: false, address: false },
 
         /* ── AFT flags ── */
-        aft:         true,
+        aft: true,
         paymentType: 'ACCOUNT_FUND_TRANSFER',
-        BAI:         [HARDCODED.bai],
+        BAI: [HARDCODED.bai],
 
         /* ── Sender (fundsSource passed silently in background) ── */
         senderInformation: {
           account: {
-            number:      aftCtx.senderAcct,
+            number: aftCtx.senderAcct,
             fundsSource: HARDCODED.fundsSource
           },
-          firstName:            aftCtx.senderFirst,
-          lastName:             aftCtx.senderLast,
-          postalCode:           aftCtx.senderPostal,
-          phoneNumber:          aftCtx.senderPhone,
-          address1:             aftCtx.senderAddress,
-          locality:             aftCtx.senderCity,
-          countryCode:          aftCtx.senderCountry,
+          firstName: aftCtx.senderFirst,
+          lastName: aftCtx.senderLast,
+          postalCode: aftCtx.senderPostal,
+          phoneNumber: aftCtx.senderPhone,
+          address1: aftCtx.senderAddress,
+          locality: aftCtx.senderCity,
+          countryCode: aftCtx.senderCountry,
           identificationNumber: '',
-          personalIdType:       '',
-          administrativeArea:   aftCtx.senderAdminArea,
-          type:                 'individual',
-          name:                 aftCtx.senderName,
-          referenceNumber:      'SENDER-REF-' + Date.now()
+          personalIdType: '',
+          administrativeArea: aftCtx.senderAdminArea,
+          type: 'individual',
+          name: aftCtx.senderName,
+          referenceNumber: 'SENDER-REF-' + Date.now()
         },
 
         /* ── Recipient (accountType passed silently in background) ── */
         recipientInformation: {
-          accountId:   aftCtx.recipientAcct,
+          accountId: aftCtx.recipientAcct,
           accountType: HARDCODED.accountType,
-          firstName:   aftCtx.recipientFirst,
-          lastName:    aftCtx.recipientLast,
-          locality:    aftCtx.recipientCity,
-          country:     aftCtx.recipientCountry,
-          postalCode:  aftCtx.recipientPostal
+          firstName: aftCtx.recipientFirst,
+          lastName: aftCtx.recipientLast,
+          locality: aftCtx.recipientCity,
+          country: aftCtx.recipientCountry,
+          postalCode: aftCtx.recipientPostal
         },
 
         /* ── UI ── */
         orderInformationUI: orderInfoHtml,
-        orderInformation:   {
-          orderId:     clientRequestId,
-          orderDate:   new Date().toISOString().split('T')[0],
+        orderInformation: {
+          orderId: clientRequestId,
+          orderDate: new Date().toISOString().split('T')[0],
           orderStatus: ''
         },
         themeColor: '#1a56db',
@@ -858,4 +920,5 @@
     });
   </script>
 </body>
+
 </html>
