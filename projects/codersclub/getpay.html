@@ -2,129 +2,290 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
-  <title>GetPay Demo – Choose Transaction Type</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>GetPay – Select Transaction Type</title>
+  <meta name="robots" content="noindex, nofollow" />
 
-  <!-- External Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Anti-Clickjacking -->
+  <script>if (window.top !== window.self) window.top.location = window.self.location.href;</script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Segregated Stylesheet -->
-  <link rel="stylesheet" href="css/getpay.css">
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <!-- NCHL GetPay SDK Bundle -->
-  <script defer src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js"></script>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0a0f1e 0%, #111827 60%, #0d1b2a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      -webkit-font-smoothing: antialiased;
+      color: #f1f5f9;
+    }
+
+    /* ── Brand header ── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    .brand-logo {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #5662ff, #7b85ff);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; font-weight: 800; color: #fff;
+      box-shadow: 0 4px 16px rgba(86,98,255,0.4);
+      letter-spacing: -1px;
+    }
+
+    .brand-text {
+      line-height: 1;
+    }
+
+    .brand-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #475569;
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    /* ── Heading block ── */
+    .heading {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .heading h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #f1f5f9;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .heading p {
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    /* ── Cards grid ── */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    @media (max-width: 460px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    /* ── Individual card ── */
+    .txn-card {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 28px 20px 24px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ECOM hover & active */
+    .txn-card.ecom:hover,
+    .txn-card.ecom:focus-visible {
+      border-color: #5662ff;
+      background: rgba(86,98,255,0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(86,98,255,0.25), 0 0 0 1px rgba(86,98,255,0.3);
+    }
+
+    .txn-card.ecom:active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(86,98,255,0.2);
+    }
+
+    /* AFT hover & active */
+    .txn-card.aft:hover,
+    .txn-card.aft:focus-visible {
+      border-color: #f59e0b;
+      background: rgba(245,158,11,0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(245,158,11,0.2), 0 0 0 1px rgba(245,158,11,0.3);
+    }
+
+    .txn-card.aft:active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(245,158,11,0.15);
+    }
+
+    /* ── Icon circle ── */
+    .card-icon {
+      width: 58px; height: 58px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .txn-card:hover .card-icon { transform: scale(1.07); }
+
+    .ecom .card-icon {
+      background: rgba(86,98,255,0.18);
+      color: #818cf8;
+    }
+
+    .aft .card-icon {
+      background: rgba(245,158,11,0.15);
+      color: #f59e0b;
+    }
+
+    /* ── Card text ── */
+    .card-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: 0.775rem;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    /* ── Arrow badge ── */
+    .card-arrow {
+      margin-top: auto;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .ecom .card-arrow  { background: rgba(86,98,255,0.14);  color: #818cf8; }
+    .aft  .card-arrow  { background: rgba(245,158,11,0.12); color: #f59e0b; }
+
+    .txn-card:hover .card-arrow { transform: translateX(3px); }
+
+    /* ── Badge ── */
+    .card-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    .ecom .card-badge { background: rgba(86,98,255,0.18); color: #818cf8; }
+    .aft  .card-badge { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+    /* ── Secure footer ── */
+    .secure-bar {
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: #334155;
+    }
+
+    .secure-bar i { color: #10b981; }
+  </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header">
-      <h1 id="header-title">GetPay Demo</h1>
-      <p id="header-subtitle">Choose a transaction type to continue</p>
-    </div>
-
-    <div class="content">
-
-      <!-- ── Step 1: Transaction Type Selector ── -->
-      <div id="type-selector">
-        <p class="step-label">SELECT TRANSACTION TYPE</p>
-        <div class="txn-type-grid">
-
-          <button class="txn-type-btn active" id="btn-ecom" onclick="selectType('ecom')">
-            <span class="txn-type-icon"><i class="fas fa-shopping-cart"></i></span>
-            <span class="txn-type-name">ECOM Purchase</span>
-            <span class="txn-type-desc">Course enrollment &amp; checkout</span>
-          </button>
-
-          <button class="txn-type-btn" id="btn-aft" onclick="selectType('aft')">
-            <span class="txn-type-icon aft-icon"><i class="fas fa-paper-plane"></i></span>
-            <span class="txn-type-name">Account Fund Transfer</span>
-            <span class="txn-type-desc">Send funds to a recipient account</span>
-          </button>
-
-        </div>
-      </div>
-
-      <!-- ── ECOM: Course Card + Pay Button ── -->
-      <div id="ecom-block">
-        <div class="course-card">
-          <img id="course-img" src="img/java.png" alt="Course Image">
-          <div class="course-info">
-            <h3 id="course-name">JAVA FULL COURSE</h3>
-            <div class="price" id="course-price">Rs 4,500.55</div>
-          </div>
-        </div>
-
-        <!-- Hidden checkout container per GetPay specification -->
-        <div id="checkout" hidden></div>
-
-        <button id="checkout-btn" class="btn-pay">
-          <i class="fas fa-lock"></i>
-          <span id="btn-text">Proceed to Pay Securely</span>
-        </button>
-
-        <p class="secure-note">
-          <i class="fas fa-shield-alt"></i>
-          Secured by NCHL GetPay &bull; 256-bit SSL Encryption
-        </p>
-
-        <div id="integration-status">Waiting for checkout&hellip;</div>
-      </div>
-
-      <!-- ── AFT: Callout Card + Navigate Button ── -->
-      <div id="aft-block" style="display:none;">
-        <div class="aft-info-card">
-          <div class="aft-info-icon"><i class="fas fa-paper-plane"></i></div>
-          <div class="aft-info-body">
-            <div class="aft-info-title">Account Fund Transfer</div>
-            <div class="aft-info-sub">Securely transfer funds directly to a recipient account using NCHL GetPay AFT.</div>
-          </div>
-        </div>
-
-        <div class="aft-features">
-          <div class="aft-feature"><i class="fas fa-check-circle"></i> Sender &amp; recipient account details</div>
-          <div class="aft-feature"><i class="fas fa-check-circle"></i> Custom transfer amount in USD</div>
-          <div class="aft-feature"><i class="fas fa-check-circle"></i> Instant verification via GetPay v3 SDK</div>
-          <div class="aft-feature"><i class="fas fa-shield-halved"></i> 256-bit SSL &bull; Anti-clickjacking protected</div>
-        </div>
-
-        <button class="btn-pay btn-aft-go" onclick="window.location.href='aft.html'">
-          <i class="fas fa-arrow-right"></i>
-          Start Transfer
-        </button>
-
-        <p class="secure-note">
-          <i class="fas fa-shield-alt"></i>
-          Secured by NCHL GetPay AFT &bull; 256-bit SSL Encryption
-        </p>
-      </div>
-
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-logo">GP</div>
+    <div class="brand-text">
+      <div class="brand-name">GetPay</div>
+      <div class="brand-sub">NCHL Secure Gateway</div>
     </div>
   </div>
 
-  <script>
-    function selectType(type) {
-      var ecomBtn  = document.getElementById('btn-ecom');
-      var aftBtn   = document.getElementById('btn-aft');
-      var ecomBlk  = document.getElementById('ecom-block');
-      var aftBlk   = document.getElementById('aft-block');
+  <!-- Heading -->
+  <div class="heading">
+    <h1>Select Transaction Type</h1>
+    <p>Choose how you'd like to proceed</p>
+  </div>
 
-      if (type === 'aft') {
-        aftBtn.classList.add('active');
-        ecomBtn.classList.remove('active');
-        ecomBlk.style.display = 'none';
-        aftBlk.style.display  = 'block';
-      } else {
-        ecomBtn.classList.add('active');
-        aftBtn.classList.remove('active');
-        ecomBlk.style.display = 'block';
-        aftBlk.style.display  = 'none';
-      }
-    }
-  </script>
+  <!-- Transaction Type Cards -->
+  <div class="cards">
 
-  <!-- Segregated Configuration & Checkout Logic -->
-  <script src="js/getpay-config.js"></script>
-  <script src="js/getpay-checkout.js"></script>
+    <!-- ECOM Purchase -->
+    <a class="txn-card ecom" href="payment.html?courseId=oracle-plsql" id="ecom-card">
+      <span class="card-badge">ECOM</span>
+      <div class="card-icon">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div>
+        <div class="card-label">ECOM Purchase</div>
+        <div class="card-desc">Course enrollment &amp; secure card checkout</div>
+      </div>
+      <div class="card-arrow">
+        <i class="fas fa-arrow-right"></i>
+      </div>
+    </a>
+
+    <!-- AFT -->
+    <a class="txn-card aft" href="aft.html" id="aft-card">
+      <span class="card-badge">AFT</span>
+      <div class="card-icon">
+        <i class="fas fa-paper-plane"></i>
+      </div>
+      <div>
+        <div class="card-label">Account Fund Transfer</div>
+        <div class="card-desc">Send funds directly to a recipient account</div>
+      </div>
+      <div class="card-arrow">
+        <i class="fas fa-arrow-right"></i>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Secure note -->
+  <div class="secure-bar">
+    <i class="fas fa-shield-halved"></i>
+    Secured by NCHL GetPay &middot; 256-bit SSL Encryption
+  </div>
+
 </body>
 </html>
