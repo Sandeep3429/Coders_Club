@@ -82,13 +82,13 @@
         userInfo: {
           name:    ctx.senderName      || '',
           email:   '',
-          state:   ctx.senderAdminArea || '',
-          country: ctx.senderCountry   || 'NP',
-          zipcode: ctx.senderPostal    || '',
-          city:    ctx.senderCity      || '',
-          address: ctx.senderAddress   || ''
+          state:   '',
+          country: '',
+          zipcode: '',
+          city:    '',
+          address: ''
         },
-        prefill: { name: false, email: false, state: false, city: false, address: false },
+        prefill: { state: false, city: false, address: false, zipcode: false, country: false },
 
         // AFT-specific flags
         aft:         true,
@@ -112,7 +112,7 @@
           administrativeArea:   ctx.senderAdminArea || '',
           type:                 'individual',
           name:                 ctx.senderName      || '',
-          referenceNumber:      'SENDER-REF-' + Date.now()
+          referenceNumber:      'SENDER-REF-001' // Strictly <= 19 chars required by Cybersource
         },
 
         recipientInformation: {
@@ -127,7 +127,7 @@
 
         orderInformationUI: ctx.orderInfoHtml || '',
         orderInformation: {
-          orderId:     ctx.clientRequestId || ('AFT-' + Date.now()),
+          orderId:     'order_' + Date.now().toString().slice(-6),
           orderDate:   new Date().toISOString().split('T')[0],
           orderStatus: ''
         },

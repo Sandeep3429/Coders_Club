@@ -855,17 +855,17 @@
           failUrl: absUrl('fail.html') + '?flow=aft'
         },
 
-        /* ── User stub ── */
+        /* ── User stub (AFT fields reside in senderInformation) ── */
         userInfo: {
-          name: aftCtx.senderName,
+          name: '',
           email: '',
-          state: aftCtx.senderAdminArea,
-          country: aftCtx.senderCountry,
-          zipcode: aftCtx.senderPostal,
-          city: aftCtx.senderCity,
-          address: aftCtx.senderAddress
+          state: '',
+          country: '',
+          zipcode: '',
+          city: '',
+          address: ''
         },
-        prefill: { name: false, email: false, state: false, city: false, address: false },
+        prefill: { state: false, city: false, address: false, zipcode: false, country: false },
 
         /* ── AFT flags ── */
         aft: true,
@@ -890,7 +890,7 @@
           administrativeArea: aftCtx.senderAdminArea,
           type: 'individual',
           name: aftCtx.senderName,
-          referenceNumber: 'SENDER-REF-' + Date.now()
+          referenceNumber: 'SENDER-REF-001' // Strictly <= 19 chars required by Cybersource
         },
 
         /* ── Recipient (accountType passed silently in background) ── */
@@ -907,7 +907,7 @@
         /* ── UI ── */
         orderInformationUI: orderInfoHtml,
         orderInformation: {
-          orderId: clientRequestId,
+          orderId: 'order_' + Date.now().toString().slice(-6),
           orderDate: new Date().toISOString().split('T')[0],
           orderStatus: ''
         },
