@@ -1,29 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Failed</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; border-top: 6px solid #dc3545; }
-        .icon { font-size: 60px; color: #dc3545; margin-bottom: 20px; }
-        .reason { color: #666; font-style: italic; margin-bottom: 20px; }
-        .btn { display: inline-block; background-color: #dc3545; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction Failed | GetPay</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Anti-clickjacking -->
+  <script>if (window.top !== window.self) window.top.location = window.self.location.href;</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(15,23,42,0.1), 0 2px 8px rgba(15,23,42,0.06);
+      max-width: 460px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ── Fail stripe ── */
+    .top-stripe {
+      height: 5px;
+      background: linear-gradient(90deg, #dc2626, #f87171);
+    }
+
+    .card-body { padding: 40px 36px 36px; text-align: center; }
+
+    /* ── Icon ── */
+    .icon-wrap {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #fef2f2;
+      border: 2px solid #fecaca;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 28px;
+      color: #dc2626;
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── Reason box ── */
+    .reason-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 0.875rem;
+      color: #b91c1c;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .reason-box i { margin-top: 2px; flex-shrink: 0; }
+
+    /* ── Tips ── */
+    .tips {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .tips .tip-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+
+    .tips ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tips ul li {
+      font-size: 0.825rem;
+      color: #374151;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.45;
+    }
+
+    .tips ul li i {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 20px;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.18s, transform 0.18s;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .btn-primary-action:hover { background: #1344b4; transform: translateY(-1px); }
+
+    .btn-ghost {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 11px 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      background: transparent;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.18s, border-color 0.18s;
+    }
+
+    .btn-ghost:hover { background: #f9fafb; border-color: #9ca3af; }
+
+    /* ── Reason label map ── */
+    /* ── Secure note ── */
+    .secure-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.73rem;
+      color: #9ca3af;
+      margin-top: 20px;
+    }
+
+    .secure-note i { color: #059669; }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <div class="icon">❌</div>
-        <h2>Payment Failed</h2>
-        <p>We couldn't process your transaction.</p>
-        <p class="reason" id="failReason"></p>
-        <a href="getpay.html" class="btn">Try Again</a>
+
+  <div class="card">
+    <div class="top-stripe"></div>
+    <div class="card-body">
+
+      <div class="icon-wrap">
+        <i class="fas fa-xmark"></i>
+      </div>
+
+      <h1 id="main-title">Transaction Failed</h1>
+      <p class="subtitle" id="main-subtitle">We were unable to process your request.</p>
+
+      <div class="reason-box" id="reason-box">
+        <i class="fas fa-triangle-exclamation"></i>
+        <span id="reason-text">The transaction was declined or cancelled.</span>
+      </div>
+
+      <div class="tips" id="tips-block">
+        <div class="tip-title">What you can try</div>
+        <ul id="tips-list">
+          <!-- populated by JS -->
+        </ul>
+      </div>
+
+      <a href="#" class="btn-primary-action" id="retry-btn">
+        <i class="fas fa-rotate-right"></i>
+        <span id="retry-text">Try Again</span>
+      </a>
+
+      <a href="https://sandeepkumarjha.com.np" class="btn-ghost" id="home-btn">
+        <i class="fas fa-house"></i>
+        <span>Go to Homepage</span>
+      </a>
+
+      <div class="secure-note">
+        <i class="fas fa-shield-halved"></i>
+        Secured by NCHL GetPay &middot; 256-bit SSL
+      </div>
     </div>
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const reason = params.get('reason') || "Transaction was declined or cancelled.";
-        document.getElementById('failReason').innerText = "Reason: " + reason;
-    </script>
+  </div>
+
+  <script>
+    const params  = new URLSearchParams(window.location.search);
+    const isAft   = params.get('flow') === 'aft';
+    const rawReason = (params.get('reason') || '').toLowerCase();
+
+    // ── Reason → human-readable message ──────────────────────────
+    const REASON_MAP = {
+      'amount_mismatch':     'The verified amount did not match the requested transfer amount.',
+      'amount':              'The verified amount did not match the expected payment amount.',
+      'verification_error':  'We could not verify your transaction with the payment server.',
+      'verification':        'We could not verify your transaction with the payment server.',
+      'cancelled':           'The transaction was cancelled before completion.',
+      'declined':            'The transaction was declined by the issuing institution.'
+    };
+
+    const reasonText = REASON_MAP[rawReason]
+      || (rawReason ? decodeURIComponent(rawReason) : null)
+      || (isAft ? 'The fund transfer could not be processed.' : 'The payment could not be processed.');
+
+    document.getElementById('reason-text').textContent = reasonText;
+
+    // ── Tips ──────────────────────────────────────────────────────
+    const ECOM_TIPS = [
+      'Ensure your card has sufficient funds and is enabled for online transactions.',
+      'Check that your card details were entered correctly.',
+      'Try a different payment method or card.',
+      'Contact your bank if the issue persists.'
+    ];
+
+    const AFT_TIPS = [
+      'Verify the sender and recipient account numbers are correct.',
+      'Ensure the transfer amount is within your account limits.',
+      'Check that the sender account has sufficient balance.',
+      'Contact your bank if the transaction keeps failing.'
+    ];
+
+    const tips = isAft ? AFT_TIPS : ECOM_TIPS;
+    document.getElementById('tips-list').innerHTML = tips
+      .map(t => '<li><i class="fas fa-circle"></i><span>' + t + '</span></li>')
+      .join('');
+
+    // ── Flow-specific wording ─────────────────────────────────────
+    if (isAft) {
+      document.getElementById('main-title').textContent    = 'Transfer Failed';
+      document.getElementById('main-subtitle').textContent = 'Your account fund transfer could not be completed.';
+      document.getElementById('retry-text').textContent    = 'Retry Transfer';
+      document.getElementById('retry-btn').href            = 'aft.html';
+    } else {
+      document.getElementById('retry-btn').href = 'getpay.html';
+    }
+
+    // Clean up any leftover AFT session data
+    if (!isAft) sessionStorage.removeItem('aft_ctx');
+  </script>
 </body>
 </html>

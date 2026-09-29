@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Anti-Clickjacking: CSP frame-ancestors -->
+  <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none';" />
+
+  <title>Account Fund Transfer | GetPay</title>
+  <meta name="description" content="Initiate a secure Account Fund Transfer via NCHL GetPay." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- GetPay Bundle SDK — AFT -->
+  <script id="bundle-script" defer src="https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js"></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       Design Tokens — Corporate Light
+    ───────────────────────────────────────── */
+    :root {
+      --page-bg:       #f0f2f5;
+      --white:         #ffffff;
+      --card-border:   #e2e6ec;
+      --input-bg:      #f8f9fb;
+      --input-border:  #d1d9e6;
+      --input-focus:   #1a56db;
+      --text-h:        #0f172a;
+      --text-body:     #374151;
+      --text-muted:    #6b7280;
+      --text-label:    #4b5563;
+      --accent:        #1a56db;
+      --accent-dark:   #1344b4;
+      --accent-light:  #eff4ff;
+      --accent-border: #c7d7fd;
+      --divider:       #e5e7eb;
+      --success:       #059669;
+      --success-bg:    #ecfdf5;
+      --warn:          #d97706;
+      --warn-bg:       #fffbeb;
+      --danger:        #dc2626;
+      --shadow-sm:     0 1px 3px rgba(15,23,42,0.07), 0 1px 2px rgba(15,23,42,0.04);
+      --shadow-md:     0 4px 16px rgba(15,23,42,0.09), 0 1px 4px rgba(15,23,42,0.05);
+      --shadow-lg:     0 12px 40px rgba(15,23,42,0.12), 0 4px 12px rgba(15,23,42,0.06);
+      --radius-xs:     4px;
+      --radius-sm:     6px;
+      --radius-md:     10px;
+      --radius-lg:     16px;
+      --radius-xl:     20px;
+      --transition:    0.18s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--page-bg);
+      color: var(--text-body);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Top header bar ─── */
+    .site-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .header-brand .logo-mark {
+      width: 34px; height: 34px;
+      background: var(--accent);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .header-brand .brand-text {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-h);
+      letter-spacing: -0.01em;
+    }
+
+    .header-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--accent-light);
+      border: 1px solid var(--accent-border);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.03em;
+    }
+
+    .header-pill::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+    }
+
+    /* ─── Page content ─── */
+    .page-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 36px 20px 80px;
+    }
+
+    /* ─── Page title block ─── */
+    .page-title-block {
+      margin-bottom: 28px;
+    }
+
+    .page-title-block h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-h);
+      letter-spacing: -0.025em;
+      margin-bottom: 4px;
+    }
+
+    .page-title-block p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Transfer card (single unified card) ─── */
+    .transfer-card {
+      background: var(--white);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    /* ─── Card inner sections ─── */
+    .card-section {
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .card-section:last-child { border-bottom: none; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .section-icon {
+      width: 30px; height: 30px;
+      border-radius: var(--radius-xs);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .section-icon.sender-icon {
+      background: #eff4ff;
+      color: var(--accent);
+    }
+
+    .section-icon.recipient-icon {
+      background: #f0fdf4;
+      color: var(--success);
+    }
+
+    .section-icon.amount-icon {
+      background: #fffbeb;
+      color: var(--warn);
+    }
+
+    .section-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-h);
+      letter-spacing: -0.01em;
+    }
+
+    /* ─── Field grid ─── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+
+    @media (max-width: 640px) {
+      .field-grid,
+      .field-grid.three-col { grid-template-columns: 1fr; }
+      .card-section { padding: 22px 18px; }
+    }
+
+    /* ─── Field ─── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.span-2 { grid-column: 1 / -1; }
+
+    .field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-label);
+      letter-spacing: 0.01em;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-h);
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+      appearance: none;
+    }
+
+    .field input::placeholder { color: #adb5bd; }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--input-focus);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+    }
+
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 11px center;
+      padding-right: 32px;
+      cursor: pointer;
+    }
+
+    /* ─── Amount section ─── */
+    .amount-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .amount-row .field:first-child { flex: 0 0 130px; }
+    .amount-row .field:last-child  { flex: 1; }
+
+    /* ─── Transfer summary strip ─── */
+    .summary-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--accent-light);
+      border: 1px solid var(--accent-border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .summary-strip .route {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-h);
+    }
+
+    .summary-strip .route .arrow {
+      color: var(--accent);
+      font-size: 0.75rem;
+    }
+
+    .summary-strip .route .name {
+      font-weight: 600;
+    }
+
+    .summary-strip .total-label {
+      text-align: right;
+    }
+
+    .summary-strip .total-label .lbl {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .summary-strip .total-label .amount {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+
+    /* ─── Checkout section ─── */
+    .checkout-section {
+      padding: 24px 32px 28px;
+      background: #fafbfc;
+    }
+
+    /* ─── Proceed button ─── */
+    .btn-proceed {
+      width: 100%;
+      padding: 13px 20px;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 2px 8px rgba(26,86,219,0.25);
+      letter-spacing: -0.01em;
+    }
+
+    .btn-proceed:hover:not(:disabled) {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(26,86,219,0.3);
+    }
+
+    .btn-proceed:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-proceed:disabled {
+      background: #c7d2e7;
+      color: #8fa3c7;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* ─── Hint ─── */
+    .hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 0.775rem;
+      color: var(--warn);
+      margin-top: 10px;
+    }
+
+    /* ─── Secure note ─── */
+    .secure-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 14px;
+    }
+
+    .secure-note i { color: var(--success); }
+
+    /* ─── SDK status bar (top of checkout section) ─── */
+    .sdk-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: var(--radius-xs);
+      margin-bottom: 16px;
+    }
+
+    .sdk-bar.idle    { background: #f1f5f9; color: #64748b; }
+    .sdk-bar.ready   { background: var(--success-bg); color: var(--success); }
+    .sdk-bar.warn    { background: var(--warn-bg); color: var(--warn); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 500px) {
+      .site-header { padding: 0 16px; }
+      .page-content { padding: 20px 12px 60px; }
+      .checkout-section { padding: 20px 18px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Anti-Clickjacking: JS frame-buster -->
+  <script>if (window.self !== window.top) window.top.location = window.self.location;</script>
+
+  <!-- Hidden GetPay SDK mount -->
+  <div id="checkout" hidden></div>
+
+  <!-- ── Header ── -->
+  <header class="site-header">
+    <div class="header-brand">
+      <div class="logo-mark">GP</div>
+      <span class="brand-text">GetPay</span>
+    </div>
+    <div class="header-pill">AFT &nbsp;·&nbsp; Account Fund Transfer</div>
+  </header>
+
+  <!-- ── Page ── -->
+  <main class="page-content">
+
+    <div class="page-title-block">
+      <h1>Account Fund Transfer</h1>
+      <p>Enter sender &amp; recipient details and the amount to initiate a secure fund transfer.</p>
+    </div>
+
+    <div class="transfer-card">
+
+      <!-- ── Sender ── -->
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-icon sender-icon"><i class="fas fa-arrow-up-from-bracket"></i></div>
+          <span class="section-title">Sender Information</span>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="sender-first-name">First Name</label>
+            <input type="text" id="sender-first-name" value="Jane" autocomplete="given-name" />
+          </div>
+          <div class="field">
+            <label for="sender-last-name">Last Name</label>
+            <input type="text" id="sender-last-name" value="Sender" autocomplete="family-name" />
+          </div>
+          <div class="field">
+            <label for="sender-account-number">Account Number</label>
+            <input type="text" id="sender-account-number" value="4805070000000002" />
+          </div>
+          <div class="field">
+            <label for="sender-phone">Phone Number</label>
+            <input type="tel" id="sender-phone" value="+9779800000001" autocomplete="tel" />
+          </div>
+          <div class="field">
+            <label for="sender-address">Address</label>
+            <input type="text" id="sender-address" value="456 Sender St" autocomplete="street-address" />
+          </div>
+          <div class="field">
+            <label for="sender-city">City</label>
+            <input type="text" id="sender-city" value="Kathmandu" autocomplete="address-level2" />
+          </div>
+          <div class="field">
+            <label for="sender-admin-area">State / Province</label>
+            <input type="text" id="sender-admin-area" value="KA" autocomplete="address-level1" />
+          </div>
+          <div class="field">
+            <label for="sender-country">Country Code</label>
+            <input type="text" id="sender-country" value="NP" maxlength="2" style="text-transform:uppercase;" autocomplete="country" />
+          </div>
+          <div class="field">
+            <label for="sender-postal-code">Postal Code</label>
+            <input type="text" id="sender-postal-code" value="44600" autocomplete="postal-code" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Recipient ── -->
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-icon recipient-icon"><i class="fas fa-arrow-down-to-bracket"></i></div>
+          <span class="section-title">Recipient Information</span>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="recipient-first-name">First Name</label>
+            <input type="text" id="recipient-first-name" value="John" autocomplete="given-name" />
+          </div>
+          <div class="field">
+            <label for="recipient-last-name">Last Name</label>
+            <input type="text" id="recipient-last-name" value="Doe" autocomplete="family-name" />
+          </div>
+          <div class="field">
+            <label for="recipient-account-id">Account ID</label>
+            <input type="text" id="recipient-account-id" value="5555555555554444" />
+          </div>
+          <div class="field">
+            <label for="recipient-city">City</label>
+            <input type="text" id="recipient-city" value="Kathmandu" autocomplete="address-level2" />
+          </div>
+          <div class="field">
+            <label for="recipient-country">Country</label>
+            <input type="text" id="recipient-country" value="NP" maxlength="2" style="text-transform:uppercase;" autocomplete="country" />
+          </div>
+          <div class="field">
+            <label for="recipient-postal-code">Postal Code</label>
+            <input type="text" id="recipient-postal-code" value="44600" autocomplete="postal-code" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Amount ── -->
+      <div class="card-section">
+        <div class="section-header">
+          <div class="section-icon amount-icon"><i class="fas fa-coins"></i></div>
+          <span class="section-title">Transfer Amount</span>
+        </div>
+
+        <div class="amount-row">
+          <div class="field">
+            <label for="currency">Currency</label>
+            <select id="currency">
+              <option value="USD" selected>USD</option>
+              <option value="NPR">NPR</option>
+              <option value="INR">INR</option>
+              <option value="EUR">EUR</option>
+              <option value="AUD">AUD</option>
+              <option value="GBP">GBP</option>
+              <option value="TZS">TZS</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="aft-amount">Amount</label>
+            <input type="number" id="aft-amount" min="0.01" step="0.01" value="1000" placeholder="0.00" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Checkout ── -->
+      <div class="checkout-section">
+
+        <!-- SDK status -->
+        <div class="sdk-bar idle" id="sdk-status">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <span>Connecting to GetPay SDK&hellip;</span>
+        </div>
+
+        <!-- Transfer summary strip -->
+        <div class="summary-strip" id="summary-strip">
+          <div class="route">
+            <span class="name" id="sum-sender">Jane Sender</span>
+            <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+            <span class="name" id="sum-recipient">John Doe</span>
+          </div>
+          <div class="total-label">
+            <div class="lbl">Transfer Total</div>
+            <div class="amount" id="sum-total">USD 1,000.00</div>
+          </div>
+        </div>
+
+        <button class="btn-proceed" id="checkout-btn" disabled>
+          <i class="fas fa-lock"></i>
+          <span id="btn-text">Initiate Transfer</span>
+        </button>
+
+        <p class="hint" id="checkout-hint">
+          <i class="fas fa-triangle-exclamation"></i>
+          Please fill in all required fields.
+        </p>
+
+        <p class="secure-note">
+          <i class="fas fa-shield-halved"></i>
+          Secured by NCHL GetPay &middot; 256-bit SSL Encryption
+        </p>
+
+      </div><!-- /checkout-section -->
+
+    </div><!-- /transfer-card -->
+  </main>
+
+  <script>
+    /* ================================================================
+       GetPay AFT Demo — aft.html
+       Anti-Clickjacking : frame-buster JS + CSP meta (in <head>)
+       Flow              : Bundle SDK only
+       Environment       : UAT (hardcoded)
+       papInfo           : hardcoded (UAT AFT merchant)
+       BAI               : PP  (hardcoded, passed in background)
+       Hidden fields     : fundsSource "05", accountType "01"
+       User edits only   : Sender/Recipient names & account fields + Amount
+    ================================================================ */
+
+    const $   = id => document.getElementById(id);
+    const val = id => ($( id ).value || '').trim();
+    const fmt = (n, cur) => cur + '\u00a0' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const absUrl = path => new URL(path, window.location.href).href;
+
+    /* ── Hardcoded config (never shown in UI) ───────────────────── */
+    const HARDCODED = {
+      environment:   'UAT',
+      papInfo:       'eyJpbnN0aXR1dGlvbklkIjoiMTIyIiwibWlkIjoiODc4Nzk3OTc4Nzg3ODc5IiwidGlkIjoiMTAxMDM3NDgifQ==',
+      oprKey:        '4fa4c6b9-3f91-43e5-9b4f-319f68187ba5',
+      insKey:        '',
+      baseUrl:       'https://uat-bank-getpay.nchl.com.np/ecom-web-checkout/v1/secure-merchant/transactions',
+      bai:           'PP',        // Business Application ID — Person to Person
+      fundsSource:   '05',        // Sender funds source (hidden)
+      accountType:   '01',        // Recipient account type (hidden)
+      businessName:  'GetPay AFT',
+    };
+
+    /* ── SDK readiness ──────────────────────────────────────────── */
+    const sdkBar = $('sdk-status');
+    function setSDK(state, msg) {
+      sdkBar.className = 'sdk-bar ' + state;
+      const icon = state === 'ready' ? 'fa-circle-check' : state === 'warn' ? 'fa-triangle-exclamation' : 'fa-circle-notch fa-spin';
+      sdkBar.innerHTML = '<i class="fas ' + icon + '"></i><span>' + msg + '</span>';
+    }
+
+    window.addEventListener('load', () => setTimeout(() => {
+      if (typeof window.GetPay === 'undefined') {
+        setSDK('warn', 'GetPay SDK not detected \u2014 check network or AdBlock settings.');
+      } else {
+        setSDK('ready', 'GetPay SDK ready.');
+      }
+      checkValidity();
+    }, 800));
+
+    /* ── Live summary ───────────────────────────────────────────── */
+    function updateSummary() {
+      const sName = ((val('sender-first-name') + ' ' + val('sender-last-name')).trim()) || '\u2014';
+      const rName = ((val('recipient-first-name') + ' ' + val('recipient-last-name')).trim()) || '\u2014';
+      const cur   = $('currency').value;
+      const amt   = parseFloat($('aft-amount').value) || 0;
+      $('sum-sender').textContent    = sName;
+      $('sum-recipient').textContent = rName;
+      $('sum-total').textContent     = fmt(amt, cur);
+    }
+
+    /* ── Validation ─────────────────────────────────────────────── */
+    const REQUIRED = [
+      'sender-first-name', 'sender-last-name', 'sender-account-number',
+      'sender-phone', 'sender-address', 'sender-city', 'sender-country', 'sender-postal-code',
+      'recipient-first-name', 'recipient-last-name', 'recipient-account-id',
+      'recipient-city', 'recipient-country', 'recipient-postal-code',
+      'aft-amount'
+    ];
+
+    function checkValidity() {
+      updateSummary();
+      const amount    = parseFloat($('aft-amount').value) || 0;
+      const allFilled = REQUIRED.every(id => val(id) !== '') && amount > 0;
+      $('checkout-btn').disabled       = !allFilled;
+      $('checkout-hint').style.display = allFilled ? 'none' : 'flex';
+    }
+
+    REQUIRED.forEach(id => { const el = $(id); if (el) el.addEventListener('input', checkValidity); });
+    $('currency').addEventListener('change', checkValidity);
+
+    updateSummary();
+    checkValidity();
+
+    /* ── Order info HTML shown inside checkout modal ────────────── */
+    function buildOrderInfoHtml() {
+      const cur = $('currency').value;
+      const amt = parseFloat($('aft-amount').value) || 0;
+      return '<div style="font-family:Inter,sans-serif;padding:20px 0">' +
+        '<div style="font-size:18px;color:#1a56db;font-weight:700;margin-bottom:14px">Account Fund Transfer</div>' +
+        '<div style="font-size:13px;color:#374151;margin-bottom:8px"><b>From:</b> ' + val('sender-first-name') + ' ' + val('sender-last-name') +
+          ' &nbsp;&middot;&nbsp; Acct: ' + val('sender-account-number') + '</div>' +
+        '<div style="font-size:13px;color:#374151;margin-bottom:8px"><b>To:</b> ' + val('recipient-first-name') + ' ' + val('recipient-last-name') +
+          ' &nbsp;&middot;&nbsp; Acct: ' + val('recipient-account-id') + '</div>' +
+        '<div style="display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;margin-top:14px;padding-top:12px">' +
+          '<span style="font-size:13px;font-weight:600">Total</span>' +
+          '<span style="font-size:15px;font-weight:700;color:#1a56db">' + fmt(amt, cur) + '</span>' +
+        '</div></div>';
+    }
+
+    /* ── Reset button ───────────────────────────────────────────── */
+    function resetBtn() {
+      $('checkout-btn').disabled  = false;
+      $('btn-text').textContent   = 'Initiate Transfer';
+    }
+
+    /* ── Checkout handler ───────────────────────────────────────── */
+    $('checkout-btn').addEventListener('click', function () {
+      if (typeof window.GetPay === 'undefined') {
+        alert('GetPay SDK is not loaded. Please check your internet connection or disable AdBlock.');
+        return;
+      }
+
+      this.disabled             = true;
+      $('btn-text').textContent = 'Initializing\u2026';
+
+      const currency        = $('currency').value;
+      const amount          = parseFloat($('aft-amount').value) || 0;
+      const clientRequestId = 'AFT-' + Date.now();
+      const orderInfoHtml   = buildOrderInfoHtml();
+
+      /*
+       * SECURITY: Store AFT display context in sessionStorage only.
+       * - sessionStorage is tab-scoped and cleared when the tab closes.
+       * - No sensitive data (account numbers, amounts) is placed in the URL.
+       * - payment.html reads this object and clears it after display.
+       * - success.html clears sessionStorage after rendering the receipt.
+       * papInfo is NOT secret — it is an opaque merchant reference only.
+       */
+      const aftCtx = {
+        clientRequestId,
+        senderFirst:    val('sender-first-name'),
+        senderLast:     val('sender-last-name'),
+        senderName:     (val('sender-first-name') + ' ' + val('sender-last-name')).trim(),
+        senderAcct:     val('sender-account-number'),
+        senderPhone:    val('sender-phone'),
+        senderAddress:  val('sender-address'),
+        senderCity:     val('sender-city'),
+        senderAdminArea: val('sender-admin-area'),
+        senderCountry:  val('sender-country'),
+        senderPostal:   val('sender-postal-code'),
+        recipientFirst:   val('recipient-first-name'),
+        recipientLast:    val('recipient-last-name'),
+        recipientName:    (val('recipient-first-name') + ' ' + val('recipient-last-name')).trim(),
+        recipientAcct:    val('recipient-account-id'),
+        recipientCity:    val('recipient-city'),
+        recipientCountry: val('recipient-country'),
+        recipientPostal:  val('recipient-postal-code'),
+        amount,
+        currency,
+        bai:           HARDCODED.bai,
+        displayAmount: fmt(amount, currency),
+        orderInfoHtml
+      };
+      sessionStorage.setItem('aft_ctx', JSON.stringify(aftCtx));
+
+      const options = {
+        /* ── Identity ── */
+        clientRequestId,
+        papInfo:  HARDCODED.papInfo,
+        oprKey:   HARDCODED.oprKey,
+        insKey:   HARDCODED.insKey,
+
+        /* ── Commerce ── */
+        price:        amount,
+        currency,
+        businessName: HARDCODED.businessName,
+        imageUrl:     absUrl('img/java.png'),
+
+        /* ── URLs ── */
+        baseUrl:       HARDCODED.baseUrl,
+        websiteDomain: window.location.origin,
+        callbackUrl: {
+          successUrl: absUrl('payment.html') + '?flow=aft',
+          failUrl:    absUrl('fail.html')    + '?flow=aft'
+        },
+
+        /* ── User stub ── */
+        userInfo: {
+          name:    aftCtx.senderName,
+          email:   '',
+          state:   aftCtx.senderAdminArea,
+          country: aftCtx.senderCountry,
+          zipcode: aftCtx.senderPostal,
+          city:    aftCtx.senderCity,
+          address: aftCtx.senderAddress
+        },
+        prefill: { name: false, email: false, state: false, city: false, address: false },
+
+        /* ── AFT flags ── */
+        aft:         true,
+        paymentType: 'ACCOUNT_FUND_TRANSFER',
+        BAI:         [HARDCODED.bai],
+
+        /* ── Sender (fundsSource passed silently in background) ── */
+        senderInformation: {
+          account: {
+            number:      aftCtx.senderAcct,
+            fundsSource: HARDCODED.fundsSource
+          },
+          firstName:            aftCtx.senderFirst,
+          lastName:             aftCtx.senderLast,
+          postalCode:           aftCtx.senderPostal,
+          phoneNumber:          aftCtx.senderPhone,
+          address1:             aftCtx.senderAddress,
+          locality:             aftCtx.senderCity,
+          countryCode:          aftCtx.senderCountry,
+          identificationNumber: '',
+          personalIdType:       '',
+          administrativeArea:   aftCtx.senderAdminArea,
+          type:                 'individual',
+          name:                 aftCtx.senderName,
+          referenceNumber:      'SENDER-REF-' + Date.now()
+        },
+
+        /* ── Recipient (accountType passed silently in background) ── */
+        recipientInformation: {
+          accountId:   aftCtx.recipientAcct,
+          accountType: HARDCODED.accountType,
+          firstName:   aftCtx.recipientFirst,
+          lastName:    aftCtx.recipientLast,
+          locality:    aftCtx.recipientCity,
+          country:     aftCtx.recipientCountry,
+          postalCode:  aftCtx.recipientPostal
+        },
+
+        /* ── UI ── */
+        orderInformationUI: orderInfoHtml,
+        orderInformation:   {
+          orderId:     clientRequestId,
+          orderDate:   new Date().toISOString().split('T')[0],
+          orderStatus: ''
+        },
+        themeColor: '#1a56db',
+
+        /* ── Callbacks ── */
+        onSuccess: () => {
+          resetBtn();
+          // payment.html reads aft_ctx from sessionStorage for the inline SDK mount
+          window.location.href = absUrl('payment.html') + '?flow=aft';
+        },
+        onError: err => {
+          resetBtn();
+          console.error('[GetPay AFT] error:', err);
+          alert('Transfer failed: ' + (err && err.message ? err.message : String(err)));
+        },
+        onLoading: loading => console.log('[GetPay AFT] loading:', loading)
+      };
+
+      console.log('[GetPay AFT] options:', options);
+
+      try {
+        const getpay = new GetPay(options);
+        getpay.initialize();
+      } catch (err) {
+        console.error('[GetPay AFT] init error:', err);
+        resetBtn();
+        alert('SDK error: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,56 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; border-top: 6px solid #28a745; }
-        .icon { font-size: 60px; color: #28a745; margin-bottom: 20px; }
-        .txid { font-family: monospace; background: #eee; padding: 8px; border-radius: 4px; display: block; margin: 15px 0; word-break: break-all; font-size: 14px; }
-        .btn { display: inline-block; background-color: #5662FF; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction Successful | GetPay</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Anti-clickjacking -->
+  <script>if (window.top !== window.self) window.top.location = window.self.location.href;</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(15,23,42,0.1), 0 2px 8px rgba(15,23,42,0.06);
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ── Success stripe ── */
+    .top-stripe {
+      height: 5px;
+      background: linear-gradient(90deg, #059669, #34d399);
+    }
+
+    .card-body { padding: 40px 36px 36px; text-align: center; }
+
+    /* ── Icon ── */
+    .icon-wrap {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #ecfdf5;
+      border: 2px solid #a7f3d0;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 30px;
+      color: #059669;
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* ── Detail rows ── */
+    .details {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      gap: 12px;
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-row .lbl {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #9ca3af;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .detail-row .val {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #0f172a;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .detail-row.total-row .val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1a56db;
+    }
+
+    /* Txn ID pill */
+    .txn-pill {
+      display: inline-block;
+      background: #eff4ff;
+      border: 1px solid #c7d7fd;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: #1a56db;
+      word-break: break-all;
+    }
+
+    /* ── CTA button ── */
+    .btn-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 20px;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.18s ease;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .btn-cta:hover { background: #1344b4; transform: translateY(-1px); }
+
+    .btn-secondary {
+      display: inline-block;
+      font-size: 0.825rem;
+      color: #6b7280;
+      text-decoration: none;
+      margin-top: 4px;
+    }
+
+    .btn-secondary:hover { color: #374151; }
+
+    /* ── Secure note ── */
+    .secure-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.73rem;
+      color: #9ca3af;
+      margin-top: 20px;
+    }
+
+    .secure-note i { color: #059669; }
+
+    /* ── AFT route summary ── */
+    .route-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .route-icon {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .route-icon.sender    { background: #dbeafe; color: #1a56db; }
+    .route-icon.recipient { background: #dcfce7; color: #059669; }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <div class="icon">✅</div>
-        <h2>Enrollment Successful!</h2>
-        <p>Your payment of <strong id="displayAmount">Rs. 0.00</strong> has been verified.</p>
-        <p>Transaction ID:</p>
-        <span class="txid" id="displayTxid"></span>
-        <a href="https://sandeepkumarjha.com.np" class="btn" id="learningBtn">Start Learning</a>
+
+  <div class="card">
+    <div class="top-stripe"></div>
+    <div class="card-body">
+
+      <div class="icon-wrap">
+        <i class="fas fa-check"></i>
+      </div>
+
+      <h1 id="main-title">Transaction Successful</h1>
+      <p class="subtitle" id="main-subtitle">Your transaction has been verified and completed.</p>
+
+      <div class="details" id="detail-block">
+        <!-- populated by JS -->
+      </div>
+
+      <a href="#" class="btn-cta" id="cta-btn">
+        <i class="fas fa-arrow-right"></i>
+        <span id="cta-text">Continue</span>
+      </a>
+
+      <div>
+        <a href="aft.html" class="btn-secondary" id="new-transfer-link" style="display:none;">
+          <i class="fas fa-plus"></i> New Transfer
+        </a>
+      </div>
+
+      <div class="secure-note">
+        <i class="fas fa-shield-halved"></i>
+        Secured by NCHL GetPay &middot; 256-bit SSL
+      </div>
     </div>
+  </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('verified') !== 'true') {
-            window.location.href = "getpay.html";
-        } else {
-            document.getElementById('displayTxid').innerText = params.get('txid') || 'N/A';
+  <script>
+    const params  = new URLSearchParams(window.location.search);
+    const isAft   = params.get('flow') === 'aft';
+    const verified = params.get('verified') === 'true';
 
-            // Dynamic course catalog mapping
-            const courseCatalog = {
-              "oracle-plsql": {
-                price: 6500.00,
-                btnText: "Start Learning Oracle PL/SQL"
-              },
-              "banking-etl": {
-                price: 10500.00,
-                btnText: "Start Learning Banking ETL"
-              },
-              "java-mastery": {
-                price: 4500.55,
-                btnText: "Start Learning Java"
-              }
-            };
+    // Guard: only show this page when arrived correctly
+    if (!verified) {
+      window.location.href = isAft ? 'aft.html' : 'getpay.html';
+    }
 
-            const courseId = localStorage.getItem("getpay_expected_course") || "oracle-plsql";
-            const courseData = courseCatalog[courseId] || courseCatalog["oracle-plsql"];
+    const txid = params.get('txid') || 'N/A';
 
-            document.getElementById('displayAmount').innerText = "Rs. " + courseData.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
-            document.getElementById('learningBtn').innerText = courseData.btnText;
-        }
-    </script>
+    function row(label, value, isTotalRow = false) {
+      return '<div class="detail-row' + (isTotalRow ? ' total-row' : '') + '">'
+        + '<span class="lbl">' + label + '</span>'
+        + '<span class="val">' + value + '</span>'
+        + '</div>';
+    }
+
+    function txnPill(id) {
+      return '<span class="txn-pill">' + id + '</span>';
+    }
+
+    if (isAft) {
+      // ── AFT success ──────────────────────────────────────────
+      document.getElementById('main-title').textContent    = 'Transfer Successful!';
+      document.getElementById('main-subtitle').textContent = 'Your account fund transfer has been completed and verified.';
+
+      // Recover display context from sessionStorage
+      let ctx = {};
+      try { ctx = JSON.parse(sessionStorage.getItem('aft_ctx') || '{}'); } catch(e) {}
+
+      const amt = params.get('amt') || ctx.displayAmount || '—';
+      const cur = params.get('cur') || ctx.currency || '';
+
+      const sName = ctx.senderName    || params.get('sname') || '—';
+      const rName = ctx.recipientName || params.get('rname') || '—';
+      const sAcct = ctx.senderAcct    ? ('•••• ' + String(ctx.senderAcct).slice(-4))    : '—';
+      const rAcct = ctx.recipientAcct ? ('•••• ' + String(ctx.recipientAcct).slice(-4)) : '—';
+
+      const displayAmt = (cur && !isNaN(parseFloat(amt)))
+        ? cur + '\u00a0' + parseFloat(amt).toLocaleString('en-US', { minimumFractionDigits: 2 })
+        : amt;
+
+      document.getElementById('detail-block').innerHTML =
+        row('From',           '<span class="route-row"><span class="route-icon sender"><i class="fas fa-arrow-up" style="font-size:10px"></i></span><span>' + sName + ' &nbsp;<span style="color:#9ca3af;font-weight:400;font-size:0.75rem">' + sAcct + '</span></span></span>')
+        + row('To',           '<span class="route-row"><span class="route-icon recipient"><i class="fas fa-arrow-down" style="font-size:10px"></i></span><span>' + rName + ' &nbsp;<span style="color:#9ca3af;font-weight:400;font-size:0.75rem">' + rAcct + '</span></span></span>')
+        + row('Transaction ID', txnPill(txid))
+        + row('Status',       '<span style="color:#059669;font-weight:700"><i class="fas fa-circle-check"></i> Verified</span>')
+        + row('Amount',       displayAmt, true);
+
+      document.getElementById('cta-btn').href         = 'aft.html';
+      document.getElementById('cta-text').textContent = 'Back to AFT';
+      document.getElementById('new-transfer-link').style.display = 'inline';
+
+      // Clear sensitive session data after displaying
+      sessionStorage.removeItem('aft_ctx');
+
+    } else {
+      // ── ECOM success ─────────────────────────────────────────
+      document.getElementById('main-title').textContent    = 'Enrollment Successful!';
+      document.getElementById('main-subtitle').textContent = 'Your payment has been verified. You\'re all set to start learning.';
+
+      const COURSE_CATALOG = {
+        'oracle-plsql': { name: 'Mastering Oracle PL/SQL',          price: 6500.00,  btnText: 'Start Learning PL/SQL' },
+        'banking-etl':  { name: 'Banking Data Pipelines',            price: 10500.00, btnText: 'Start Learning ETL' },
+        'java-mastery': { name: 'Java Mastery Course',               price: 4500.55,  btnText: 'Start Learning Java' }
+      };
+
+      const courseId   = localStorage.getItem('getpay_expected_course') || 'oracle-plsql';
+      const courseData = COURSE_CATALOG[courseId] || COURSE_CATALOG['oracle-plsql'];
+      const dispAmt    = 'Rs\u00a0' + courseData.price.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+      document.getElementById('detail-block').innerHTML =
+        row('Course',         courseData.name)
+        + row('Transaction ID', txnPill(txid))
+        + row('Status',       '<span style="color:#059669;font-weight:700"><i class="fas fa-circle-check"></i> Verified</span>')
+        + row('Amount Paid',  dispAmt, true);
+
+      document.getElementById('cta-btn').href         = 'https://sandeepkumarjha.com.np';
+      document.getElementById('cta-text').textContent = courseData.btnText;
+    }
+  </script>
 </body>
 </html>
