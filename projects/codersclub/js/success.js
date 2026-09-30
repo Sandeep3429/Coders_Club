@@ -58,7 +58,7 @@
   }
 
   const finalTxid = txid || ("TXN-" + Date.now());
-  const finalClientReqId = clientRequestId || ("ORD-" + Date.now().toString().slice(-8));
+  const finalClientReqId = clientRequestId || localStorage.getItem("getpay_client_request_id") || ("ORD-" + Date.now().toString().slice(-8));
 
   // Resolve Cardholder Name, Email, and Card Details hierarchically
   function resolvePayerDetails(apiData = {}) {

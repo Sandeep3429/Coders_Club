@@ -99,6 +99,16 @@
       const callbacks = config.getCallbackUrls();
       const verifiedImageUrl = config.getImageUrl(courseData.imageUrl);
 
+      // Compute dynamic 3.5% fee identifier (safe string format, e.g. ORD-1727712345678-F35_227_50)
+      const feeRate = 0.035;
+      const feeAmount = (amount * feeRate).toFixed(2);
+      const feeTag = feeAmount.replace(".", "_");
+      const clientRequestId = `ORD-${Date.now()}-F35_${feeTag}`;
+
+      // Persist identifier and calculated fee for receipts and downstream verification
+      localStorage.setItem("getpay_client_request_id", clientRequestId);
+      localStorage.setItem("getpay_fee_amount", feeAmount);
+
       const options = {
         userInfo: {
           name: userName,
@@ -109,7 +119,7 @@
           city: "",
           address: ""
         },
-        clientRequestId: "ORD-" + Date.now(),
+        clientRequestId: clientRequestId,
         clientRemarks:"TEST-if passess through",
         papInfo: config.PAP_INFO,
         oprKey: config.OPR_KEY,

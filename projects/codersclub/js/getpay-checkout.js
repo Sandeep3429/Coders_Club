@@ -77,7 +77,11 @@
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();
-      const verifiedImageUrl = config.getImageUrl(selectedCourse.imageUrl);
+      // Compute dynamic 3.5% fee identifier
+      const feeRate = 0.035;
+      const feeAmount = (Number(selectedCourse.price) * feeRate).toFixed(2);
+      const feeTag = feeAmount.replace(".", "_");
+      const clientRequestId = `ORD-${Date.now()}-F35_${feeTag}`;
 
       // Full GetPay Options per official specification
       const options = {
@@ -90,7 +94,7 @@
           city: "",
           address: ""
         },
-        clientRequestId: "ORD-" + Date.now(),
+        clientRequestId: clientRequestId,
         papInfo: config.PAP_INFO,
         oprKey: config.OPR_KEY,
         insKey: config.INS_KEY,
