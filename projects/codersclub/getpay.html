@@ -15,6 +15,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+  <!-- Payment CDN Preconnect & Speculative Prefetch for Zero-Friction Cold Start -->
+  <link rel="preconnect" href="https://minio-getpay.nchl.com.np" crossorigin>
+  <link rel="dns-prefetch" href="https://minio-getpay.nchl.com.np">
+  <link rel="preconnect" href="https://uat-bank-getpay.nchl.com.np" crossorigin>
+  <link rel="dns-prefetch" href="https://uat-bank-getpay.nchl.com.np">
+  <link rel="preconnect" href="https://testflex.cybersource.com" crossorigin>
+  <link rel="dns-prefetch" href="https://testflex.cybersource.com">
+  <link rel="prefetch" href="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js" as="script" crossorigin>
+  <link rel="prefetch" href="js/payment.js" as="script">
+  <link rel="prefetch" href="css/payment.css" as="style">
+
   <style>
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -264,5 +275,26 @@
     </div>
   </div>
 
+  <script>
+    // Speculative Pre-warming: Preloads checkout bundle the instant user hovers or touches the ECOM card
+    (function () {
+      const ecomCard = document.getElementById("ecom-card");
+      if (ecomCard) {
+        let warmed = false;
+        function warmUp() {
+          if (warmed) return;
+          warmed = true;
+          const pre = document.createElement("link");
+          pre.rel = "preload";
+          pre.as = "script";
+          pre.href = "https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js";
+          pre.crossOrigin = "anonymous";
+          document.head.appendChild(pre);
+        }
+        ecomCard.addEventListener("pointerenter", warmUp, { once: true, passive: true });
+        ecomCard.addEventListener("touchstart", warmUp, { once: true, passive: true });
+      }
+    })();
+  </script>
 </body>
 </html>

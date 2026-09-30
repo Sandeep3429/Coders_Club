@@ -17,6 +17,12 @@
   <link rel="dns-prefetch" href="https://minio-getpay.nchl.com.np">
   <link rel="preconnect" href="https://uat-bank-getpay.nchl.com.np" crossorigin>
   <link rel="dns-prefetch" href="https://uat-bank-getpay.nchl.com.np">
+  <link rel="preconnect" href="https://testflex.cybersource.com" crossorigin>
+  <link rel="dns-prefetch" href="https://testflex.cybersource.com">
+
+  <!-- Preload Critical Scripts to Eliminate Waterfall in Cold Incognito -->
+  <link rel="preload" href="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js" as="script" crossorigin>
+  <link rel="preload" href="js/payment.js" as="script">
 
   <!-- Segregated Stylesheet -->
   <link rel="stylesheet" href="css/payment.css">
@@ -24,12 +30,13 @@
 <body>
 
   <main class="payment-page-container">
-    <!-- GetPay Checkout Mount Element -->
-    <div id="checkout">
+    <!-- Clean GetPay Checkout Mount Element with Independent Overlay Loader -->
+    <div class="checkout-wrapper">
       <div id="checkout-loader">
         <div class="checkout-spinner"></div>
         <div style="font-weight: 500; font-size: 14px;">Loading Secure Checkout…</div>
       </div>
+      <div id="checkout"></div>
     </div>
     <div id="error-box"></div>
   </main>
@@ -53,22 +60,26 @@
           window.location.replace('./aft.html');
         });
       } else {
-        // ECOM Flow: Load NCHL v5 bundle, then initialize course checkout via js/payment.js
+        // ECOM Flow: Load NCHL v5 bundle and payment controller concurrently in parallel
         const ecomBundle = document.createElement('script');
         ecomBundle.src = (window.GetPayConfig && window.GetPayConfig.BUNDLE_URL) || 'https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js';
-        ecomBundle.onload = function () {
-          const ctrl = document.createElement('script');
-          ctrl.src = 'js/payment.js';
-          document.body.appendChild(ctrl);
-        };
+        ecomBundle.async = true;
         ecomBundle.onerror = function () {
           const errBox = document.getElementById('error-box');
           if (errBox) {
             errBox.textContent = 'GetPay SDK failed to load. Check network / AdBlock.';
             errBox.style.display = 'block';
           }
+          const loader = document.getElementById('checkout-loader');
+          if (loader) loader.style.display = 'none';
         };
+
+        const ctrl = document.createElement('script');
+        ctrl.src = 'js/payment.js';
+        ctrl.async = true;
+
         document.body.appendChild(ecomBundle);
+        document.body.appendChild(ctrl);
       }
     })();
   </script>

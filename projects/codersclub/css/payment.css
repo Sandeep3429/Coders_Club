@@ -24,6 +24,12 @@ body {
   align-items: center;
 }
 
+.checkout-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 940px;
+}
+
 /* Primary GetPay Container */
 #checkout {
   width: 100%;
@@ -46,15 +52,27 @@ body {
   background: transparent !important;
 }
 
-/* Custom Loader displayed before bundle mounts */
+/* Custom Loader displayed as an overlay before bundle mounts */
 #checkout-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  background: #ffffff;
+  border-radius: 16px;
+  min-height: 480px;
   color: #64748b;
   gap: 16px;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+#checkout-loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .checkout-spinner {
