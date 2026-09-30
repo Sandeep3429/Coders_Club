@@ -110,6 +110,7 @@
           address: ""
         },
         clientRequestId: "ORD-" + Date.now(),
+        clientRemarks:"TEST-if passess through",
         papInfo: config.PAP_INFO,
         oprKey: config.OPR_KEY,
         insKey: config.INS_KEY,
