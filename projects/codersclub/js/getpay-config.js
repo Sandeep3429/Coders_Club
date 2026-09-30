@@ -90,46 +90,55 @@
     },
 
     // Generates 100% responsive orderInformationUI HTML string with itemized breakdown for GetPay SDK
-    createOrderInformationUI: function (course, amount, customNote) {
-      const baseVal = Number(amount || course.price);
+    createOrderInformationUI: function (course, totalAmount, customNote) {
+      // Total amount paid by user (e.g. 6500.00)
+      const totalVal = Number(totalAmount || course.price);
       const feeRate = 0.035;
-      const feeVal = Number((baseVal * feeRate).toFixed(2));
-      const totalVal = Number((baseVal + feeVal).toFixed(2));
+      const feeVal = Number((totalVal * feeRate).toFixed(2)); // 227.50
+      const netVal = Number((totalVal - feeVal).toFixed(2));   // 6272.50
 
-      const formattedBase = baseVal.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      const formattedNet = netVal.toLocaleString('en-US', { minimumFractionDigits: 2 });
       const formattedFee = feeVal.toLocaleString('en-US', { minimumFractionDigits: 2 });
       const formattedTotal = totalVal.toLocaleString('en-US', { minimumFractionDigits: 2 });
       const imgPath = this.getImageUrl(course.imageUrl);
-      const bankNote = customNote || "Powered by Laxmi Sunrise Bank Limited";
+      const bankNote = customNote || "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
 
       return `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 12px 14px; box-sizing: border-box; width: 100%; max-width: 100%;">
-          <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin: 0 0 12px 0;">Order Summary</h3>
-          <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; width: 100%; margin-bottom: 12px;">
-            <img src="${imgPath}" alt="${course.name}" style="width: 48px; height: 48px; min-width: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; flex-shrink: 0;" />
-            <div style="min-width: 0; flex: 1;">
-              <div style="font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-bottom: 2px; word-break: break-word;">${course.name}</div>
-              <div style="font-size: 12px; color: #64748b;">Course Enrollment</div>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 10px 12px; box-sizing: border-box; width: 100%; max-width: 100%;">
+          <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0 0 10px 0;">Order Information</h3>
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; box-sizing: border-box; width: 100%;">
+            <!-- Course Header -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <img src="${imgPath}" alt="${course.name}" style="width: 42px; height: 42px; min-width: 42px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; flex-shrink: 0;" />
+              <div style="min-width: 0; flex: 1;">
+                <div style="font-size: 13.5px; font-weight: 600; color: #0f172a; line-height: 1.35;">${course.name}</div>
+              </div>
             </div>
-          </div>
 
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 13px; color: #334155; box-sizing: border-box; width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="color: #64748b;">Course Fee</span>
-              <span style="font-weight: 600; color: #0f172a;">NPR ${formattedBase}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="color: #64748b;">Convenience Fee (3.5%)**</span>
-              <span style="font-weight: 600; color: #0f172a;">NPR ${formattedFee}</span>
-            </div>
+            <!-- Dotted Divider -->
             <div style="border-top: 1px dashed #cbd5e1; margin: 8px 0;"></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
-              <span style="font-weight: 700; color: #0f172a;">Total Payable</span>
-              <span style="font-weight: 700; color: #2563eb; font-size: 15px;">NPR ${formattedTotal}</span>
+
+            <!-- Breakdown Rows (Sum = Total Amount Paid) -->
+            <div style="font-size: 12.5px; color: #475569; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Course Fee:</span>
+                <span style="font-weight: 600; color: #0f172a;">NPR ${formattedNet}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Convenience Fee (3.5%)**:</span>
+                <span style="font-weight: 600; color: #0f172a;">NPR ${formattedFee}</span>
+              </div>
+              <div style="border-top: 1px dashed #94a3b8; margin: 4px 0;"></div>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13.5px;">
+                <span style="font-weight: 700; color: #0f172a;">Total Payable:</span>
+                <span style="font-weight: 700; color: #2563eb;">NPR ${formattedTotal}</span>
+              </div>
             </div>
-            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e2e8f0; font-size: 10.5px; color: #64748b; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
-              <span>** 3.5% Gateway Convenience Fee</span>
-              <span style="color: #0f172a; font-weight: 500;">${bankNote}</span>
+
+            <!-- Footer Bank Notice -->
+            <div style="margin-top: 10px; padding-top: 6px; border-top: 1px dashed #cbd5e1; font-size: 10.5px; color: #64748b; display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2563eb; flex-shrink: 0;"></span>
+              <span>${bankNote}</span>
             </div>
           </div>
         </div>

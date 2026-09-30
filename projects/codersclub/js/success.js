@@ -140,18 +140,33 @@
     const baseAmt = localStorage.getItem("getpay_base_amount");
     const feeAmt = localStorage.getItem("getpay_fee_amount");
 
+    // Extract or compute 3.5% fee amount
+    let feeVal = feeAmt ? Number(feeAmt) : null;
+    if (!feeVal && clientRequestId) {
+      const match = clientRequestId.match(/-F35_(\d+)_(\d+)/);
+      if (match) {
+        feeVal = parseFloat(`${match[1]}.${match[2]}`);
+      }
+    }
+    if (!feeVal && finalAmount > 0) {
+      feeVal = Number((finalAmount * 0.035).toFixed(2));
+    }
+
+    // Net course fee so Net (6272.50) + Fee (227.50) = Grand Total (6500.00)
+    const netCourseVal = (feeVal && finalAmount > feeVal)
+      ? Number((finalAmount - feeVal).toFixed(2))
+      : (baseAmt ? Number(baseAmt) : finalAmount);
+
     const receiptTotalEl = document.getElementById("receipt-total");
     if (receiptTotalEl) receiptTotalEl.innerText = formattedAmount;
 
     const receiptItemPriceEl = document.getElementById("receipt-item-price");
     if (receiptItemPriceEl) {
-      receiptItemPriceEl.innerText = baseAmt
-        ? ("NPR " + Number(baseAmt).toLocaleString("en-US", { minimumFractionDigits: 2 }))
-        : formattedAmount;
+      receiptItemPriceEl.innerText = "NPR " + netCourseVal.toLocaleString("en-US", { minimumFractionDigits: 2 });
     }
 
-    // Render convenience fee row in receipt table if applicable
-    if (feeAmt && Number(feeAmt) > 0) {
+    // Render convenience fee row in receipt table so Net + Fee = Grand Total Paid
+    if (feeVal && feeVal > 0) {
       let feeRow = document.getElementById("receipt-fee-row");
       if (!feeRow && receiptItemPriceEl && receiptItemPriceEl.closest("tbody")) {
         feeRow = document.createElement("tr");
@@ -159,9 +174,12 @@
         feeRow.innerHTML = `
           <td>Convenience Fee (3.5%)**</td>
           <td class="col-right">1</td>
-          <td class="col-right">NPR ${Number(feeAmt).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+          <td class="col-right">NPR ${feeVal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
         `;
         receiptItemPriceEl.closest("tbody").appendChild(feeRow);
+      } else if (feeRow) {
+        const lastCell = feeRow.querySelector(".col-right:last-child");
+        if (lastCell) lastCell.innerText = "NPR " + feeVal.toLocaleString("en-US", { minimumFractionDigits: 2 });
       }
     }
 

@@ -68,20 +68,20 @@
       btn.disabled = true;
       if (btnText) btnText.innerText = "Initializing Checkout…";
 
-      const basePrice = Number(selectedCourse.price);
+      const totalPrice = Number(selectedCourse.price);
       const feeRate = 0.035;
-      const feeAmount = parseFloat((basePrice * feeRate).toFixed(2));
-      const totalPrice = parseFloat((basePrice + feeAmount).toFixed(2));
+      const feeAmount = parseFloat((totalPrice * feeRate).toFixed(2));
+      const netPrice = parseFloat((totalPrice - feeAmount).toFixed(2));
 
       // Persist user selection and breakdown
-      localStorage.setItem("getpay_base_amount", basePrice);
+      localStorage.setItem("getpay_base_amount", netPrice);
       localStorage.setItem("getpay_fee_amount", feeAmount.toFixed(2));
       localStorage.setItem("getpay_expected_amount", totalPrice);
       localStorage.setItem("getpay_expected_course", courseId);
       if (userEmail) localStorage.setItem("getpay_user_email", userEmail);
 
-      const paymentComment = "Convenience Fee 3.5% - Powered by Laxmi Sunrise Bank Limited";
-      const orderInformationUI = config.createOrderInformationUI(selectedCourse, basePrice, "Powered by Laxmi Sunrise Bank Limited");
+      const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
+      const orderInformationUI = config.createOrderInformationUI(selectedCourse, totalPrice, paymentComment);
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();

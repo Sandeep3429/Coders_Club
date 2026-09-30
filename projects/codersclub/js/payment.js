@@ -26,14 +26,15 @@
   const params = new URLSearchParams(window.location.search);
   const courseId = params.get("courseId") || "oracle-plsql";
   const courseData = config.getCourseData(courseId);
-  const baseAmount = parseFloat(params.get("amount")) || courseData.price;
+  // Total amount paid by the user (inclusive of 3.5% fee, e.g. 6500.00)
+  const totalAmount = parseFloat(params.get("amount")) || courseData.price;
   const feeRate = 0.035;
-  const feeAmount = parseFloat((baseAmount * feeRate).toFixed(2));
-  const totalAmount = parseFloat((baseAmount + feeAmount).toFixed(2));
+  const feeAmount = parseFloat((totalAmount * feeRate).toFixed(2)); // 227.50
+  const netAmount = parseFloat((totalAmount - feeAmount).toFixed(2)); // 6272.50 (sum = 6500.00)
 
-  // Persist expected course & amount breakdown
+  // Persist expected course & amount breakdown for receipts
   localStorage.setItem("getpay_expected_course", courseId);
-  localStorage.setItem("getpay_base_amount", baseAmount);
+  localStorage.setItem("getpay_base_amount", netAmount);
   localStorage.setItem("getpay_fee_amount", feeAmount.toFixed(2));
   localStorage.setItem("getpay_expected_amount", totalAmount);
 
@@ -98,10 +99,10 @@
       }
 
       // Payment initialization comment / surcharge disclosure
-      const paymentComment = "Convenience Fee 3.5% - Powered by Laxmi Sunrise Bank Limited";
+      const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
 
-      // Freshly generate orderInformationUI with itemized 3.5% convenience fee breakdown
-      const orderInformationUI = config.createOrderInformationUI(courseData, baseAmount, "Powered by Laxmi Sunrise Bank Limited");
+      // Freshly generate orderInformationUI with itemized 3.5% convenience fee breakdown (summing to 6500.00)
+      const orderInformationUI = config.createOrderInformationUI(courseData, totalAmount, paymentComment);
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();
