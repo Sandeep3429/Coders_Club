@@ -137,11 +137,33 @@
     const receiptCourseEl = document.getElementById("receipt-course");
     if (receiptCourseEl) receiptCourseEl.innerText = statementData.particulars || courseData.name;
 
+    const baseAmt = localStorage.getItem("getpay_base_amount");
+    const feeAmt = localStorage.getItem("getpay_fee_amount");
+
     const receiptTotalEl = document.getElementById("receipt-total");
     if (receiptTotalEl) receiptTotalEl.innerText = formattedAmount;
 
     const receiptItemPriceEl = document.getElementById("receipt-item-price");
-    if (receiptItemPriceEl) receiptItemPriceEl.innerText = formattedAmount;
+    if (receiptItemPriceEl) {
+      receiptItemPriceEl.innerText = baseAmt
+        ? ("NPR " + Number(baseAmt).toLocaleString("en-US", { minimumFractionDigits: 2 }))
+        : formattedAmount;
+    }
+
+    // Render convenience fee row in receipt table if applicable
+    if (feeAmt && Number(feeAmt) > 0) {
+      let feeRow = document.getElementById("receipt-fee-row");
+      if (!feeRow && receiptItemPriceEl && receiptItemPriceEl.closest("tbody")) {
+        feeRow = document.createElement("tr");
+        feeRow.id = "receipt-fee-row";
+        feeRow.innerHTML = `
+          <td>Convenience Fee (3.5%)**</td>
+          <td class="col-right">1</td>
+          <td class="col-right">NPR ${Number(feeAmt).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+        `;
+        receiptItemPriceEl.closest("tbody").appendChild(feeRow);
+      }
+    }
 
     const statusBadgeEl = document.getElementById("statusBadge");
     if (statusBadgeEl) statusBadgeEl.innerText = "Bank Verified • " + statusText;

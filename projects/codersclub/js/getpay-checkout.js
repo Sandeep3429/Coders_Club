@@ -68,20 +68,25 @@
       btn.disabled = true;
       if (btnText) btnText.innerText = "Initializing Checkout…";
 
-      // Persist user selection
-      localStorage.setItem("getpay_expected_amount", selectedCourse.price);
+      const basePrice = Number(selectedCourse.price);
+      const feeRate = 0.035;
+      const feeAmount = parseFloat((basePrice * feeRate).toFixed(2));
+      const totalPrice = parseFloat((basePrice + feeAmount).toFixed(2));
+
+      // Persist user selection and breakdown
+      localStorage.setItem("getpay_base_amount", basePrice);
+      localStorage.setItem("getpay_fee_amount", feeAmount.toFixed(2));
+      localStorage.setItem("getpay_expected_amount", totalPrice);
       localStorage.setItem("getpay_expected_course", courseId);
       if (userEmail) localStorage.setItem("getpay_user_email", userEmail);
 
-      const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
-      const orderInformationUI = config.createOrderInformationUI(selectedCourse, selectedCourse.price, paymentComment);
+      const paymentComment = "Convenience Fee 3.5% - Powered by Laxmi Sunrise Bank Limited";
+      const orderInformationUI = config.createOrderInformationUI(selectedCourse, basePrice, "Powered by Laxmi Sunrise Bank Limited");
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();
       // Compute dynamic 3.5% fee identifier
-      const feeRate = 0.035;
-      const feeAmount = (Number(selectedCourse.price) * feeRate).toFixed(2);
-      const feeTag = feeAmount.replace(".", "_");
+      const feeTag = feeAmount.toFixed(2).replace(".", "_");
       const clientRequestId = `ORD-${Date.now()}-F35_${feeTag}`;
 
       // Full GetPay Options per official specification
@@ -102,7 +107,7 @@
         insKey: config.INS_KEY,
         websiteDomain: config.WEBSITE_DOMAIN,
         allowBillingAddressFields: true,
-        price: Number(selectedCourse.price),
+        price: Number(totalPrice),
         businessName: selectedCourse.name,
         imageUrl: verifiedImageUrl,
         orderInformationUI: orderInformationUI,

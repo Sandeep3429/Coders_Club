@@ -26,11 +26,16 @@
   const params = new URLSearchParams(window.location.search);
   const courseId = params.get("courseId") || "oracle-plsql";
   const courseData = config.getCourseData(courseId);
-  const amount = parseFloat(params.get("amount")) || courseData.price;
+  const baseAmount = parseFloat(params.get("amount")) || courseData.price;
+  const feeRate = 0.035;
+  const feeAmount = parseFloat((baseAmount * feeRate).toFixed(2));
+  const totalAmount = parseFloat((baseAmount + feeAmount).toFixed(2));
 
-  // Persist expected course & amount
+  // Persist expected course & amount breakdown
   localStorage.setItem("getpay_expected_course", courseId);
-  localStorage.setItem("getpay_expected_amount", amount);
+  localStorage.setItem("getpay_base_amount", baseAmount);
+  localStorage.setItem("getpay_fee_amount", feeAmount.toFixed(2));
+  localStorage.setItem("getpay_expected_amount", totalAmount);
 
   // Persist email & cardholder if present in URL
   const userEmail = params.get("email") || localStorage.getItem("getpay_user_email") || "";
@@ -93,24 +98,21 @@
       }
 
       // Payment initialization comment / surcharge disclosure
-      const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
+      const paymentComment = "Convenience Fee 3.5% - Powered by Laxmi Sunrise Bank Limited";
 
-      // Freshly generate orderInformationUI matching the exact course, amount, and surcharge notice
-      const orderInformationUI = config.createOrderInformationUI(courseData, amount, paymentComment);
+      // Freshly generate orderInformationUI with itemized 3.5% convenience fee breakdown
+      const orderInformationUI = config.createOrderInformationUI(courseData, baseAmount, "Powered by Laxmi Sunrise Bank Limited");
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();
       const verifiedImageUrl = config.getImageUrl(courseData.imageUrl);
 
       // Compute dynamic 3.5% fee identifier (safe string format, e.g. ORD-1727712345678-F35_227_50)
-      const feeRate = 0.035;
-      const feeAmount = (amount * feeRate).toFixed(2);
-      const feeTag = feeAmount.replace(".", "_");
+      const feeTag = feeAmount.toFixed(2).replace(".", "_");
       const clientRequestId = `ORD-${Date.now()}-F35_${feeTag}`;
 
       // Persist identifier and calculated fee for receipts and downstream verification
       localStorage.setItem("getpay_client_request_id", clientRequestId);
-      localStorage.setItem("getpay_fee_amount", feeAmount);
       localStorage.setItem("getpay_payment_comment", paymentComment);
 
       const options = {
@@ -130,7 +132,7 @@
         insKey: config.INS_KEY,
         websiteDomain: config.WEBSITE_DOMAIN,
         allowBillingAddressFields: true,
-        price: Number(amount),
+        price: Number(totalAmount),
         businessName: courseData.name,
         imageUrl: verifiedImageUrl,
         orderInformationUI: orderInformationUI,
