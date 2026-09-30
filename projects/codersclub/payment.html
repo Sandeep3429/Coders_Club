@@ -13,6 +13,8 @@
   </script>
 
   <!-- Resource Hints for High-Speed Cold Loading in Incognito -->
+  <link rel="preconnect" href="https://getpay.finpos.global" crossorigin>
+  <link rel="dns-prefetch" href="https://getpay.finpos.global">
   <link rel="preconnect" href="https://minio-getpay.nchl.com.np" crossorigin>
   <link rel="dns-prefetch" href="https://minio-getpay.nchl.com.np">
   <link rel="preconnect" href="https://uat-bank-getpay.nchl.com.np" crossorigin>
@@ -41,12 +43,69 @@
     (function () {
       const isAft = new URLSearchParams(window.location.search).get('flow') === 'aft';
 
+      function removeLoader() {
+        const loader = document.getElementById('checkout-loader');
+        if (loader && !loader.classList.contains('hidden')) {
+          loader.classList.add('hidden');
+          setTimeout(() => {
+            if (loader) loader.style.display = 'none';
+          }, 180);
+        }
+      }
+
+      // Universal Fast-Dismiss Observer: removes loader the instant children mount into #checkout
+      const checkoutEl = document.getElementById('checkout');
+      if (checkoutEl) {
+        const observer = new MutationObserver(() => {
+          if (checkoutEl.children.length > 0) {
+            requestAnimationFrame(removeLoader);
+          }
+        });
+        observer.observe(checkoutEl, { childList: true, subtree: true });
+      }
+
       if (isAft) {
         // AFT Flow: Matches official reference implementation (https://getpay.finpos.global/v3/ecom-merchant/payment.html)
         // bundle-v1.js automatically runs: new App({ target: document.getElementById("checkout") })
         // It reads the active payment context from sessionStorage initialized by aft.html and renders the card form.
+
+        // Verify active AFT session context from sessionStorage
+        let ctx = null;
+        try { ctx = JSON.parse(sessionStorage.getItem('aft_ctx') || '{}'); } catch (e) {}
+
+        if (!ctx || !ctx.amount) {
+          console.warn('[AFT] aft_ctx missing from sessionStorage.');
+          removeLoader();
+          const errBox = document.getElementById('error-box');
+          if (errBox) {
+            errBox.textContent = 'AFT session missing or expired. Redirecting to transfer page…';
+            errBox.style.display = 'block';
+          }
+          setTimeout(() => window.location.replace('./aft.html'), 2200);
+          return;
+        }
+
         const bundleScript = document.createElement('script');
         bundleScript.src = (window.GetPayAftConfig && window.GetPayAftConfig.BUNDLE_URL) || 'https://getpay.finpos.global/v3/ecom-merchant/bundle-v1.js';
+        bundleScript.async = true;
+
+        bundleScript.onload = function () {
+          // Micro-tick to ensure Svelte App DOM injection triggers removal
+          setTimeout(removeLoader, 250);
+        };
+
+        bundleScript.onerror = function () {
+          removeLoader();
+          const errBox = document.getElementById('error-box');
+          if (errBox) {
+            errBox.textContent = 'GetPay AFT SDK failed to load. Check network / AdBlock.';
+            errBox.style.display = 'block';
+          }
+        };
+
+        // Safety fallback: Never keep spinning indefinitely
+        setTimeout(removeLoader, 2200);
+
         document.body.appendChild(bundleScript);
 
         history.pushState(null, '', window.location.href);
@@ -64,8 +123,7 @@
             errBox.textContent = 'GetPay SDK failed to load. Check network / AdBlock.';
             errBox.style.display = 'block';
           }
-          const loader = document.getElementById('checkout-loader');
-          if (loader) loader.style.display = 'none';
+          removeLoader();
         };
 
         const ctrl = document.createElement('script');
