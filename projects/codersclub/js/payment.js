@@ -164,15 +164,25 @@
       }
     };
 
-    function launchCheckout() {
+    function launchDirectInitialization() {
       if (hasInitialized) return;
       hasInitialized = true;
 
+      options.baseUrl = config.BASE_URL;
+      options.onSuccess = function (res) {
+        console.log("GetPay direct session initialization success:", res);
+        const mountEl = document.getElementById("checkout");
+        if (!mountEl || mountEl.children.length === 0) {
+          // One seamless reload to let Svelte App mount with the freshly created session
+          window.location.replace(window.location.href);
+        } else {
+          removeLoader();
+        }
+      };
+
       try {
-        options.baseUrl = config.BASE_URL;
-        let gp = null;
         if (typeof window.GetPay === "function") {
-          gp = new window.GetPay(options, config.BASE_URL);
+          const gp = new window.GetPay(options, config.BASE_URL);
           if (typeof gp.initialize === "function") {
             gp.initialize();
           } else if (typeof gp.init === "function") {
@@ -182,65 +192,58 @@
           window.getpay.initialize(options, config.BASE_URL);
         }
 
-        // Self-Healing Cold-Start Verification:
-        // In cold Incognito, if Svelte's App was still flushing during the initial call,
-        // retry initialize automatically after 120ms if #checkout has no children.
-        // This ensures 100% deterministic mounting without requiring a page reload.
-        setTimeout(() => {
-          const mountEl = document.getElementById("checkout");
-          if (mountEl && mountEl.children.length === 0) {
-            console.warn("Self-healing: Re-triggering GetPay initialize for cold Incognito mount...");
-            try {
-              if (gp && typeof gp.initialize === "function") {
-                gp.initialize();
-              } else if (typeof window.GetPay === "function") {
-                new window.GetPay(options, config.BASE_URL).initialize();
-              }
-            } catch (retryErr) {
-              console.error("Cold retry failed:", retryErr);
-            }
-          }
-        }, 120);
-
-        // Safety fallback: remove loader overlay after 2.5s maximum
-        setTimeout(removeLoader, 2500);
+        setTimeout(removeLoader, 3000);
       } catch (e) {
-        console.error("Payment initialization exception:", e);
+        console.error("Direct payment initialization exception:", e);
         removeLoader();
       }
     }
 
-    function checkReadyAndInit() {
+    function monitorAndInit() {
       if (hasInitialized) return;
 
-      const hasSdk = typeof window.GetPay === "function" || (window.getpay && typeof window.getpay.initialize === "function");
       const checkoutEl = document.getElementById("checkout");
+      const hasSdk = typeof window.GetPay === "function" || (window.getpay && typeof window.getpay.initialize === "function");
 
-      if (hasSdk && checkoutEl) {
-        // 20ms micro-delay: allows Svelte App microtasks and DOM layout to settle cleanly
-        setTimeout(launchCheckout, 20);
+      // Path 1 (Official flow from getpay.html):
+      // If Svelte's App bundle mounted elements into #checkout using the session from Page 1
+      if (checkoutEl && checkoutEl.children.length > 0) {
+        console.log("GetPay card checkout form active from pre-initialized session.");
+        hasInitialized = true;
+        removeLoader();
         return;
       }
 
       attempts++;
+
+      // Give Svelte bundle up to 300ms (15 attempts x 20ms) to mount from existing session
+      if (attempts < 15) {
+        setTimeout(monitorAndInit, pollIntervalMs);
+        return;
+      }
+
+      // Path 2 (Direct arrival without Page 1 session):
+      // If checkout is still empty after 300ms and SDK is ready, initialize directly
+      if (hasSdk) {
+        launchDirectInitialization();
+        return;
+      }
+
+      // If SDK is still downloading over slow connection, keep polling
       if (attempts < maxAttempts) {
-        setTimeout(checkReadyAndInit, pollIntervalMs);
+        setTimeout(monitorAndInit, pollIntervalMs);
       } else {
-        if (hasSdk) {
-          launchCheckout();
-        } else {
-          console.error("GetPay SDK bundle failed to load.");
-          removeLoader();
-          const errBox = document.getElementById("error-box");
-          if (errBox) {
-            errBox.textContent = "GetPay Checkout SDK could not be loaded. Please check your internet connection or disable AdBlock.";
-            errBox.style.display = "block";
-          }
+        console.error("GetPay SDK bundle failed to load.");
+        removeLoader();
+        const errBox = document.getElementById("error-box");
+        if (errBox) {
+          errBox.textContent = "GetPay Checkout SDK could not be loaded. Please check your internet connection or disable AdBlock.";
+          errBox.style.display = "block";
         }
       }
     }
 
-    checkReadyAndInit();
+    monitorAndInit();
   }
 
   // Ensure immediate execution whether DOM is already loaded or still loading

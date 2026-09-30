@@ -15,16 +15,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Payment CDN Preconnect & Speculative Prefetch for Zero-Friction Cold Start -->
-  <link rel="preconnect" href="https://minio-getpay.nchl.com.np" crossorigin>
+  <!-- Payment Gateway Preconnections -->
+  <link rel="preconnect" href="https://minio-getpay.nchl.com.np">
   <link rel="dns-prefetch" href="https://minio-getpay.nchl.com.np">
-  <link rel="preconnect" href="https://uat-bank-getpay.nchl.com.np" crossorigin>
+  <link rel="preconnect" href="https://uat-bank-getpay.nchl.com.np">
   <link rel="dns-prefetch" href="https://uat-bank-getpay.nchl.com.np">
-  <link rel="preconnect" href="https://testflex.cybersource.com" crossorigin>
+  <link rel="preconnect" href="https://testflex.cybersource.com">
   <link rel="dns-prefetch" href="https://testflex.cybersource.com">
-  <link rel="prefetch" href="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js" as="script" crossorigin>
-  <link rel="prefetch" href="js/payment.js" as="script">
-  <link rel="prefetch" href="css/payment.css" as="style">
 
   <style>
     /* ── Reset & Base ── */
@@ -275,25 +272,110 @@
     </div>
   </div>
 
+  <!-- Hidden checkout anchor for SDK bundle initialization on Page 1 -->
+  <div id="checkout" hidden style="display:none;"></div>
+
+  <script src="js/getpay-config.js"></script>
+  <script src="https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js" defer></script>
+
   <script>
-    // Speculative Pre-warming: Preloads checkout bundle the instant user hovers or touches the ECOM card
     (function () {
       const ecomCard = document.getElementById("ecom-card");
-      if (ecomCard) {
-        let warmed = false;
-        function warmUp() {
-          if (warmed) return;
-          warmed = true;
-          const pre = document.createElement("link");
-          pre.rel = "preload";
-          pre.as = "script";
-          pre.href = "https://minio-getpay.nchl.com.np/getpay-cdn/webcheckout/v5/bundle.js";
-          pre.crossOrigin = "anonymous";
-          document.head.appendChild(pre);
+      if (!ecomCard) return;
+
+      ecomCard.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const desc = ecomCard.querySelector(".card-desc");
+        const arrow = ecomCard.querySelector(".card-arrow");
+        if (desc) desc.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Initializing secure checkout…';
+        if (arrow) arrow.style.opacity = "0.5";
+        ecomCard.style.pointerEvents = "none";
+
+        const config = window.GetPayConfig;
+        const courseId = "oracle-plsql";
+        const courseData = config ? config.getCourseData(courseId) : { price: 6500.00, name: "Oracle PL/SQL", imageUrl: "img/python.jpg" };
+        const totalAmount = courseData.price;
+        const feeRate = 0.035;
+        const feeAmount = parseFloat((totalAmount * feeRate).toFixed(2));
+        const netAmount = parseFloat((totalAmount - feeAmount).toFixed(2));
+
+        // Persist expected course & amount breakdown for receipts
+        localStorage.setItem("getpay_expected_course", courseId);
+        localStorage.setItem("getpay_base_amount", netAmount);
+        localStorage.setItem("getpay_fee_amount", feeAmount.toFixed(2));
+        localStorage.setItem("getpay_expected_amount", totalAmount);
+
+        const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
+        const orderInformationUI = config ? config.createOrderInformationUI(courseData, totalAmount, paymentComment) : "";
+        localStorage.setItem("getpay_order_ui", orderInformationUI);
+
+        const feeTag = feeAmount.toFixed(2).replace(".", "_");
+        const clientRequestId = `ORD-${Date.now()}-F35_${feeTag}`;
+        localStorage.setItem("getpay_client_request_id", clientRequestId);
+        localStorage.setItem("getpay_payment_comment", paymentComment);
+
+        const callbacks = config ? config.getCallbackUrls() : { successUrl: "", failUrl: "" };
+        const verifiedImageUrl = config ? config.getImageUrl(courseData.imageUrl) : "";
+        const targetUrl = "payment.html?courseId=" + encodeURIComponent(courseId);
+
+        let navigated = false;
+        function goPayment() {
+          if (navigated) return;
+          navigated = true;
+          window.location.href = targetUrl;
         }
-        ecomCard.addEventListener("pointerenter", warmUp, { once: true, passive: true });
-        ecomCard.addEventListener("touchstart", warmUp, { once: true, passive: true });
-      }
+
+        // Safety fallback navigation: if SDK takes > 2s, proceed anyway
+        const safetyTimer = setTimeout(goPayment, 2200);
+
+        // Official Page 1 Flow: Pre-initialize session into sessionStorage before payment.html opens
+        if (typeof window.GetPay === "function" && config) {
+          try {
+            const options = {
+              userInfo: { name: "", email: "", state: "", country: "", zipcode: "", city: "", address: "" },
+              clientRequestId: clientRequestId,
+              clientRemarks: paymentComment,
+              papInfo: config.PAP_INFO,
+              oprKey: config.OPR_KEY,
+              insKey: config.INS_KEY,
+              websiteDomain: config.WEBSITE_DOMAIN,
+              allowBillingAddressFields: true,
+              price: Number(totalAmount),
+              businessName: courseData.name,
+              imageUrl: verifiedImageUrl,
+              orderInformationUI: orderInformationUI,
+              currency: "NPR",
+              prefill: { name: true, email: true, state: true, city: true, address: true, zipcode: true, country: true },
+              disableFields: { address: false, state: false },
+              themeColor: "#5662FF",
+              baseUrl: config.BASE_URL,
+              callbackUrl: { successUrl: callbacks.successUrl, failUrl: callbacks.failUrl },
+              onSuccess: function (res) {
+                clearTimeout(safetyTimer);
+                console.log("GetPay Page 1 session initialized:", res);
+                goPayment();
+              },
+              onError: function (err) {
+                clearTimeout(safetyTimer);
+                console.warn("GetPay Page 1 session note:", err);
+                goPayment();
+              }
+            };
+
+            const gp = new window.GetPay(options, config.BASE_URL);
+            if (typeof gp.initialize === "function") {
+              gp.initialize();
+            } else {
+              goPayment();
+            }
+          } catch (err) {
+            goPayment();
+          }
+        } else {
+          goPayment();
+        }
+      });
     })();
   </script>
 </body>
