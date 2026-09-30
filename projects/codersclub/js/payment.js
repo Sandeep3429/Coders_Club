@@ -73,8 +73,11 @@
 
     let attempts = 0;
     const maxAttempts = 150; // up to 15 seconds (150 x 100ms)
+    let hasInitialized = false;
 
     function initGetPay() {
+      if (hasInitialized) return;
+
       attempts++;
       if (typeof window.GetPay === "undefined" && typeof window.getpay === "undefined") {
         if (attempts < maxAttempts) {
@@ -91,12 +94,7 @@
         return;
       }
 
-      // Check if GetPay checkout already mounted
-      if (checkoutContainer && checkoutContainer.querySelectorAll("iframe, form, div.checkout-root").length > 0) {
-        console.log("GetPay checkout already rendered automatically by bundle.");
-        removeLoader();
-        return;
-      }
+      hasInitialized = true;
 
       // Payment initialization comment / surcharge disclosure
       const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
@@ -178,14 +176,14 @@
       try {
         options.baseUrl = config.BASE_URL;
         if (typeof window.GetPay === "function") {
-          const gp = new window.GetPay(options);
+          const gp = new window.GetPay(options, config.BASE_URL);
           if (typeof gp.initialize === "function") {
             gp.initialize();
           } else if (typeof gp.init === "function") {
             gp.init();
           }
         } else if (window.getpay && typeof window.getpay.initialize === "function") {
-          window.getpay.initialize(options);
+          window.getpay.initialize(options, config.BASE_URL);
         }
         // Fallback: Remove loader after 2s if mount succeeded
         setTimeout(removeLoader, 2000);

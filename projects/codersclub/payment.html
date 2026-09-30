@@ -12,14 +12,25 @@
     }
   </script>
 
+  <!-- Resource Hints for High-Speed Cold Loading in Incognito -->
+  <link rel="preconnect" href="https://minio-getpay.nchl.com.np" crossorigin>
+  <link rel="dns-prefetch" href="https://minio-getpay.nchl.com.np">
+  <link rel="preconnect" href="https://uat-bank-getpay.nchl.com.np" crossorigin>
+  <link rel="dns-prefetch" href="https://uat-bank-getpay.nchl.com.np">
+
   <!-- Segregated Stylesheet -->
   <link rel="stylesheet" href="css/payment.css">
 </head>
 <body>
 
   <main class="payment-page-container">
-    <!-- GetPay Checkout Mount Element: must be clean and present in DOM before bundle executes -->
-    <div id="checkout"></div>
+    <!-- GetPay Checkout Mount Element -->
+    <div id="checkout">
+      <div id="checkout-loader">
+        <div class="checkout-spinner"></div>
+        <div style="font-weight: 500; font-size: 14px;">Loading Secure Checkout…</div>
+      </div>
+    </div>
     <div id="error-box"></div>
   </main>
 
