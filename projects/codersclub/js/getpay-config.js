@@ -90,20 +90,28 @@
     },
 
     // Generates 100% responsive orderInformationUI HTML string for GetPay SDK
-    createOrderInformationUI: function (course, amount) {
+    createOrderInformationUI: function (course, amount, customNote) {
       const priceVal = amount || course.price;
       const formattedPrice = Number(priceVal).toLocaleString('en-US', { minimumFractionDigits: 2 });
       const imgPath = this.getImageUrl(course.imageUrl);
+      const noteHtml = customNote ? `
+        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569; display: flex; align-items: center; gap: 6px; font-weight: 500;">
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #2563eb; flex-shrink: 0;"></span>
+          <span>${customNote}</span>
+        </div>` : '';
 
       return `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 12px 14px; box-sizing: border-box; width: 100%; max-width: 100%;">
           <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin: 0 0 12px 0;">Order Information</h3>
-          <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; width: 100%;">
-            <img src="${imgPath}" alt="${course.name}" style="width: 48px; height: 48px; min-width: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; flex-shrink: 0;" />
-            <div style="min-width: 0; flex: 1;">
-              <div style="font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-bottom: 4px; word-break: break-word;">${course.name}</div>
-              <div style="font-size: 15px; font-weight: 700; color: #2563eb;">NPR ${formattedPrice}</div>
+          <div style="display: flex; flex-direction: column; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="${imgPath}" alt="${course.name}" style="width: 48px; height: 48px; min-width: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; flex-shrink: 0;" />
+              <div style="min-width: 0; flex: 1;">
+                <div style="font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-bottom: 4px; word-break: break-word;">${course.name}</div>
+                <div style="font-size: 15px; font-weight: 700; color: #2563eb;">NPR ${formattedPrice}</div>
+              </div>
             </div>
+            ${noteHtml}
           </div>
         </div>
       `.trim();

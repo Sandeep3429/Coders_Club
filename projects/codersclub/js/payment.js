@@ -92,8 +92,11 @@
         return;
       }
 
-      // Freshly generate orderInformationUI matching the exact course and amount
-      const orderInformationUI = config.createOrderInformationUI(courseData, amount);
+      // Payment initialization comment / surcharge disclosure
+      const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
+
+      // Freshly generate orderInformationUI matching the exact course, amount, and surcharge notice
+      const orderInformationUI = config.createOrderInformationUI(courseData, amount, paymentComment);
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();
@@ -108,6 +111,7 @@
       // Persist identifier and calculated fee for receipts and downstream verification
       localStorage.setItem("getpay_client_request_id", clientRequestId);
       localStorage.setItem("getpay_fee_amount", feeAmount);
+      localStorage.setItem("getpay_payment_comment", paymentComment);
 
       const options = {
         userInfo: {
@@ -120,7 +124,7 @@
           address: ""
         },
         clientRequestId: clientRequestId,
-        clientRemarks:"TEST-if passess through",
+        clientRemarks: paymentComment,
         papInfo: config.PAP_INFO,
         oprKey: config.OPR_KEY,
         insKey: config.INS_KEY,

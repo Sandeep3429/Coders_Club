@@ -73,7 +73,8 @@
       localStorage.setItem("getpay_expected_course", courseId);
       if (userEmail) localStorage.setItem("getpay_user_email", userEmail);
 
-      const orderInformationUI = config.createOrderInformationUI(selectedCourse, selectedCourse.price);
+      const paymentComment = "Added 3.5% surcharge and Powered by Laxmi Sunrise Bank Limited";
+      const orderInformationUI = config.createOrderInformationUI(selectedCourse, selectedCourse.price, paymentComment);
       localStorage.setItem("getpay_order_ui", orderInformationUI);
 
       const callbacks = config.getCallbackUrls();
@@ -95,6 +96,7 @@
           address: ""
         },
         clientRequestId: clientRequestId,
+        clientRemarks: paymentComment,
         papInfo: config.PAP_INFO,
         oprKey: config.OPR_KEY,
         insKey: config.INS_KEY,
